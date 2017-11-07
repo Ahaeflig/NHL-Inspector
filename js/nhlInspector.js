@@ -19,7 +19,6 @@ function loadTeamsData(){
 
 }
 
-
 $( document ).ready(function() {
     console.log("Document is ready");
-}
+});
