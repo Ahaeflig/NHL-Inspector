@@ -19,9 +19,14 @@ html, body, .container-fluid {
 
 svg {
     height: 100%;
-    width: 100%; 
+    width: 100%;
 }
 
+path.spiral {
+    fill: none;
+    stroke: #000000;
+    stroke-width: 3px;
+}
 
 
 /*Test display with specific colors*/

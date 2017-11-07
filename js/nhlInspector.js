@@ -59,6 +59,38 @@ function placeTeam(prefix){
         .attr("y", cy - s/2);
 }
 
+function drawSpiral(){
+
+    // Get the Spiral SVG
+    const spiralSVG = $('#spiralSVG');
+    const width = spiralSVG.width();
+    const height = spiralSVG.height();
+
+    // Select the number of turn
+    const start = 0;
+    const end = 3;
+
+    const radius = d3.scaleLinear()
+        .domain([start, end])
+        .range([0, d3.min([width,height])/2]);
+
+    const pieces = d3.range(start, end+0.001, (end-start)/31);
+
+    const spiral = d3.radialLine()
+        .curve(d3.curveCardinal)
+        .angle(function(r) {return -2*Math.PI*r;})
+        .radius(radius);
+
+    // Get the spiral graphics
+    const spiralG = d3.select("#spiralG")
+
+    // Move the graphics to the midde of the SVG
+    spiralG.attr("transform", "translate(" + width/2 + "," + (height/2) +")");
+    spiralG.selectAll(".spiral").data([pieces]).enter()
+        .append("path")
+            .attr("class", "spiral")
+            .attr("d", spiral)
+}
 
 // When the document is ready
 $( document ).ready(
@@ -99,6 +131,13 @@ $( document ).ready(
             .attr("xlink:href", "logos/Washington_Capitals_logo.svg");
         placeTeam("other");
 
+        // Initialize spiral
+        const spiralG = d3.select("#leftPanel")
+            .append("svg")
+                .attr("id", "spiralSVG")
+            .append("g")
+                .attr("id", "spiralG");
+        drawSpiral();
     }
 );
 
@@ -108,5 +147,6 @@ $( window ).resize(
         console.log("Windows is resized");
         placeTeam("my");
         placeTeam("other");
+        drawSpiral();
     }
 );
