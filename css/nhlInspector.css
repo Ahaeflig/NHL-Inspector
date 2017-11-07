@@ -1,8 +1,39 @@
-html{
+
+html, body, .container-fluid {
+    height:100%;
     background-color: black;
 }
 
+.container-fluid {
+    width: 100%;
+    box-sizing: border-box;
+}
 
-.popup{
-    
+#mainRow, #leftPanel, #rightPanel{
+    height: 100%;
+}
+
+#myTeam, #otherTeam{
+    height:50%;
+}
+
+svg {
+    height: 100%;
+    width: 100%; 
+}
+
+
+
+/*Test display with specific colors*/
+#leftPanel{
+    background-color: green;
+}
+
+
+#myTeam{
+    background-color: red;
+}
+
+#otherTeam{
+    background-color: blue;
 }
