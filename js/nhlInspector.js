@@ -59,6 +59,8 @@ function placeTeam(prefix){
         .attr("y", cy - s/2);
 }
 
+
+// Draw a blank tunnel spiral in corresponding SVG
 function drawSpiral(){
 
     // Get the Spiral SVG and its dimensions
@@ -66,41 +68,57 @@ function drawSpiral(){
     const width = spiralSVG.width();
     const height = spiralSVG.height();
 
-    // Get the center of the SVG and compute the spiral's radius
-    const cx = width/2;
+    // Get the center of the SVG
+    const cx = width/5 ;
     const cy = height/2;
-    const r = Math.min(height, width)/2 - 20;
 
-    // Choose the number of turn which implies the max theta angle
-    const turns = 3;
-    const thetaMax = turns*2*Math.PI;
-    const dotsNumber = 31;
+    // Define the number of team, the minimum radius of each pills and a
+    // resizing factor. Those value will probably came as input of the function
+    const teamNumber = 31;
 
-    const new_time = [];
-    let sizeBuffer = 0;
+    // Or need to be computated in a clever way
+    const minSize = 20;
+    const sizeFactor = 1;
 
-    for (let i = 0; i < dotsNumber; i++){
+    // Set initial position and value of the sprial
+    let oldTheta = -Math.PI/2;
+    let oldR = 0;
+    let oldX = cx;
+    let oldY = cy;
 
-        const theta = i*thetaMax/(dotsNumber-1);
-        const away = sizeBuffer;
-        const around = theta + 2*Math.PI;
+    // Construct iterativelly all the pills
+    const pills = [];
 
-        const x = cx + Math.cos ( around ) * away;
-        const y = cy + Math.sin ( around ) * away;
-        const r = (dotsNumber-i)*1;
-        sizeBuffer += r;
+    for (let i = 0; i < teamNumber; i++){
 
-        new_time.push({x: x, y: y, r:r});
+        // For now the number of point of a team is define between 31 and 1
+        const teamPoint = (teamNumber-i);
+
+        const theta = oldTheta + Math.PI/10;
+        const r = (minSize+teamPoint)*sizeFactor;
+        const x = oldX + (oldR+r)*Math.cos(theta);
+        const y = oldY + (oldR+r)*Math.sin(theta);
+        const corrX = (x-cx)
+
+        oldTheta = theta;
+        oldR = r;
+        oldX = x;
+        oldY = y;
+
+        pills.push({x: x, y: y, r:r});
     }
 
     // Get the spiral graphics
     const spiralG = d3.select("#spiralG")
 
-    spiralG.selectAll("circle").data(new_time).enter()
+    // Clean the previous drawing if exists and then draw the new one !
+    spiralG.selectAll("circle").remove();
+    spiralG.selectAll("circle").data(pills).enter()
         .append("circle")
             .attr("cx", function (d) { return d.x; })
             .attr("cy", function (d) { return d.y; })
             .attr("r", function (d) { return d.r; });
+
 }
 
 // When the document is ready
