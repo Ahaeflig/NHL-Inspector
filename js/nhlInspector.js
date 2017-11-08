@@ -61,35 +61,46 @@ function placeTeam(prefix){
 
 function drawSpiral(){
 
-    // Get the Spiral SVG
+    // Get the Spiral SVG and its dimensions
     const spiralSVG = $('#spiralSVG');
     const width = spiralSVG.width();
     const height = spiralSVG.height();
 
-    // Select the number of turn
-    const start = 0;
-    const end = 3;
+    // Get the center of the SVG and compute the spiral's radius
+    const cx = width/2;
+    const cy = height/2;
+    const r = Math.min(height, width)/2 - 20;
 
-    const radius = d3.scaleLinear()
-        .domain([start, end])
-        .range([0, d3.min([width,height])/2]);
+    // Choose the number of turn which implies the max theta angle
+    const turns = 3;
+    const thetaMax = turns*2*Math.PI;
+    const dotsNumber = 31;
 
-    const pieces = d3.range(start, end+0.001, (end-start)/31);
+    const new_time = [];
+    let sizeBuffer = 0;
 
-    const spiral = d3.radialLine()
-        .curve(d3.curveCardinal)
-        .angle(function(r) {return -2*Math.PI*r;})
-        .radius(radius);
+    for (let i = 0; i < dotsNumber; i++){
+
+        const theta = i*thetaMax/(dotsNumber-1);
+        const away = sizeBuffer;
+        const around = theta + 2*Math.PI;
+
+        const x = cx + Math.cos ( around ) * away;
+        const y = cy + Math.sin ( around ) * away;
+        const r = (dotsNumber-i)*1;
+        sizeBuffer += r;
+
+        new_time.push({x: x, y: y, r:r});
+    }
 
     // Get the spiral graphics
     const spiralG = d3.select("#spiralG")
 
-    // Move the graphics to the midde of the SVG
-    spiralG.attr("transform", "translate(" + width/2 + "," + (height/2) +")");
-    spiralG.selectAll(".spiral").data([pieces]).enter()
-        .append("path")
-            .attr("class", "spiral")
-            .attr("d", spiral)
+    spiralG.selectAll("circle").data(new_time).enter()
+        .append("circle")
+            .attr("cx", function (d) { return d.x; })
+            .attr("cy", function (d) { return d.y; })
+            .attr("r", function (d) { return d.r; });
 }
 
 // When the document is ready
