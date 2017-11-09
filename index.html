@@ -22,6 +22,11 @@
 <body>
     <div class="container-fluid">
 
+        <nav class="navbar navbar-light bg-faded ">
+            <button type="button" class="btn btn-outline-success" data-toggle="modal" data-target="#teamSelection">Select Your Team</button>
+        </nav>
+
+
         <!-- Modal Popup for favorite team selection-->
         <div class="modal fade" id="teamSelection" role="dialog">
             <div class="modal-dialog">
@@ -41,9 +46,7 @@
         <!----------------------------------------------->
 
         <div id="mainRow" class="row">
-            <div id="leftPanel" class="col-lg-8 no-float">
-                <!--<button type="button" class="btn btn-info btn-lg" data-toggle="modal" data-target="#teamSelection">Select Team</button>-->
-            </div>
+            <div id="leftPanel" class="col-lg-8 no-float"></div>
             <div id="rightPanel" class="col-lg-4 no-float">
                 <div id="myTeam" class="row"></div>
                 <div id="otherTeam" class="row"></div>
