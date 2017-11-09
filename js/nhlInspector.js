@@ -18,6 +18,11 @@ function loadTeamsData(){
     return teamLoaded;
 }
 
+// Clean the teamsData it receive as input and return a JS Object which contains:
+// name : the name of the team
+// logo : the corresponding logo String path
+// ... TODO To complete
+// What Assume on the sort ?
 function cleanTeamsData(teamsData){
 
     // TODO by Adan
@@ -50,13 +55,6 @@ function createTeamSelectorCarousel(teams) {
             );
     }
 }
-/*
-<div class="">
-    <h3>...</h3>
-    <p>...</p>
-  </div>
-
-*/
 
 // Place a Team Logo at the middle of the corresponding SVG.
 // It addapts the logo size to fit a circle of radius svg.width/4
