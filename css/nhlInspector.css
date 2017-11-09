@@ -9,7 +9,7 @@ html, body, .container-fluid {
 }
 
 .modal-title{
-    color: #e9ecef; 
+    color: #e9ecef;
 }
 
 .modal-content{
@@ -41,6 +41,7 @@ svg {
     height: 100%;
     width: 100%;
 }
+
 
 path.spiral {
     fill: none;

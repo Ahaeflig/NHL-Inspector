@@ -110,9 +110,9 @@ function getCleanedTeams(data){
     // Just 30 minimal team now to visualize
     const teams = [];
     for (let i = 0; i< 10; i++){
-        teams.push({name:"Arizona Coyotes", logo:"logos/Arizona_Coyotes_logo.svg"});
-        teams.push({name:"Anaheim Ducks", logo:"logos/Anaheim_Ducks_logo.svg"});
-        teams.push({name:"Boston Bruins", logo:"logos/Boston_Bruins_logo.svg"});
+        teams.push({name:"Arizona Coyotes", logo:"logos/Arizona_Coyotes_logo.svg", id:"arz"});
+        teams.push({name:"Anaheim Ducks", logo:"logos/Anaheim_Ducks_logo.svg", id:"anh"});
+        teams.push({name:"Boston Bruins", logo:"logos/Boston_Bruins_logo.svg", id:"bst"});
     }
     return teams;
 }
@@ -210,7 +210,10 @@ function drawSpiral(teams){
 
     // Get the number of team, the minimum radius of each pills and a
     // resizing factor.
+
     const teamNumber = teams.length;
+    //const teamNumber = 3;
+
     // Probably need to be computated in a clever way
     const minSize = 20;
     const sizeFactor = 1;
@@ -238,7 +241,7 @@ function drawSpiral(teams){
         const rCorr = r/2;
         const s = r+rCorr;
 
-        pills.push({x: x, y: y, r:r, s:s, logo:teams[i].logo});
+        pills.push({x: x, y: y, r:r, s:s, logo:teams[i].logo, name:teams[i].name, id:teams[i].id});
 
         // Update the previous value
         oldTheta = theta;
@@ -250,21 +253,138 @@ function drawSpiral(teams){
     // Get the spiral graphics
     const spiralG = d3.select("#spiralG")
 
-    // Clean the previous drawing if exists and then draw the new one !
-    // (Circle and images)
+    var defs = spiralSVG.append("defs");
+
+
     spiralG.selectAll("circle").remove();
     spiralG.selectAll("image").remove();
+
     const test = spiralG.selectAll("circle").data(pills).enter();
-    test.append("circle")
+
+
+
+var circle = test.append("circle")
+        .attr("id", function(d){
+          console.log(d.id+"c");
+          return d.id+"c";
+        })
         .attr("cx", function (d) { return d.x; })
         .attr("cy", function (d) { return d.y; })
-        .attr("r", function (d) { return d.r; })
+        .attr("r", function (d) { return d.r; });
+
+
+    test.selectAll("circle")
+        .attr('stroke', 'yellow')
+        .attr('stroke-width', 0)
+        /*
+        .on("mouseenter", function(){
+          //console.log("mouseenter");
+          d3.select(this)
+            .transition()
+            //.ease('elastic')
+            .duration(200)
+            .attr("r", function (d) {return d.r*1.5;})
+            .attr('stroke-width',5)
+          d3.select(function(d){
+            return '\x22#'+d.id+'i\x22';
+          })
+            .transition()
+            //.ease('elastic')
+            .duration(200)
+            .attr("width", function (d) {return d.s*1.5;})
+            .attr("height", function (d) {return d.s*1.5;})
+            .attr("x", function (d) { return d.x - d.s*1.5/2; })
+            .attr("y", function (d) { return d.y - d.s*1.5/2; })
+        })
+        .on("mouseleave", function(){
+          //console.log("mouseleave");
+          d3.select(this)
+            .transition()
+            //.ease('elastic')
+            .duration(200)
+            .attr("r", function (d) {return d.r;})
+            .attr('stroke-width',0)
+          d3.select(function(d){
+            return '\x22#'+d.id+'i\x22';
+          })
+            .transition()
+            //.ease('elastic')
+            .duration(200)
+            .attr("width", function (d) {return d.s;})
+            .attr("height", function (d) { return d.s;})
+            .attr("x", function (d) { return d.x - d.s/2; })
+            .attr("y", function (d) { return d.y - d.s/2; })
+        })
+        //*/
+        ;
+
+
+
+
     test.append("image")
+        .attr("id", function(d){
+          console.log(d.id+"i");
+          return d.id+"i";
+        })
         .attr("width", function (d) { return d.s;})
         .attr("height", function (d) { return d.s;})
         .attr("x", function (d) { return d.x - d.s/2; })
         .attr("y", function (d) { return d.y - d.s/2; })
-        .attr("xlink:href", function (d){ return d.logo; });
+        .attr("xlink:href", function (d){ return d.logo; })
+        //*
+        .on("mouseenter", function(){
+          //console.log("mouseenter");
+          d3.select(this)
+            .transition()
+            //.ease('elastic')
+            .duration(200)
+            .attr("width", function (d) { return d.s*2;})
+            .attr("height", function (d) { return d.s*2;})
+            .attr("x", function (d) { return d.x - d.s*2/2; })
+            .attr("y", function (d) { return d.y - d.s*2/2; })
+          })
+          /*
+          d3.select(function(d){
+            return '\x22#'+d.id+'c\x22';
+          })
+            .transition()
+            //.ease('elastic')
+            .duration(200)
+            .attr("r", function (d) { return d.r*1.5;})
+            .attr('stroke-width',5)
+        })
+
+        //*/
+        .on("mouseleave", function(){
+          //console.log("mouseleave");
+          d3.select(this)
+              .transition()
+              //.ease('elastic')
+              .duration(200)
+              .attr("width", function (d) { return d.s;})
+              .attr("height", function (d) { return d.s;})
+              .attr("x", function (d) { return d.x - d.s/2; })
+              .attr("y", function (d) { return d.y - d.s/2; })
+            })
+          /*
+          d3.select(function(d){
+            return '\x22#'+d.id+'c\x22';
+          })
+              .transition()
+              //.ease('elastic')
+              .duration(200)
+              .attr("r", function (d) { return d.r;})
+              .attr('stroke-width',0)
+        })
+        //*/
+        ;
+    test.append("text")
+      .attr("class", "nodetext")
+      .attr("x", 40)
+      .attr("y", 40)
+      .attr("fill", "black")
+      .text(function(d){return d.name});
+    //*/
 }
 
 // Is called when the document is ready
