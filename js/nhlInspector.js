@@ -11,12 +11,10 @@ function loadTeamsData(){
         function(response){
             console.log("Data Loaded");
             console.log(response);
-            $("#team").html(String(response.records[0].teamRecords[1].team.name));
             console.log(response.records[0].teamRecords[1].team.name);
             teamLoaded = response;
 	    }
     );
-
     return teamLoaded;
 }
 
