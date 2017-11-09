@@ -9,39 +9,6 @@ const WARNING = true
 const ERROR = true;
 
 /**
-* Print a message inside the console if MESSAGE = true
-* @param str (String): The message string to print
-*/
-const message = function(str){
-    if(MESSAGE) console.log(str);
-}
-
-/**
-* Print a debug message inside the console if DEBUG = true
-* @param str (String): The debug string to print
-*/
-const debug = function(str){
-    if(DEBUG) console.log(str);
-}
-
-/**
-* Print a warning message inside the console if WARNING = true
-* @param str (String): The warning string to print
-*/
-const warning = function(str){
-    if(WARNING) console.log(str);
-}
-
-/**
-* Print an error message inside the console if ERROR = true
-* @param str (String): The error string to print
-*/
-const error = function(str){
-    if(ERROR) console.log(str);
-}
-
-
-/**
 * Load NHL data from statsapi.web.nhl.com
 * Use ajax and done() callback
 * the ajax's url can be custumised using parameters i.e:
@@ -62,14 +29,54 @@ function loadNHLData(){
 		url: 'https://statsapi.web.nhl.com/api/v1/standings?expand=standings.team&season=20172018&date=2017-10-10'
     }).done(
         function(response){
-            message("Data Loaded");
+            if(MESSAGE) console.log("Data Loaded");
             // Test of the returned structure
-            debug(response);
-            debug(response.records[0].teamRecords[1].team.name);
+            if(DEBUG) console.log(response);
+            if(DEBUG) console.log(response.records[0].teamRecords[1].team.name);
             dataLoaded = response;
 	    }
     );
     return dataLoaded;
+}
+
+/**
+* Locally store the id of the user favorite team
+* @param id (int): the id to store
+*/
+function locallyStoreFavoriteTeamId(id){
+    localStorage.setItem("id", id);
+}
+
+/**
+* @return (int): the user favorite team id
+*/
+const myFavoriteTeamId = function(){
+    return localStorage.getItem("id");
+}
+
+/**
+* Locally Store all team
+* @param teams (Array of team): the array of team to stringify
+*/
+function locallyStoreTeams(teams){
+    localStorage.setItem("teams", JSON.stringify(teams));
+}
+
+/**
+* Return All the stored team inside an array of teams
+* @return (Array of team): the parsed array of teams
+*/
+function teams(){
+    return JSON.parse(localStorage.getItem("teams"));
+}
+
+/**
+* Return a specific stored team
+* @param id (int): The id of the team to return
+* @return (team): the parsed team at index i of stored teams
+*/
+function team(id){
+    return JSON.parse(localStorage.getItem("teams"))[id];
 }
 
 
@@ -85,7 +92,6 @@ function getCleanedGlobalData(data){
     // TODO by Adan
     return data;
 }
-
 
 /**
 * Get and Clean the teams data inside the received input data and return an
@@ -164,19 +170,24 @@ function placeTeam(prefix, team){
     const cx = width/2;
     const cy = height/2;
 
-    // Update the circle position and size
-    d3.select("#"+prefix+"TeamC")
-        .attr("cx", cx)
-        .attr("cy", cy)
-        .attr("r", r);
+    if(team != null){
+        // Update the circle position and size
+        d3.select("#"+prefix+"TeamC")
+            .attr("cx", cx)
+            .attr("cy", cy)
+            .attr("r", r);
 
-    // Compute the Logo dimension and position
-    const s = r+rCorr;
-    d3.select("#"+prefix+"TeamL")
-        .attr("width", s)
-        .attr("height", s)
-        .attr("x", cx - s/2)
-        .attr("y", cy - s/2);
+        // Compute the Logo dimension and position
+        const s = r+rCorr;
+        d3.select("#"+prefix+"TeamL")
+            .attr("width", s)
+            .attr("height", s)
+            .attr("x", cx - s/2)
+            .attr("y", cy - s/2)
+            .attr("xlink:href", team.logo);
+    }else{
+        if(WARNING) console.log(prefix+"Team is null !")
+    }
 }
 
 /**
@@ -259,7 +270,7 @@ function drawSpiral(teams){
 // Is called when the document is ready
 $( document ).ready(
     function(){
-        message("Document is Ready");
+        if(MESSAGE) console.log("Document is Ready");
 
         // Load the teams using ajax
         const loadedData = loadNHLData();
@@ -267,6 +278,11 @@ $( document ).ready(
         const cleanedTeams = getCleanedTeams(loadedData);
         // Construnct the team carousel
         const teamSelectorCarousel = createTeamSelectorInCarousel(cleanedTeams);
+
+        // Store locally the teams values
+        locallyStoreFavoriteTeamId(-1);
+        locallyStoreTeams(cleanedTeams);
+
 
         // Everyting will be inside a SVG html element
         // Initialize myTeamSVG and myTeamG
@@ -281,9 +297,8 @@ $( document ).ready(
             .attr("id", "myTeamC")
         myTeamG.append("image")
             .attr("id", "myTeamL")
-            .attr("xlink:href", "logos/San_Jose_Sharks_logo.svg");
         // Place myTeamG in a dynamic way
-        placeTeam("my");
+        placeTeam("my", team(myFavoriteTeamId()));
 
         // Initialize otherTeamSVG and oterTeamG
         const otherTeamG = d3.select("#otherTeam")
@@ -296,9 +311,8 @@ $( document ).ready(
             .attr("id", "otherTeamC")
         otherTeamG.append("image")
             .attr("id", "otherTeamL")
-            .attr("xlink:href", "logos/Washington_Capitals_logo.svg");
         // Place otherTeamG in a dynamic way
-        placeTeam("other");
+        placeTeam("other", team(myFavoriteTeamId()));
 
         // Initialize spiral
         const spiralG = d3.select("#leftPanel")
@@ -307,19 +321,24 @@ $( document ).ready(
             .append("g")
                 .attr("id", "spiralG");
         // Place spiralG in a dynamic way.
-        drawSpiral(cleanedTeams);
+        drawSpiral(teams());
+
+        $("#teamSelection").on("hidden.bs.modal", function () {
+            const index = $('#teamSelectorCarousel li.active').attr('data-slide-to');
+            locallyStoreFavoriteTeamId(index);
+            placeTeam("my", team(index));
+        });
 
     }
 );
 
+
 // When the window is resized
 $( window ).resize(
     function() {
-        message("Windows is resized");
-        placeTeam("my");
+        if(MESSAGE) console.log("Windows is resized");
+        placeTeam("my", team(myFavoriteTeamId()));
         placeTeam("other");
-        // TODO Need the teams data... so decide if we put a global constant or
-        // if we provide a constant function that return the data without recomputing it
-        //drawSpiral(teams);
+        drawSpiral(teams());
     }
 );
