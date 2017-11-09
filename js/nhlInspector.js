@@ -23,10 +23,42 @@ function loadTeamsData(){
 function cleanTeamsData(teamsData){
 
     // TODO by Adan
-
-    return teamsData;
+    // Please include a team.logo with the corresponding logo path !
+    // Just 3 minimal team now
+    const teams = [];
+    for (let i = 0; i< 10; i++){
+        teams.push({name:"Arizona Coyotes", logo:"logos/Arizona_Coyotes_logo.svg"});
+        teams.push({name:"Anaheim Ducks", logo:"logos/Anaheim_Ducks_logo.svg"});
+        teams.push({name:"Boston Bruins", logo:"logos/Boston_Bruins_logo.svg"});
+    }
+    return teams;
 }
 
+// Create the team selector as a bootstrap carousel
+function createTeamSelectorCarousel(teams) {
+
+    const indicators = $('#teamSelectorCarouselIndicators');
+    const inner = $('#teamSelectorCarouselInner');
+
+    for (let i = 0; i< teams.length; i++) {
+
+        const active = i == 0 ? " active" : "";
+        indicators.append($('<li data-target="#teamSelectorCarousel" data-slide-to="'+i+'">').addClass(active));
+        inner.append($('<a>').addClass("carousel-item"+active)
+                .append($('<img>').addClass("carousel-img d-block img-fluid").attr('src',teams[i].logo))
+                .append($('<div>').addClass("carousel-caption d-none d-md-block")
+                    .append($('<h3>').addClass("").text(teams[i].name))
+                )
+            );
+    }
+}
+/*
+<div class="">
+    <h3>...</h3>
+    <p>...</p>
+  </div>
+
+*/
 
 // Place a Team Logo at the middle of the corresponding SVG.
 // It addapts the logo size to fit a circle of radius svg.width/4
@@ -131,6 +163,8 @@ $( document ).ready(
         // Parse and clean the teams keeping needed data
         const cleanedTeams = cleanTeamsData(loadedTeams);
 
+        const teamSelectorCarousel = createTeamSelectorCarousel(cleanedTeams);
+
         // Everyting will be inside a SVG html element
         // Initialize myTeamDrawing
         const myTeamG = d3.select("#myTeam")
@@ -167,6 +201,7 @@ $( document ).ready(
             .append("g")
                 .attr("id", "spiralG");
         drawSpiral();
+
     }
 );
 
