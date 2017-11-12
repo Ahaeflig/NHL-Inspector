@@ -8,6 +8,44 @@ const DEBUG = true;
 const WARNING = true
 const ERROR = true;
 
+//TODO check if need to use ids at some point
+const LOGO_DICT = {
+  "Washington Capitals" : "logos/Washington_Capitals_logo.svg",
+  "New Jersey Devils" : "logos/New_Jersey_Devils_logo.svg",
+  "Columbus Blue Jackets" : "logos/Columbus_Blue_Jackets_logo.svg",
+  "Philadelphia Flyers" : "logos/Philadelphia_Flyers_logo.svg",
+  "Carolina Hurricanes" : "logos/Carolina_Hurricanes_logo.svg",
+  "New York Islanders" : "logos/New_York_Islanders_logo.svg",
+  "Pittsburgh Penguins" : "logos/Pittsburgh_Penguins_logo.svg",
+  "New York Rangers" : "logos/New_York_Rangers_logo.svg",
+  "Toronto Maple Leafs" : "logos/Toronto_Maple_Leafs_logo.svg",
+  "Tampa Bay Lightning" : "logos/Tampa_Bay_Lightning_logo.svg",
+  "Detroit Red Wings" : "logos/Detroit_Red_Wings_logo.svg",
+  "Ottawa Senators" : "logos/Ottawa_Senators_logo.svg",
+  "Boston Bruins" : "logos/Boston_Bruins_logo.svg",
+  "Florida Panthers" : "logos/Florida_Panthers_logo.svg",
+  "Montréal Canadiens" : "logos/Montreal_Canadiens_logo.svg",
+  "Buffalo Sabres" : "logos/Buffalo_Sabres_logo.svg",
+  "St. Louis Blues" : "logos/St_Louis_Blues_logo.svg",
+  "Chicago Blackhawks" : "logos/Chicago_Blackhawks_logo.svg",
+  "Colorado Avalanche" : "logos/Colorado_Avalanche_logo.svg",
+  "Nashville Predators" : "logos/Nashville_Predators_logo.svg",
+  "Winnipeg Jets" : "logos/Winnipeg_Jets_logo.svg",
+  "Dallas Stars" : "logos/Dallas_Stars_logo.svg",
+  "Minnesota Wild" : "logos/Minnesota_Wild_logo.svg",
+  "Vegas Golden Knights" : "logos/Vegas_Golden_Knights_logo.svg",
+  "Los Angeles Kings" : "logos/Los_Angeles_Kings_logo.svg",
+  "Calgary Flames" : "logos/Calgary_Flames_logo.svg",
+  "Vancouver Canucks" : "logos/Vancouver_Canucks_logo.svg",
+  "Anaheim Ducks" : "logos/Anaheim_Ducks_logo.svg",
+  "Edmonton Oilers" : "logos/Edmonton_Oilers_logo.svg",
+  "Arizona Coyotes" : "logos/Arizona_Coyotes_logo.svg",
+  "San Jose Sharks" : "logos/San_Jose_Sharks_logo.svg"
+}
+
+
+
+
 /**
 * Load NHL data from statsapi.web.nhl.com
 * Use ajax and done() callback
@@ -21,22 +59,12 @@ const ERROR = true;
 */
 function loadNHLData(){
 
-    let dataLoaded;
-
-    $.ajax(
+    return $.getJSON(
     {
-        type: "GET",
-		url: 'https://statsapi.web.nhl.com/api/v1/standings?expand=standings.team&season=20172018&date=2017-10-10'
-    }).done(
-        function(response){
-            if(MESSAGE) console.log("Data Loaded");
-            // Test of the returned structure
-            if(DEBUG) console.log(response);
-            if(DEBUG) console.log(response.records[0].teamRecords[1].team.name);
-            dataLoaded = response;
-	    }
-    );
-    return dataLoaded;
+      type: "GET",
+  		url: 'https://statsapi.web.nhl.com/api/v1/standings?expand=standings.team&season=20172018&date=2017-10-10'
+    });
+
 }
 
 /**
@@ -83,13 +111,55 @@ function team(id){
 /**
 * Get and clean some global data from the input data
 * @assume data is the output of @see loadNHLData
-* @param data (): TODO to complete
+* @param data (): whole JSON data
 * @return the cleaned global data as a JS Object which contains:
-*   - TODO to complete
-*   -
+*    -TBD
 */
 function getCleanedGlobalData(data){
-    // TODO by Adan
+
+    conferenceData = data.records
+    var teams = [];
+
+    //Fill Array with team values
+    for (let conf=0; conf < conferenceData.length; ++conf) {
+      for (let i=0; i < conferenceData[conf]["teamRecords"].length; ++i) {
+
+          // TODO refactor if needed and chose correct stats
+          let teamName = conferenceData[conf]["teamRecords"][i].team.name
+          let points = conferenceData[conf]["teamRecords"][i].points
+          let gamesPlayed = conferenceData[conf]["teamRecords"][i]["gamesPlayed"]
+          let wins = conferenceData[conf]["teamRecords"][i]["leagueRecord"].wins
+          let overtime = conferenceData[conf]["teamRecords"][i]["leagueRecord"].ot
+          let losses = conferenceData[conf]["teamRecords"][i]["leagueRecord"].losses
+          let goalAgainst = conferenceData[conf]["teamRecords"][i].goalsAgainst
+          let goalScored = conferenceData[conf]["teamRecords"][i].goalsScored
+          let divisionRank = conferenceData[conf]["teamRecords"][i].divisionRank
+          let conferenceRank = conferenceData[conf]["teamRecords"][i].conferenceRank
+          let leagueRank = conferenceData[conf]["teamRecords"][i].leagueRank
+          let wildCardRank = conferenceData[conf]["teamRecords"][i].wildCardRank
+
+          teams.push({
+            "name":teamName,
+            "logo":LOGO_DICT[teamName],
+            "point":points,
+            "teamName":teamName,
+            "points":points,
+            "gamesPlayed":gamesPlayed,
+            "wins":wins,
+            "overtime":overtime,
+            "losses ":losses,
+            "goalAgainst":goalAgainst,
+            "goalScored ":goalScored,
+            "divisionRank":divisionRank,
+            "conferenceRank":conferenceRank,
+            "leagueRank":leagueRank,
+            "wildCardRank":wildCardRank,
+          })
+
+      }
+    }
+
+
     return data;
 }
 
@@ -98,23 +168,31 @@ function getCleanedGlobalData(data){
 * array of teams where a team is a JS Object which contains:
 * - name : the name of the team
 * - logo : the corresponding logo String path
-* - ... TODO To complete
-* @assume on the input sort ? TODO to complete
-* @param data (): TODO to complete
-* @return the cleaned data as an array of teams
+* - point : the current league score of the team
+* @assume ouput is sorted decreasingly by point
+* @param data (): The parsed JSON object with nhl league data
+* @return the cleaned data as an array of teams sorted by point decreasingly
 */
 function getCleanedTeams(data){
 
-    // TODO by Adan
-    // Please include a team.logo with the corresponding logo path !
-    // Just 30 minimal team now to visualize
-    const teams = [];
-    for (let i = 0; i< 10; i++){
-        teams.push({name:"Arizona Coyotes", logo:"logos/Arizona_Coyotes_logo.svg"});
-        teams.push({name:"Anaheim Ducks", logo:"logos/Anaheim_Ducks_logo.svg"});
-        teams.push({name:"Boston Bruins", logo:"logos/Boston_Bruins_logo.svg"});
+  conferenceData = data.records
+  var teams = [];
+
+  //Fill Array with team values
+  for (let conf=0; conf < conferenceData.length; ++conf) {
+    for (let i=0; i < conferenceData[conf]["teamRecords"].length; ++i) {
+        let teamName = conferenceData[conf]["teamRecords"][i].team.name
+        let points = conferenceData[conf]["teamRecords"][i].points
+        teams.push({name:teamName, logo:LOGO_DICT[teamName], point:points})
     }
-    return teams;
+  }
+
+  //Sort array by team points decreasing
+  teams.sort(function(a,b) {
+    return b.point - a.point;
+  });
+
+  return teams;
 }
 
 /**
@@ -267,70 +345,82 @@ function drawSpiral(teams){
         .attr("xlink:href", function (d){ return d.logo; });
 }
 
-// Is called when the document is ready
-$( document ).ready(
-    function(){
-        if(MESSAGE) console.log("Document is Ready");
 
-        // Load the teams using ajax
-        const loadedData = loadNHLData();
-        // Parse and clean the data into an array
-        const cleanedTeams = getCleanedTeams(loadedData);
-        // Construnct the team carousel
-        const teamSelectorCarousel = createTeamSelectorInCarousel(cleanedTeams);
+function init() {
+  if(MESSAGE) console.log("Document is Ready");
 
-        // Store locally the teams values
-        locallyStoreFavoriteTeamId(-1);
-        locallyStoreTeams(cleanedTeams);
+  // Load the teams using ajax
+  loadedData = loadNHLData();
+  // Parse and clean the data into an array
+
+  loadedData.done(function(response) {
+
+    cleanedTeams = getCleanedTeams(response);
+    // Construnct the team carousel
+    teamSelectorCarousel = createTeamSelectorInCarousel(cleanedTeams);
+
+    // Store locally the teams values
+    locallyStoreFavoriteTeamId(-1);
+    locallyStoreTeams(cleanedTeams);
+
+    // Everyting will be inside a SVG html element
+    // Initialize myTeamSVG and myTeamG
+    const myTeamG = d3.select("#myTeam")
+    .append('svg')
+    .attr("id", "myTeamSVG")
+    .append("g")
+    .attr("id", "myTeamG");
+
+    // Append the myTeamC circle and the myTeamL logo
+    myTeamG.append("circle")
+    .attr("id", "myTeamC")
+    myTeamG.append("image")
+    .attr("id", "myTeamL")
+    // Place myTeamG in a dynamic way
+    placeTeam("my", team(myFavoriteTeamId()));
+
+    // Initialize otherTeamSVG and oterTeamG
+    const otherTeamG = d3.select("#otherTeam")
+    .append('svg')
+    .attr("id", "otherTeamSVG")
+    .append("g")
+    .attr("id", "otherTeamG");
+    // Append the otherTeamC circle and the otherTeamL logo
+    otherTeamG.append("circle")
+    .attr("id", "otherTeamC")
+    otherTeamG.append("image")
+    .attr("id", "otherTeamL")
+    // Place otherTeamG in a dynamic way
+    placeTeam("other", team(myFavoriteTeamId()));
+
+    // Initialize spiral
+    const spiralG = d3.select("#leftPanel")
+    .append("svg")
+    .attr("id", "spiralSVG")
+    .append("g")
+    .attr("id", "spiralG");
+    // Place spiralG in a dynamic way.
+    drawSpiral(teams());
+
+    $("#teamSelection").on("hidden.bs.modal", function () {
+      const index = $('#teamSelectorCarousel li.active').attr('data-slide-to');
+      locallyStoreFavoriteTeamId(index);
+      placeTeam("my", team(index));
+    });
 
 
-        // Everyting will be inside a SVG html element
-        // Initialize myTeamSVG and myTeamG
-        const myTeamG = d3.select("#myTeam")
-            .append('svg')
-                .attr("id", "myTeamSVG")
-            .append("g")
-                .attr("id", "myTeamG");
 
-        // Append the myTeamC circle and the myTeamL logo
-        myTeamG.append("circle")
-            .attr("id", "myTeamC")
-        myTeamG.append("image")
-            .attr("id", "myTeamL")
-        // Place myTeamG in a dynamic way
-        placeTeam("my", team(myFavoriteTeamId()));
+    //TEST TODO remove
 
-        // Initialize otherTeamSVG and oterTeamG
-        const otherTeamG = d3.select("#otherTeam")
-            .append('svg')
-                .attr("id", "otherTeamSVG")
-            .append("g")
-                .attr("id", "otherTeamG");
-        // Append the otherTeamC circle and the otherTeamL logo
-        otherTeamG.append("circle")
-            .attr("id", "otherTeamC")
-        otherTeamG.append("image")
-            .attr("id", "otherTeamL")
-        // Place otherTeamG in a dynamic way
-        placeTeam("other", team(myFavoriteTeamId()));
+    cleanedTeams = getCleanedGlobalData(response);
 
-        // Initialize spiral
-        const spiralG = d3.select("#leftPanel")
-            .append("svg")
-                .attr("id", "spiralSVG")
-            .append("g")
-                .attr("id", "spiralG");
-        // Place spiralG in a dynamic way.
-        drawSpiral(teams());
+  }
 
-        $("#teamSelection").on("hidden.bs.modal", function () {
-            const index = $('#teamSelectorCarousel li.active').attr('data-slide-to');
-            locallyStoreFavoriteTeamId(index);
-            placeTeam("my", team(index));
-        });
+).fail(console.log("failed"))
 
-    }
-);
+
+
+}
 
 
 // When the window is resized
