@@ -251,7 +251,7 @@ function drawSpiral(teams){
 
 
 
-var circle = test.append("circle")
+    var circle = test.append("circle")
         .attr("id", function(d){
           return d.id+"c";
         })
@@ -305,13 +305,11 @@ var circle = test.append("circle")
         //*/
         ;
 
-
-
-
     test.append("image")
-        .attr("id", function(d){
+        /*.attr("id", function(d){
+          console.log(d.id);
           return d.id+"i";
-        })
+        })*/
         .attr("width", function (d) { return d.s;})
         .attr("height", function (d) { return d.s;})
         .attr("x", function (d) { return d.x - d.s/2; })
@@ -329,13 +327,16 @@ var circle = test.append("circle")
             .attr("x", function (d) { return d.x - d.s*2/2; })
             .attr("y", function (d) { return d.y - d.s*2/2; });
 
-          /*test.append("text")
-            .attr("id", function(d){return "t"+d.name})
+          d3.select(this).append("text")
+            .attr("id", function(d){return "t_"+d.id})
             .attr("class", "nodetext")
-            .attr("x", 40)
-            .attr("y", 40)
+            .attr("x", function(d) { d.x - 30;})
+            .attr("y", function(d) { d.y - 15;})
             .attr("fill", "black")
-            .text(function(d){return d.name;console.log(d.name)});*/
+            .text(function(d){
+              console.log(d.id);
+              return d.name;
+            })
           })
           /*
           d3.select(function(d){
@@ -358,9 +359,9 @@ var circle = test.append("circle")
               .attr("width", function (d) { return d.s;})
               .attr("height", function (d) { return d.s;})
               .attr("x", function (d) { return d.x - d.s/2; })
-              .attr("y", function (d) { return d.y - d.s/2; });
+              .attr("y", function (d) {return d.y - d.s/2; });
 
-        //  d3.select(function(d){return "#t"+d.name}).remove();
+          d3.select(this).selectAll(function(d){console.log("out " + d.id);return "#t_"+d.id;}).remove();
             })
           /*
           d3.select(function(d){
@@ -458,7 +459,8 @@ function getCleanedTeams(data){
     for (let i=0; i < conferenceData[conf]["teamRecords"].length; ++i) {
         let teamName = conferenceData[conf]["teamRecords"][i].team.name
         let points = conferenceData[conf]["teamRecords"][i].points
-        teams.push({name:teamName, logo:LOGO_DICT[teamName], point:points})
+        let id = conferenceData[conf]["teamRecords"][i].team.id
+        teams.push({name:teamName, logo:LOGO_DICT[teamName], point:points, id:id})
     }
   }
 
