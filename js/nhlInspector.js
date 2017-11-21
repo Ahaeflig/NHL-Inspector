@@ -122,18 +122,65 @@ function createTeamSelectorInCarousel(teams) {
     const inner = $('#teamSelectorCarouselInner');
 
     for (let i = 0; i< teams.length; i++) {
-
         const active = i == 0 ? " active" : "";
         indicators.append($('<li data-target="#teamSelectorCarousel" data-slide-to="'+i+'">').addClass(active));
-        inner.append($('<a>').addClass("carousel-item"+active)
+        inner.append($('<a>').addClass("slide carousel-item"+active)
             .append($('<img>').addClass("carousel-img d-block img-fluid").attr('src',teams[i].logo))
             .append($('<div>').addClass("carousel-caption d-none d-md-block")
                 .append($('<h3>').addClass("").text(teams[i].name))
             )
         );
     }
-    return $('#teamSelectorCarousel')
+    return $('#teamSelectorCarousel').bind('mousewheel', function(e) {
+        if(e.originalEvent.wheelDelta /120 > 0) {
+            $(this).carousel('next');
+        } else {
+            $(this).carousel('prev');
+        }
+    });
 }
+
+/**
+* Create the team selector inside an existing teamSelectorGrid
+* This method create a clickable image grid of 4x8
+* with a random img which is linked to an existing teamSelectorCarousel
+* @assume #teamSelectorGrid exists as a main grid div
+* @assume #teamSelectorCarousel exists as a main carousel div
+* @assume also the complete carousel's structure exists: i.e
+* we can access the indicators list and the inner div using jQuery on
+* #teamSelectorCarouselIndicators and #teamSelectorCarouselInner id.
+* @param teams (): An array of all teams @see getCleanedTeams
+* @return the #teamSelectorGrid div
+*/
+function createTeamSelectorInGrid(teams) {
+    const $grid = $('<table align="center">');
+    for(let row = 0; row < 4; row++){
+        $row = $('<tr>');
+        for(let col = 0; col < 8; col++){
+            const i = row*8+col-1;
+            if(i < 0){
+                $row.append($("<td>")
+                    .append($('<input type="image">').addClass("grid-img").attr('src', "logos/random_team_logo.svg")
+                        .click(function(){
+                            const r = Math.floor(Math.random() * 31);
+                            $('#teamSelectorCarousel').carousel(r)
+                        }))
+                );
+            }else{
+                $row.append($("<td>")
+                    .append($('<input type="image">').addClass("grid-img").attr('src',teams[i].logo)
+                        .click(function(){$('#teamSelectorCarousel').carousel(i)}))
+                );
+            }
+        }
+        $grid.append($row);
+    }
+    return $('#teamSelectorGrid').append($grid);
+}
+
+
+
+
 
 /**
 * Place the input team Logo at the middle of the SVG obtained with prefix.
@@ -486,6 +533,7 @@ function init() {
     cleanedTeams = getCleanedTeams(response);
     // Construnct the team carousel
     teamSelectorCarousel = createTeamSelectorInCarousel(cleanedTeams);
+    teamSelectorGrid = createTeamSelectorInGrid(cleanedTeams)
 
     // Store locally the teams values
     locallyStoreFavoriteTeamId(-1);
