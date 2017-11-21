@@ -527,7 +527,9 @@ function init() {
     .attr("id", "spiralSVG")
     .append("g")
     .attr("id", "spiralG");
+
     // Place spiralG in a dynamic way.
+
     drawSpiral(teams());
 
     $("#teamSelection").on("hidden.bs.modal", function () {

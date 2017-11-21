@@ -29,12 +29,10 @@ html, body, .container-fluid {
     padding-bottom: 40px;
 }
 
+.
+
 #mainRow, #leftPanel, #rightPanel{
     height: 100%;
-}
-
-#myTeam, #otherTeam{
-    height:50%;
 }
 
 svg {
@@ -49,18 +47,32 @@ path.spiral {
     stroke-width: 3px;
 }
 
+.left, .right{
+        float:left;
+    }
 
+    .left{
+        background: green;
+        min-width: 30%;
+        width: 30%;
+        height: 100vh;
+        transition: width 0.5s ease-in-out ;/*1s for smooth, 0s for neat*/
+        overflow: hidden;
+    }
 
-/*Test display with specific colors*/
-#leftPanel{
-    background-color: green;
-}
+    .right{
+        background: blue;
+        min-width: 30%;
+        width: 70%;
+        height: 100vh;
+        transition: width 0.5s ease-in-out; /*1s for smooth, 0s for neat*/
+        overflow: hidden;
+    }
 
+    .left:hover{
+        width: 70%;
+    }
 
-#myTeam{
-    background-color: red;
-}
-
-#otherTeam{
-    background-color: blue;
-}
+    .left:hover + .right{
+        width: 100px;
+    }
