@@ -3,8 +3,15 @@ html, body, .container-fluid {
     height:100%;
     background-color: black;
 }
+nav{
+    position: fixed !important;
+    right: 0;
+    left: 0;
+    z-index: 1030;
+    background-color: black;
+}
+
 .container-fluid {
-    width: 100%;
     box-sizing: border-box;
 }
 
@@ -29,6 +36,7 @@ html, body, .container-fluid {
     padding-bottom: 40px;
 }
 
+
 #mainRow, #leftPanel, #rightPanel{
     height: 100%;
 }
@@ -42,13 +50,29 @@ svg {
     width: 100%;
 }
 
-
 path.spiral {
     fill: none;
     stroke: #000000;
     stroke-width: 3px;
 }
 
+#teamSlider{
+    height: 80%;
+    margin-top: 10%;
+    position: absolute;
+    right: 10px;
+}
+#timeSlider{
+    width: 80%;
+    margin-left: 10%;
+    position: absolute;
+    bottom: 10px;
+}
+
+
+.tooltip{
+    opacity: 1;
+}
 
 
 /*Test display with specific colors*/

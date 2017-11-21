@@ -537,6 +537,42 @@ function init() {
     });
 
 
+    $("#teamSliderInput")
+    .slider(
+        {
+            id: "teamSlider",
+            orientation: "vertical",
+            tooltip_position:'left',
+            min:1,
+            max:31,
+            steps:1,
+            value:1,// TODO define this value depending on the selected team
+        }
+    );
+    // NHL opens the 4th october 2017 this season !
+    const championshipStartDate = new Date(2017,9,4); // TODO maybe not hardcoded this value here ?
+    const today = new Date();
+    const diffDays = Math.floor((today.getTime()-championshipStartDate.getTime())/(1000*3600*24));
+
+    $("#timeSliderInput")
+    .slider(
+        {
+            id: "timeSlider",
+            min:0,
+            max:diffDays,
+            value:diffDays,
+            steps:1,
+            tooltip: 'always',
+            formatter: function(value) {
+                const date = new Date(championshipStartDate.valueOf());
+                date.setDate(date.getDate()+value);
+                return date.toDateString();
+	        }
+        }
+    );
+
+
+
 
     //TEST TODO remove
 
