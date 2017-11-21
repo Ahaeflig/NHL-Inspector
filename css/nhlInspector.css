@@ -56,6 +56,16 @@ path.spiral {
     stroke-width: 3px;
 }
 
+#teamName{
+    position: absolute;
+    left:10px;
+    top:60px;
+    background-color: yellow;
+    width: 150px;
+    height: 50px; 
+}
+
+
 #teamSlider{
     height: 80%;
     margin-top: 10%;
@@ -64,7 +74,7 @@ path.spiral {
 }
 #timeSlider{
     width: 80%;
-    margin-left: 10%;
+    margin-left: 8%;
     position: absolute;
     bottom: 10px;
 }
