@@ -88,34 +88,24 @@ path.spiral {
     z-index: 100;
 }
 
+.panels {
+    width:100%;
+    height:100vh;
+    overflow: hidden;
+    white-space:nowrap;
+}
+
 .left, .right{
-        float:left;
-    }
+    float:left;
+    display: inline-block;
+    width:49.5%;
+    position:relative;
+}
 
-    .left{
-        position:relative;
-        background: green;
-        min-width: 30%;
-        width: 30%;
-        height: 100vh;
-        transition: width 0.5s ease-in-out ;/*1s for smooth, 0s for neat*/
-        overflow: hidden;
-    }
+.panels .left{
+    background: green;
+}
 
-    .right{
-        position: relative;
-        background: blue;
-        min-width: 30%;
-        width: 70%;
-        height: 100vh;
-        transition: width 0.5s ease-in-out; /*1s for smooth, 0s for neat*/
-        overflow: hidden;
-    }
-
-    .left:hover{
-        width: 70%;
-    }
-
-    .left:hover + .right{
-        width: 100px;
-    }
+.panels .right{
+    background: blue;
+}
