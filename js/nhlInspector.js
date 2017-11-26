@@ -309,54 +309,9 @@ function drawSpiral(teams){
 
     test.selectAll("circle")
         .attr('stroke', 'yellow')
-        .attr('stroke-width', 0)
-        /*
-        .on("mouseenter", function(){
-          //console.log("mouseenter");
-          d3.select(this)
-            .transition()
-            //.ease('elastic')
-            .duration(200)
-            .attr("r", function (d) {return d.r*1.5;})
-            .attr('stroke-width',5)
-          d3.select(function(d){
-            return '\x22#'+d.id+'i\x22';
-          })
-            .transition()
-            //.ease('elastic')
-            .duration(200)
-            .attr("width", function (d) {return d.s*1.5;})
-            .attr("height", function (d) {return d.s*1.5;})
-            .attr("x", function (d) { return d.x - d.s*1.5/2; })
-            .attr("y", function (d) { return d.y - d.s*1.5/2; })
-        })
-        .on("mouseleave", function(){
-          //console.log("mouseleave");
-          d3.select(this)
-            .transition()
-            //.ease('elastic')
-            .duration(200)
-            .attr("r", function (d) {return d.r;})
-            .attr('stroke-width',0)
-          d3.select(function(d){
-            return '\x22#'+d.id+'i\x22';
-          })
-            .transition()
-            //.ease('elastic')
-            .duration(200)
-            .attr("width", function (d) {return d.s;})
-            .attr("height", function (d) { return d.s;})
-            .attr("x", function (d) { return d.x - d.s/2; })
-            .attr("y", function (d) { return d.y - d.s/2; })
-        })
-        //*/
-        ;
+        .attr('stroke-width', 0);
 
     test.append("image")
-        /*.attr("id", function(d){
-          console.log(d.id);
-          return d.id+"i";
-        })*/
         .attr("width", function (d) { return d.s;})
         .attr("height", function (d) { return d.s;})
         .attr("x", function (d) { return d.x - d.s/2; })
@@ -373,18 +328,10 @@ function drawSpiral(teams){
             .attr("height", function (d) { return d.s*2;})
             .attr("x", function (d) { return d.x - d.s*2/2; })
             .attr("y", function (d) { return d.y - d.s*2/2; });
-
-          d3.select(this).append("text")
-            .attr("id", function(d){return "t_"+d.id})
-            .attr("class", "nodetext")
-            .attr("x", function(d) { d.x - 30;})
-            .attr("y", function(d) { d.y - 15;})
-            .attr("fill", "black")
-            .text(function(d){
-              console.log(d.id);
-              return d.name;
-            })
+          d3.select("#teamName").text(function(d){
+            return d.name;
           })
+        })
           /*
           d3.select(function(d){
             return '\x22#'+d.id+'c\x22';
@@ -401,33 +348,16 @@ function drawSpiral(teams){
           //console.log("mouseleave");
           d3.select(this)
               .transition()
-              //.ease('elastic')
               .duration(200)
               .attr("width", function (d) { return d.s;})
               .attr("height", function (d) { return d.s;})
               .attr("x", function (d) { return d.x - d.s/2; })
               .attr("y", function (d) {return d.y - d.s/2; });
 
-          d3.select(this).selectAll(function(d){console.log("out " + d.id);return "#t_"+d.id;}).remove();
-            })
-          /*
-          d3.select(function(d){
-            return '\x22#'+d.id+'c\x22';
-          })
-              .transition()
-              //.ease('elastic')
-              .duration(200)
-              .attr("r", function (d) { return d.r;})
-              .attr('stroke-width',0)
-        })
-        //*/
-        ;
-    /*test.append("text")
-      .attr("class", "nodetext")
-      .attr("x", 40)
-      .attr("y", 40)
-      .attr("fill", "black")
-      .text(function(d){return d.name});
+          d3.select(this).selectAll(function(d){return "#t_"+d.id;}).remove();
+            });
+    //*
+
     //*/
 }
 
@@ -541,7 +471,7 @@ function init() {
 
     // Everyting will be inside a SVG html element
     // Initialize myTeamSVG and myTeamG
-    const myTeamG = d3.select("#myTeam")
+    const myTeamG = d3.select("#rightPanel")
     .append('svg')
     .attr("id", "myTeamSVG")
     .append("g")
@@ -556,7 +486,7 @@ function init() {
     placeTeam("my", team(myFavoriteTeamId()));
 
     // Initialize otherTeamSVG and oterTeamG
-    const otherTeamG = d3.select("#otherTeam")
+    const otherTeamG = d3.select("#rightPanel")
     .append('svg')
     .attr("id", "otherTeamSVG")
     .append("g")
@@ -575,7 +505,10 @@ function init() {
     .attr("id", "spiralSVG")
     .append("g")
     .attr("id", "spiralG");
+
+
     // Place spiralG in a dynamic way.
+
     drawSpiral(teams());
 
     $("#teamSelection").on("hidden.bs.modal", function () {
@@ -633,8 +566,6 @@ function init() {
 
 
 }
-
-
 // When the window is resized
 $( window ).resize(
     function() {
@@ -644,3 +575,57 @@ $( window ).resize(
         drawSpiral(teams());
     }
 );
+
+/* METHOD 1 */
+/*
+$(function () {
+	 $(".left").on("mouseenter",
+	 function () {
+         $(".panels .right").stop().animate({
+           width:'29.5%'
+         }, 500);
+         $(this).stop().animate({
+             width: '70%'
+         }, 500);
+         drawSpiral(teams());
+         placeTeam("my", team(myFavoriteTeamId()));
+     }).on("mouseleave",function(){
+         $(this).stop().animate({
+             width: '29.5%'
+         }, 500);
+         $(".panels .right").stop().animate({
+           width:'70%'
+         }, 500);
+         drawSpiral(teams());
+         placeTeam("my", team(myFavoriteTeamId()));
+     });
+});
+//*/
+
+
+/* METHOD 2 (works better)*/
+//Resize panels on mouse hover
+//*
+$(".left, .right").each(function() {
+    $(this).data("standardWidth", '49.5%');
+});
+
+$(".left, .right").hover(function() {
+    $(this).parent().children().not(this).stop().animate({
+      width: "29.5%"
+    }, 500 );
+    $(this).stop().animate({
+        width: "70%"
+    }, 500 );
+    drawSpiral(teams());
+    placeTeam("my", team(myFavoriteTeamId()));
+}, function() {
+    $(this).parent().children().each(function() {
+        $(this).stop().animate({
+            width: $(this).data("standardWidth")
+        }, 500 );
+        drawSpiral(teams());
+        placeTeam("my", team(myFavoriteTeamId()));
+    });
+});
+//*/
