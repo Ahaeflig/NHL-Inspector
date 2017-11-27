@@ -54,14 +54,103 @@ const LOGO_DICT = {
 * @see getCleanedGlobalData() and
 * @see getCleanedTeams() for the parsing and cleaning job on the data
 */
-function loadNHLData(){
+function loadNHLData(date){
 
     return $.getJSON(
     {
       type: "GET",
-  		url: 'https://statsapi.web.nhl.com/api/v1/standings?expand=standings.team&season=20172018&date=2017-10-10'
+  		url: 'https://statsapi.web.nhl.com/api/v1/standings?expand=standings.team&season=20172018&date='+date
     });
 
+}
+
+/**
+* Get and clean some global data from the input data
+* @assume data is the output of @see loadNHLData
+* @param data (): whole JSON data
+* @return the cleaned global data as a JS Object which contains:
+*    -TBD
+*/
+function getCleanedGlobalData(data){
+
+    conferenceData = data.records
+    var teams = [];
+
+    //Fill Array with team values
+    for (let conf=0; conf < conferenceData.length; ++conf) {
+      for (let i=0; i < conferenceData[conf]["teamRecords"].length; ++i) {
+
+          // TODO refactor if needed and chose correct stats
+          let teamName = conferenceData[conf]["teamRecords"][i].team.name
+          let points = conferenceData[conf]["teamRecords"][i].points
+          let gamesPlayed = conferenceData[conf]["teamRecords"][i]["gamesPlayed"]
+          let wins = conferenceData[conf]["teamRecords"][i]["leagueRecord"].wins
+          let overtime = conferenceData[conf]["teamRecords"][i]["leagueRecord"].ot
+          let losses = conferenceData[conf]["teamRecords"][i]["leagueRecord"].losses
+          let goalAgainst = conferenceData[conf]["teamRecords"][i].goalsAgainst
+          let goalScored = conferenceData[conf]["teamRecords"][i].goalsScored
+          let divisionRank = conferenceData[conf]["teamRecords"][i].divisionRank
+          let conferenceRank = conferenceData[conf]["teamRecords"][i].conferenceRank
+          let leagueRank = conferenceData[conf]["teamRecords"][i].leagueRank
+          let wildCardRank = conferenceData[conf]["teamRecords"][i].wildCardRank
+
+          teams.push({
+            "name":teamName,
+            "logo":LOGO_DICT[teamName],
+            "point":points,
+            "teamName":teamName,
+            "points":points,
+            "gamesPlayed":gamesPlayed,
+            "wins":wins,
+            "overtime":overtime,
+            "losses ":losses,
+            "goalAgainst":goalAgainst,
+            "goalScored ":goalScored,
+            "divisionRank":divisionRank,
+            "conferenceRank":conferenceRank,
+            "leagueRank":leagueRank,
+            "wildCardRank":wildCardRank,
+          })
+
+      }
+    }
+
+
+    return data;
+}
+
+
+/**
+* Get and Clean the teams data inside the received input data and return an
+* array of teams where a team is a JS Object which contains:
+* - name : the name of the team
+* - logo : the corresponding logo String path
+* - point : the current league score of the team
+* @assume ouput is sorted decreasingly by point
+* @param data (): The parsed JSON object with nhl league data
+* @return the cleaned data as an array of teams sorted by point decreasingly
+*/
+function getCleanedTeams(data){
+
+  conferenceData = data.records
+  var teams = [];
+
+  //Fill Array with team values
+  for (let conf=0; conf < conferenceData.length; ++conf) {
+    for (let i=0; i < conferenceData[conf]["teamRecords"].length; ++i) {
+        let teamName = conferenceData[conf]["teamRecords"][i].team.name
+        let points = conferenceData[conf]["teamRecords"][i].points
+        let id = conferenceData[conf]["teamRecords"][i].team.id
+        teams.push({name:teamName, logo:LOGO_DICT[teamName], point:points, id:id})
+    }
+  }
+
+  //Sort array by team points decreasing
+  teams.sort(function(a,b) {
+    return b.point - a.point;
+  });
+
+  return teams;
 }
 
 
@@ -177,8 +266,6 @@ function createTeamSelectorInGrid(teams) {
     }
     return $('#teamSelectorGrid').append($grid);
 }
-
-
 
 
 
@@ -309,48 +396,7 @@ function drawSpiral(teams){
 
     test.selectAll("circle")
         .attr('stroke', 'yellow')
-        .attr('stroke-width', 0)
-        /*
-        .on("mouseenter", function(){
-          //console.log("mouseenter");
-          d3.select(this)
-            .transition()
-            //.ease('elastic')
-            .duration(200)
-            .attr("r", function (d) {return d.r*1.5;})
-            .attr('stroke-width',5)
-          d3.select(function(d){
-            return '\x22#'+d.id+'i\x22';
-          })
-            .transition()
-            //.ease('elastic')
-            .duration(200)
-            .attr("width", function (d) {return d.s*1.5;})
-            .attr("height", function (d) {return d.s*1.5;})
-            .attr("x", function (d) { return d.x - d.s*1.5/2; })
-            .attr("y", function (d) { return d.y - d.s*1.5/2; })
-        })
-        .on("mouseleave", function(){
-          //console.log("mouseleave");
-          d3.select(this)
-            .transition()
-            //.ease('elastic')
-            .duration(200)
-            .attr("r", function (d) {return d.r;})
-            .attr('stroke-width',0)
-          d3.select(function(d){
-            return '\x22#'+d.id+'i\x22';
-          })
-            .transition()
-            //.ease('elastic')
-            .duration(200)
-            .attr("width", function (d) {return d.s;})
-            .attr("height", function (d) { return d.s;})
-            .attr("x", function (d) { return d.x - d.s/2; })
-            .attr("y", function (d) { return d.y - d.s/2; })
-        })
-        //*/
-        ;
+        .attr('stroke-width', 0);
 
     test.append("image")
         /*.attr("id", function(d){
@@ -385,16 +431,6 @@ function drawSpiral(teams){
               return d.name;
             })
           })
-          /*
-          d3.select(function(d){
-            return '\x22#'+d.id+'c\x22';
-          })
-            .transition()
-            //.ease('elastic')
-            .duration(200)
-            .attr("r", function (d) { return d.r*1.5;})
-            .attr('stroke-width',5)
-        })
 
         //*/
         .on("mouseleave", function(){
@@ -410,131 +446,89 @@ function drawSpiral(teams){
 
           d3.select(this).selectAll(function(d){console.log("out " + d.id);return "#t_"+d.id;}).remove();
             })
-          /*
-          d3.select(function(d){
-            return '\x22#'+d.id+'c\x22';
-          })
-              .transition()
-              //.ease('elastic')
-              .duration(200)
-              .attr("r", function (d) { return d.r;})
-              .attr('stroke-width',0)
-        })
-        //*/
-        ;
-    /*test.append("text")
-      .attr("class", "nodetext")
-      .attr("x", 40)
-      .attr("y", 40)
-      .attr("fill", "black")
-      .text(function(d){return d.name});
-    //*/
+
 }
-
-/**
-* Get and clean some global data from the input data
-* @assume data is the output of @see loadNHLData
-* @param data (): whole JSON data
-* @return the cleaned global data as a JS Object which contains:
-*    -TBD
-*/
-function getCleanedGlobalData(data){
-
-    conferenceData = data.records
-    var teams = [];
-
-    //Fill Array with team values
-    for (let conf=0; conf < conferenceData.length; ++conf) {
-      for (let i=0; i < conferenceData[conf]["teamRecords"].length; ++i) {
-
-          // TODO refactor if needed and chose correct stats
-          let teamName = conferenceData[conf]["teamRecords"][i].team.name
-          let points = conferenceData[conf]["teamRecords"][i].points
-          let gamesPlayed = conferenceData[conf]["teamRecords"][i]["gamesPlayed"]
-          let wins = conferenceData[conf]["teamRecords"][i]["leagueRecord"].wins
-          let overtime = conferenceData[conf]["teamRecords"][i]["leagueRecord"].ot
-          let losses = conferenceData[conf]["teamRecords"][i]["leagueRecord"].losses
-          let goalAgainst = conferenceData[conf]["teamRecords"][i].goalsAgainst
-          let goalScored = conferenceData[conf]["teamRecords"][i].goalsScored
-          let divisionRank = conferenceData[conf]["teamRecords"][i].divisionRank
-          let conferenceRank = conferenceData[conf]["teamRecords"][i].conferenceRank
-          let leagueRank = conferenceData[conf]["teamRecords"][i].leagueRank
-          let wildCardRank = conferenceData[conf]["teamRecords"][i].wildCardRank
-
-          teams.push({
-            "name":teamName,
-            "logo":LOGO_DICT[teamName],
-            "point":points,
-            "teamName":teamName,
-            "points":points,
-            "gamesPlayed":gamesPlayed,
-            "wins":wins,
-            "overtime":overtime,
-            "losses ":losses,
-            "goalAgainst":goalAgainst,
-            "goalScored ":goalScored,
-            "divisionRank":divisionRank,
-            "conferenceRank":conferenceRank,
-            "leagueRank":leagueRank,
-            "wildCardRank":wildCardRank,
-          })
-
-      }
-    }
-
-
-    return data;
-}
-
-/**
-* Get and Clean the teams data inside the received input data and return an
-* array of teams where a team is a JS Object which contains:
-* - name : the name of the team
-* - logo : the corresponding logo String path
-* - point : the current league score of the team
-* @assume ouput is sorted decreasingly by point
-* @param data (): The parsed JSON object with nhl league data
-* @return the cleaned data as an array of teams sorted by point decreasingly
-*/
-function getCleanedTeams(data){
-
-  conferenceData = data.records
-  var teams = [];
-
-  //Fill Array with team values
-  for (let conf=0; conf < conferenceData.length; ++conf) {
-    for (let i=0; i < conferenceData[conf]["teamRecords"].length; ++i) {
-        let teamName = conferenceData[conf]["teamRecords"][i].team.name
-        let points = conferenceData[conf]["teamRecords"][i].points
-        let id = conferenceData[conf]["teamRecords"][i].team.id
-        teams.push({name:teamName, logo:LOGO_DICT[teamName], point:points, id:id})
-    }
-  }
-
-  //Sort array by team points decreasing
-  teams.sort(function(a,b) {
-    return b.point - a.point;
-  });
-
-  return teams;
-}
-
 
 // Is called when the document is ready
 function init() {
   if(MESSAGE) console.log("Document is Ready");
 
-  // Load the teams using ajax
-  loadedData = loadNHLData();
-  // Parse and clean the data into an array
+      $("#teamSelection").on("hidden.bs.modal", function () {
+      const index = $('#teamSelectorCarousel li.active').attr('data-slide-to');
+      locallyStoreFavoriteTeamId(index);
+      placeTeam("my", team(index));
+      });
 
+
+      $("#teamSliderInput")
+      .slider(
+        {
+            id: "teamSlider",
+            orientation: "vertical",
+            tooltip_position:'left',
+            min:1,
+            max:31,
+            steps:1,
+            value:1,// TODO define this value depending on the selected team
+        }
+      );
+
+    // NHL opens the 4th october 2017 this season !
+    const championshipStartDate = new Date(2017,9,4); // TODO maybe not hardcoded this value here ?
+    const today = new Date();
+    const diffDays = Math.floor((today.getTime()-championshipStartDate.getTime())/(1000*3600*24));
+
+    $("#timeSliderInput")
+    .slider(
+        {
+            id: "timeSlider",
+            min:0,
+            max:diffDays,
+            value:diffDays,
+            steps:1,
+            tooltip: 'always',
+            formatter: function(value) {
+                const date = new Date(championshipStartDate.valueOf());
+                date.setDate(date.getDate()+value);
+                return date.toDateString();
+          }
+        }
+    );
+
+    $('#timeSliderInput').on({
+      change: function(ui) {
+
+        // TODO find less hacky way to fix on change called when initialized
+        if (ui.value != null) {
+          let newSliderVal = ui.value['newValue']
+          const date = new Date(championshipStartDate.valueOf());
+          date.setDate(date.getDate()+newSliderVal);
+
+          const mm = date.getMonth() + 1; // getMonth() is zero-based
+          const dd = date.getDate();
+          const yyyy = date.getFullYear();
+
+          //console.log(yyyy + "-" + mm + "-" + dd)
+          reloadAndDraw(yyyy + "-" + mm + "-" + dd)
+
+        }
+      }
+    });
+
+  $('#timeSliderInput').trigger('change');
+
+  reloadAndDraw("2017-10-20")
+}
+
+// Load Data
+function reloadAndDraw(date) {
+
+  // Load the teams using ajax
+  loadedData = loadNHLData(date);
+  // Parse and clean the data into an array
   loadedData.done(function(response) {
 
     cleanedTeams = getCleanedTeams(response);
-    // Construnct the team carousel
-    teamSelectorCarousel = createTeamSelectorInCarousel(cleanedTeams);
-    teamSelectorGrid = createTeamSelectorInGrid(cleanedTeams)
-
     // Store locally the teams values
     locallyStoreFavoriteTeamId(-1);
     locallyStoreTeams(cleanedTeams);
@@ -578,59 +572,11 @@ function init() {
     // Place spiralG in a dynamic way.
     drawSpiral(teams());
 
-    $("#teamSelection").on("hidden.bs.modal", function () {
-      const index = $('#teamSelectorCarousel li.active').attr('data-slide-to');
-      locallyStoreFavoriteTeamId(index);
-      placeTeam("my", team(index));
-    });
-
-
-    $("#teamSliderInput")
-    .slider(
-        {
-            id: "teamSlider",
-            orientation: "vertical",
-            tooltip_position:'left',
-            min:1,
-            max:31,
-            steps:1,
-            value:1,// TODO define this value depending on the selected team
-        }
-    );
-    // NHL opens the 4th october 2017 this season !
-    const championshipStartDate = new Date(2017,9,4); // TODO maybe not hardcoded this value here ?
-    const today = new Date();
-    const diffDays = Math.floor((today.getTime()-championshipStartDate.getTime())/(1000*3600*24));
-
-    $("#timeSliderInput")
-    .slider(
-        {
-            id: "timeSlider",
-            min:0,
-            max:diffDays,
-            value:diffDays,
-            steps:1,
-            tooltip: 'always',
-            formatter: function(value) {
-                const date = new Date(championshipStartDate.valueOf());
-                date.setDate(date.getDate()+value);
-                return date.toDateString();
-	        }
-        }
-    );
-
-
-
-
-    //TEST TODO remove
-
     cleanedTeams = getCleanedGlobalData(response);
 
   }
 
-).fail(console.log("failed"))
-
-
+  ).fail(console.log("failed"))
 
 }
 
