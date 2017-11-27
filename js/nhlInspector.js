@@ -115,7 +115,6 @@ function getCleanedGlobalData(data){
       }
     }
 
-
     return data;
 }
 
@@ -152,7 +151,6 @@ function getCleanedTeams(data){
 
   return teams;
 }
-
 
 /**
 * Locally store the id of the user favorite team
@@ -451,6 +449,7 @@ function drawSpiral(teams){
 
 // Is called when the document is ready
 function init() {
+
   if(MESSAGE) console.log("Document is Ready");
 
       $("#teamSelection").on("hidden.bs.modal", function () {
@@ -459,6 +458,40 @@ function init() {
       placeTeam("my", team(index));
       });
 
+      // Everyting will be inside a SVG html element
+      // Initialize myTeamSVG and myTeamG
+      const myTeamG = d3.select("#myTeam")
+      .append('svg')
+      .attr("id", "myTeamSVG")
+      .append("g")
+      .attr("id", "myTeamG");
+
+      // Initialize otherTeamSVG and oterTeamG
+      const otherTeamG = d3.select("#otherTeam")
+      .append('svg')
+      .attr("id", "otherTeamSVG")
+      .append("g")
+      .attr("id", "otherTeamG");
+
+      // Append the otherTeamC circle and the otherTeamL logo
+      otherTeamG.append("circle")
+      .attr("id", "otherTeamC")
+      otherTeamG.append("image")
+      .attr("id", "otherTeamL")
+
+      // Append the myTeamC circle and the myTeamL logo
+      myTeamG.append("circle")
+      .attr("id", "myTeamC")
+      myTeamG.append("image")
+      .attr("id", "myTeamL")
+
+
+      // Initialize spiral
+      const spiralG = d3.select("#leftPanel")
+      .append("svg")
+      .attr("id", "spiralSVG")
+      .append("g")
+      .attr("id", "spiralG");
 
       $("#teamSliderInput")
       .slider(
@@ -517,6 +550,17 @@ function init() {
 
   $('#timeSliderInput').trigger('change');
 
+  //Setup teamSelectorGrid once
+  //TODO find best way to not pull data twice at
+  // init even though we don't really care too much
+  loadedData = loadNHLData("2017-10-20");
+  // Parse and clean the data into an array
+  loadedData.done(function(response) {
+    cleanedTeams = getCleanedTeams(response);
+    teamSelectorCarousel = createTeamSelectorInCarousel(cleanedTeams);
+    teamSelectorGrid = createTeamSelectorInGrid(cleanedTeams)
+  });
+
   reloadAndDraw("2017-10-20")
 }
 
@@ -529,51 +573,21 @@ function reloadAndDraw(date) {
   loadedData.done(function(response) {
 
     cleanedTeams = getCleanedTeams(response);
+
     // Store locally the teams values
     locallyStoreFavoriteTeamId(-1);
     locallyStoreTeams(cleanedTeams);
 
-    // Everyting will be inside a SVG html element
-    // Initialize myTeamSVG and myTeamG
-    const myTeamG = d3.select("#myTeam")
-    .append('svg')
-    .attr("id", "myTeamSVG")
-    .append("g")
-    .attr("id", "myTeamG");
-
-    // Append the myTeamC circle and the myTeamL logo
-    myTeamG.append("circle")
-    .attr("id", "myTeamC")
-    myTeamG.append("image")
-    .attr("id", "myTeamL")
     // Place myTeamG in a dynamic way
     placeTeam("my", team(myFavoriteTeamId()));
 
-    // Initialize otherTeamSVG and oterTeamG
-    const otherTeamG = d3.select("#otherTeam")
-    .append('svg')
-    .attr("id", "otherTeamSVG")
-    .append("g")
-    .attr("id", "otherTeamG");
-    // Append the otherTeamC circle and the otherTeamL logo
-    otherTeamG.append("circle")
-    .attr("id", "otherTeamC")
-    otherTeamG.append("image")
-    .attr("id", "otherTeamL")
     // Place otherTeamG in a dynamic way
     placeTeam("other", team(myFavoriteTeamId()));
 
-    // Initialize spiral
-    const spiralG = d3.select("#leftPanel")
-    .append("svg")
-    .attr("id", "spiralSVG")
-    .append("g")
-    .attr("id", "spiralG");
     // Place spiralG in a dynamic way.
     drawSpiral(teams());
 
     cleanedTeams = getCleanedGlobalData(response);
-
   }
 
   ).fail(console.log("failed"))
