@@ -613,3 +613,58 @@ $( window ).resize(
         drawSpiral(teams());
     }
 );
+
+/* METHOD 1 */
+/*
+$(function () {
+	 $(".left").on("mouseenter",
+	 function () {
+         $(".panels .right").stop().animate({
+           width:'29.5%'
+         }, 500);
+         $(this).stop().animate({
+             width: '70%'
+         }, 500);
+         drawSpiral(teams());
+         placeTeam("my", team(myFavoriteTeamId()));
+     }).on("mouseleave",function(){
+         $(this).stop().animate({
+             width: '29.5%'
+         }, 500);
+         $(".panels .right").stop().animate({
+           width:'70%'
+         }, 500);
+         drawSpiral(teams());
+         placeTeam("my", team(myFavoriteTeamId()));
+     });
+});
+//*/
+
+
+/* METHOD 2 (works better)*/
+//Resize panels on mouse hover
+//*
+$(".left, .right").each(function() {
+    $(this).data("standardWidth", '49.5%');
+});
+
+$(".left, .right").hover(function() {
+    $(this).parent().children().not(this).stop().animate({
+      width: "29.5%"
+    }, 500 );
+    $(this).stop().animate({
+        width: "70%"
+    }, 500 );
+    drawSpiral(teams());
+    placeTeam("my", team(myFavoriteTeamId()));
+}, function() {
+    $(this).parent().children().each(function() {
+        $(this).stop().animate({
+            width: $(this).data("standardWidth")
+        }, 500 );
+        drawSpiral(teams());
+        placeTeam("my", team(myFavoriteTeamId()));
+    });
+});
+//*/
+

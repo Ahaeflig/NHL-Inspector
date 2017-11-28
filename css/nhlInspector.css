@@ -94,15 +94,25 @@ path.spiral {
 
 
 /*Test display with specific colors*/
-#leftPanel{
-    background-color: green;
+.panels {
+    width:100%;
+    height:100vh;
+    overflow: hidden;
+    /*white-space:nowrap;*/
 }
 
-
-#myTeam{
-    background-color: red;
+.left, .right{
+    float:left;
+    /*display: inline-block;*/
+    width:49.5%;
+    height:100%;
+    position:relative;
 }
 
-#otherTeam{
-    background-color: blue;
+.panels .left{
+    background: green;
+}
+
+.panels .right{
+    background: blue;
 }
