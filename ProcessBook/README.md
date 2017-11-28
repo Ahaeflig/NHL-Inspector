@@ -3,5 +3,4 @@
 ## Project Idea
 
 ## Project Images
-![Kiku](images/img01.jpg)
-<img src="images/img01.jpg" />
+![Kiku](images/im01.jpg)
