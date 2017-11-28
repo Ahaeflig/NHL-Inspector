@@ -550,7 +550,6 @@ function init() {
           const dd = date.getDate();
           const yyyy = date.getFullYear();
 
-          //console.log(yyyy + "-" + mm + "-" + dd)
           reloadAndDraw(yyyy + "-" + mm + "-" + dd)
 
         }
@@ -559,10 +558,12 @@ function init() {
 
   $('#timeSliderInput').trigger('change');
 
+  const today_string = today.getYear() + "-" + today.getMonth() + "-" + today.getDay();
+
   //Setup teamSelectorGrid once
   //TODO find best way to not pull data twice at
   // init even though we don't really care too much
-  loadedData = loadNHLData("2017-10-20");
+  loadedData = loadNHLData(today_string);
   // Parse and clean the data into an array
   loadedData.done(function(response) {
     cleanedTeams = getCleanedTeams(response);
@@ -570,7 +571,7 @@ function init() {
     teamSelectorGrid = createTeamSelectorInGrid(cleanedTeams)
   });
 
-  reloadAndDraw("2017-10-20")
+  reloadAndDraw(today_string)
 }
 
 // Load Data
@@ -667,4 +668,3 @@ $(".left, .right").hover(function() {
     });
 });
 //*/
-
