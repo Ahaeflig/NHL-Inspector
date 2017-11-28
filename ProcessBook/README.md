@@ -23,16 +23,22 @@ The goal is really to show how the championship is evolving over time.
 ## User interaction evolution
 
 
-
 ## Layout choice evolution
 
 First we thought about having three separated parts of the page dedicated to display the data and the user choices.
 One part was the overall state of the competition and the two other parts were to compare the selected team's statistics. 
-![image 1](images/im01.jpg)
+<div align = 'center'>
+<img src="images/im01.jpg" width="450" height="450" />
+</div>
 
 But we were not satisfied with this design so we decided to change for a "two sided" page where the user by hovering on either the right or left side of the page slides the window and can focus on the general ranking or the selected team's statistics. This gives us the possibility to show within a single circle the stats and logo of both team at the same time.
-![image 3](images/im03.jpg)
-![image 2](images/im02.jpg)
+<div align = 'center'>
+<img src="images/im03.jpg" width="450" height="450" />
+<img src="images/im02.jpg" width="450" height="450" />
+</div>
+
 
 Right now we are wondering about changing direction again as this sliding window doesn't bring a lot of value to the viz and maybe go for a "wheel" to select and show the state of the championship at the same time.
-![image 4](images/im04.jpg)
+<div align = 'center'>
+<img src="images/im04.jpg" width="450" height="450" />
+</div>
