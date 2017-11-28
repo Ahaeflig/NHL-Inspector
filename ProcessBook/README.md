@@ -42,12 +42,12 @@ One part was the overall state of the competition and the two other parts were t
 <img src="images/im01.jpg" width="450" />
 </div>
 
-But we were not satisfied with this design so we decided to change for a "two sided" page where the user by hovering on either the right or left side of the page slides the window and can focus on the general ranking or the selected team's statistics. This gives us the possibility to show within a single circle the stats and logo of both team at the same time.
+But we were not satisfied with this design so we decided to change for a "two sided" page where the user, by hovering on either the right or left side of the page, slides the window and can focus on the general ranking or the selected team's statistics. This gives us the possibility to show within a single circle the stats and logo of both team at the same time.
+
 <div align = 'center'>
 <img src="images/im03.jpg" width="450" />
 <img src="images/im02.jpg" width="450" />
 </div>
-
 
 Right now we are wondering about changing direction again as this sliding window doesn't bring a lot of value to the viz and maybe go for a "wheel" to select and show the state of the championship at the same time.
 <div align = 'center'>
@@ -59,4 +59,5 @@ Right now we are wondering about changing direction again as this sliding window
 Key things to note are:
 * We get data dynamically from the NHL league API so the visualization is always up to date.
 * We use jquery to get the data asynchronously 
+* We try to use modern Javascript syntax 
 * ...
