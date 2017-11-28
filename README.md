@@ -1,3 +1,5 @@
 # NHL-Inspector
 
-<iframe src="http://lmztpkvc.preview.infomaniak.website/"></iframe>
+https://ahaeflig.github.io/NHL-Inspector
+
+<iframe src="https://ahaeflig.github.io/NHL-Inspector"></iframe>
