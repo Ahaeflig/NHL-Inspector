@@ -23,10 +23,16 @@ The goal is really to show how the championship is evolving over time.
 ## User interaction evolution
 
 At first we went with a carousel selector with a pop-up to let the user select his favorite team.
+
 <div align = 'center'>
 <img src="images/ui0.jpg" width="450" />
 </div>
 
+But the selection of the team was too tedious and slow so we added a grid layout to select the team. Since there are 31 teams, we also added a random selector to have an nice even grid of 4 by 8.
+
+<div align = 'center'>
+<img src="images/ui1.jpg" width="450" />
+</div>
 
 ## Layout choice evolution
 
@@ -47,3 +53,10 @@ Right now we are wondering about changing direction again as this sliding window
 <div align = 'center'>
 <img src="images/im04.jpg" width="450" />
 </div>
+
+## Implementations details
+
+Key things to note are:
+* We get data dynamically from the NHL league API so the visualization is always up to date.
+* We use jquery to get the data asynchronously 
+* ...
