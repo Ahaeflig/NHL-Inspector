@@ -34,6 +34,8 @@ But the selection of the team was too tedious and slow so we added a grid layout
 <img src="images/ui1.jpg" width="450" />
 </div>
 
+We also implemented a slider that let's the user easily change the date of the championship.
+
 ## Layout choice evolution
 
 First we thought about having three separated parts of the page dedicated to display the data and the user choices.
