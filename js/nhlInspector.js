@@ -189,7 +189,14 @@ function teams(){
 * @return (team): the parsed team at index i of stored teams
 */
 function team(id){
-    return JSON.parse(localStorage.getItem("teams"))[id];
+
+    const teams =  JSON.parse(localStorage.getItem("teams"));
+    for(let i = 0; i<teams.length; i++){
+        if(teams[i].id == id){
+            return teams[i];
+        }
+    }
+    return null;
 }
 
 /**
@@ -208,9 +215,11 @@ function createTeamSelectorInCarousel(teams) {
     const indicators = $('#teamSelectorCarouselIndicators');
     const inner = $('#teamSelectorCarouselInner');
 
+console.log(teams)
+
     for (let i = 0; i< teams.length; i++) {
         const active = i == 0 ? " active" : "";
-        indicators.append($('<li data-target="#teamSelectorCarousel" data-slide-to="'+i+'">').addClass(active));
+        indicators.append($('<li data-target="#teamSelectorCarousel" data-slide-to="'+teams[i].id+'">').addClass(active));
         inner.append($('<a>').addClass("slide carousel-item"+active)
             .append($('<img>').addClass("carousel-img d-block img-fluid").attr('src',teams[i].logo))
             .append($('<div>').addClass("carousel-caption d-none d-md-block")
@@ -273,7 +282,7 @@ function createTeamSelectorInGrid(teams) {
 * @assume #myTeamSVG or #otherTeamSVG exists as <svg>
 * @assume (#myTeamC and #myTeamL) or (#otherTeamC and #otherTeamL) exists as <circle> and <image>
 * @param prefix (String): contains the SVG id prefix (i.e "my" or "other")
-* @param team (): the team as a js object @see getCleanedTeams
+* @param team (): the team as a js object @see  teams.legetCleanedTeams
 * @return void:
 */
 function placeTeam(prefix, team){
@@ -453,18 +462,18 @@ function init() {
   if(MESSAGE) console.log("Document is Ready");
 
       $("#teamSelection").on("hidden.bs.modal", function () {
-      const index = $('#teamSelectorCarousel li.active').attr('data-slide-to');
-      locallyStoreFavoriteTeamId(index);
-      placeTeam("my", team(index));
+          const index = $('#teamSelectorCarousel li.active').attr('data-slide-to');
+          locallyStoreFavoriteTeamId(index);
+          placeTeam("my", team(index));
       });
 
       // Everyting will be inside a SVG html element
       // Initialize myTeamSVG and myTeamG
       const myTeamG = d3.select("#myTeam")
       .append('svg')
-      .attr("id", "myTeamSVG")
+        .attr("id", "myTeamSVG")
       .append("g")
-      .attr("id", "myTeamG");
+        .attr("id", "myTeamG");
 
       // Initialize otherTeamSVG and oterTeamG
       const otherTeamG = d3.select("#otherTeam")
