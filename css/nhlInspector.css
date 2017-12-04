@@ -43,17 +43,30 @@ nav{
 }
 
 
-
-#mainRow, #leftPanel, #rightPanel{
+#mainRow, #myTeam{
     height: 100%;
 }
 
-#myTeam, #otherTeam{
-    height:50%;
+#rightPanel, #leftPanel{
+    height: 300px;
+    width: 400px;
+    position: absolute;
+    top: 54px;
+    right: 0px;
+    z-index: 99;
 }
+
+.active{
+    top: 0px !important;
+    height: 100% !important;
+    width: 100% !important;
+    z-index: 0 !important;
+}
+
+
 
 svg {
-    height: 100%;
+    height: 99%;
     width: 100%;
 }
 
@@ -72,20 +85,13 @@ path.spiral {
     height: 50px;
 }
 
-
-#teamSlider{
-    height: 80%;
-    margin-top: 10%;
-    position: absolute;
-    right: 10px;
-}
 #timeSlider{
     width: 80%;
-    margin-left: 8%;
+    margin-left: 10%;
     position: absolute;
-    bottom: 10px;
+    bottom: 30px;
+    z-index: 100;
 }
-
 
 .tooltip{
     opacity: 1;
@@ -99,14 +105,6 @@ path.spiral {
     height:100vh;
     overflow: hidden;
     /*white-space:nowrap;*/
-}
-
-.left, .right{
-    float:left;
-    /*display: inline-block;*/
-    width:49.5%;
-    height:100%;
-    position:relative;
 }
 
 .panels .left{

@@ -61,7 +61,6 @@ function loadNHLData(date){
       type: "GET",
   		url: 'https://statsapi.web.nhl.com/api/v1/standings?expand=standings.team&season=20172018&date='+date
     });
-
 }
 
 /**
@@ -111,10 +110,8 @@ function getCleanedGlobalData(data){
             "leagueRank":leagueRank,
             "wildCardRank":wildCardRank,
           })
-
       }
     }
-
     return data;
 }
 
@@ -214,8 +211,6 @@ function createTeamSelectorInCarousel(teams) {
 
     const indicators = $('#teamSelectorCarouselIndicators');
     const inner = $('#teamSelectorCarouselInner');
-
-console.log(teams)
 
     for (let i = 0; i< teams.length; i++) {
         const active = i == 0 ? " active" : "";
@@ -333,18 +328,18 @@ function drawSpiral(teams){
     const width = spiralSVG.width();
     const height = spiralSVG.height();
 
+    console.log("(W:"+width+", H:"+height+")");
+
     // Get the start of the spiral
     const cx = width/5 ;
     const cy = height/2;
 
     // Get the number of team, the minimum radius of each pills and a
     // resizing factor.
-
     const teamNumber = teams.length;
-    //const teamNumber = 3;
 
     // Probably need to be computated in a clever way
-    const minSize = 20;
+    const minSize = 0;
     const sizeFactor = 1;
 
     // Set initial position (and rotation) of the sprial
@@ -502,19 +497,6 @@ function init() {
       .append("g")
       .attr("id", "spiralG");
 
-      $("#teamSliderInput")
-      .slider(
-        {
-            id: "teamSlider",
-            orientation: "vertical",
-            tooltip_position:'left',
-            min:1,
-            max:31,
-            steps:1,
-            value:1,// TODO define this value depending on the selected team
-        }
-      );
-
     // NHL opens the 4th october 2017 this season !
     const championshipStartDate = new Date(2017,9,4); // TODO maybe not hardcoded this value here ?
     const today = new Date();
@@ -572,6 +554,50 @@ function init() {
   });
 
   reloadAndDraw(today_string)
+
+  const rightPl = $('#rightPanel');
+  const leftPl = $('#leftPanel');
+
+  rightPl.click(function() {
+      if(leftPl.hasClass( "active" )){
+          rightPl.animate(
+              {width:'100%', height:'100%', top: '0px'},
+              {
+                  duration:300,
+                  step: function(){
+                      placeTeam("my", team(myFavoriteTeamId()));
+                  },
+                  complete: function(){
+                      rightPl.addClass('active');
+                      leftPl.removeClass('active');
+                      leftPl.height(300).width(400).css({ top: '54px' });
+                      drawSpiral(teams());
+                  }
+              }
+          );
+      }
+  });
+
+  leftPl.click(function() {
+      if(rightPl.hasClass( "active" )){
+          leftPl.animate(
+              {width:'100%', height:'100%', top: '0px'},
+              {
+                  duration:300,
+                  step: function(){
+                      drawSpiral(teams());
+                  },
+                  complete: function(){
+                      leftPl.addClass('active');
+                      rightPl.removeClass('active');
+                      rightPl.height(300).width(400).css({ top: '54px' });;
+                      placeTeam("my", team(myFavoriteTeamId()));
+                  }
+              }
+          );
+      }
+  });
+
 }
 
 // Load Data
@@ -614,57 +640,3 @@ $( window ).resize(
         drawSpiral(teams());
     }
 );
-
-/* METHOD 1 */
-/*
-$(function () {
-	 $(".left").on("mouseenter",
-	 function () {
-         $(".panels .right").stop().animate({
-           width:'29.5%'
-         }, 500);
-         $(this).stop().animate({
-             width: '70%'
-         }, 500);
-         drawSpiral(teams());
-         placeTeam("my", team(myFavoriteTeamId()));
-     }).on("mouseleave",function(){
-         $(this).stop().animate({
-             width: '29.5%'
-         }, 500);
-         $(".panels .right").stop().animate({
-           width:'70%'
-         }, 500);
-         drawSpiral(teams());
-         placeTeam("my", team(myFavoriteTeamId()));
-     });
-});
-//*/
-
-
-/* METHOD 2 (works better)*/
-//Resize panels on mouse hover
-//*
-$(".left, .right").each(function() {
-    $(this).data("standardWidth", '49.5%');
-});
-
-$(".left, .right").hover(function() {
-    $(this).parent().children().not(this).stop().animate({
-      width: "29.5%"
-    }, 500 );
-    $(this).stop().animate({
-        width: "70%"
-    }, 500 );
-    drawSpiral(teams());
-    placeTeam("my", team(myFavoriteTeamId()));
-}, function() {
-    $(this).parent().children().each(function() {
-        $(this).stop().animate({
-            width: $(this).data("standardWidth")
-        }, 500 );
-        drawSpiral(teams());
-        placeTeam("my", team(myFavoriteTeamId()));
-    });
-});
-//*/
