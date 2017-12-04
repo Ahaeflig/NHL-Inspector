@@ -331,7 +331,7 @@ function drawSpiral(teams){
     console.log("(W:"+width+", H:"+height+")");
 
     // Get the start of the spiral
-    const cx = width/5 ;
+    const cx = width/2 ;
     const cy = height/2;
 
     // Get the number of team, the minimum radius of each pills and a
@@ -339,29 +339,44 @@ function drawSpiral(teams){
     const teamNumber = teams.length;
 
     // Probably need to be computated in a clever way
-    const minSize = 0;
-    const sizeFactor = 1;
+    const minSize = 10;
+    const sizeFactor = Math.min(width/1100, 1);
+
+    // Spiral parameters
+    const a = 0;
+    const b =  Math.min(30, width/40)
+    const step = Math.PI/100;
 
     // Set initial position (and rotation) of the sprial
-    let oldTheta = -Math.PI/2;
+    let oldTheta = 0;
     let oldR = 0;
     let oldX = cx;
     let oldY = cy;
 
-    // Construct iterativelly all the pills
+    // Construct iterativelly all the pills from the center
     const pills = [];
 
-    for (let i = 0; i < teamNumber; i++){
+    for (let i = teamNumber-1; i >= 0; i--){
 
-        // For now the number of point of a team is define by its position in the list
-        // TODO use instead team[i].points or something similar
-        const teamPoint = (teamNumber-i);
+        const teamPoint = teams[i].point;
 
         // Compute position of the pill and its logo and push the pill
-        const theta = oldTheta + Math.PI/10;
         const r = (minSize+teamPoint)*sizeFactor;
-        const x = oldX + (oldR+r)*Math.cos(theta);
-        const y = oldY + (oldR+r)*Math.sin(theta);
+        const d = (r+oldR)*(r+oldR);
+        let x = oldX;
+        let y = oldY;
+        let theta = oldTheta;
+        // TODO replace the while loop below by the exact theta solution !
+        // Need to solve theta^2 -2theta(oldX*cos(theta) +oldY*sin(theta))+oldX^2+oldY^2
+        //x = cx + -b*theta*Math.cos(theta+a);
+        //y = cy + b*theta*Math.sin(theta+a);
+        while((oldX-x)*(oldX-x) + (oldY-y)*(oldY-y) - d < 0){
+            theta = theta + step;
+            x = cx + -b*theta*Math.cos(theta+a);
+            y = cy + b*theta*Math.sin(theta+a);
+            // TODO Adan please remove me !
+        }
+
         const rCorr = r/2;
         const s = r+rCorr;
 
@@ -376,16 +391,12 @@ function drawSpiral(teams){
 
     // Get the spiral graphics
     const spiralG = d3.select("#spiralG")
-
     var defs = spiralSVG.append("defs");
-
 
     spiralG.selectAll("circle").remove();
     spiralG.selectAll("image").remove();
 
     const test = spiralG.selectAll("circle").data(pills).enter();
-
-
 
     var circle = test.append("circle")
         .attr("id", function(d){
@@ -395,16 +406,11 @@ function drawSpiral(teams){
         .attr("cy", function (d) { return d.y; })
         .attr("r", function (d) { return d.r; });
 
-
     test.selectAll("circle")
         .attr('stroke', 'yellow')
         .attr('stroke-width', 0);
 
     test.append("image")
-        /*.attr("id", function(d){
-          console.log(d.id);
-          return d.id+"i";
-        })*/
         .attr("width", function (d) { return d.s;})
         .attr("height", function (d) { return d.s;})
         .attr("x", function (d) { return d.x - d.s/2; })
