@@ -358,23 +358,31 @@ function placeTeam(prefix, team) {
     const cy = height / 2;
 
     if (team != null) {
-        // Update the circle position and size
-        d3.select("#" + prefix + "TeamC")
-            .attr("cx", cx)
-            .attr("cy", cy)
+        // Compute the Logo dimension and
+        const s = r + rCorr;
+
+        d3.select("#compareC")
+            .attr("cx", r)
+            .attr("cy", r)
             .attr("r", r);
 
-        // Compute the Logo dimension and position
-        const s = r + rCorr;
-        d3.select("#" + prefix + "TeamL")
+        d3.select("#myTeamL")
+            .attr("xlink:href", team.logo)
             .attr("width", s)
             .attr("height", s)
-            .attr("x", cx - s / 2)
-            .attr("y", cy - s / 2)
-            .attr("xlink:href", team.logo);
+            .attr("x", (s - r) / 2)
+            .attr("y", (s - r) / 2);
+
+        // Update the circle position and size
+        d3.select("#compare")
+            .attr("cx", cx)
+            .attr("cy", cy)
+            .attr("r", r)
+            .style("fill", "url(#patternCompare)")
     } else {
         if (WARNING) console.log(prefix + "Team is null !")
     }
+
 }
 
 /**
@@ -391,6 +399,8 @@ function drawSpiral(teams) {
     let spiralG = d3.select('#spiralG');
     const width = spiralSVG.width();
     const height = spiralSVG.height();
+
+    const myTeamId = myFavoriteTeamId();
 
     // Get the start of the spiral
     const cx = width / 2;
@@ -425,7 +435,8 @@ function drawSpiral(teams) {
 
     for (let i = teamNumber - 1; i >= 0; i--) {
 
-        const teamPoint = teams[i].point;
+        const team = teams[i];
+        const teamPoint = team.point;
 
         // Compute position of the pill and its logo and push the pill
         const r = (minSize + teamPoint) * sizeFactor;
@@ -448,16 +459,19 @@ function drawSpiral(teams) {
         const s = r + rCorr;
 
         const pattern = defs.append("svg:pattern")
-            .attr("id", "pattern" + teams[i].id)
+            .attr("id", "pattern" + team.id)
             .attr("width", 1)
             .attr("height", 1)
+
         pattern.append("circle")
             .attr("cx", r)
             .attr("cy", r)
             .attr("r", r)
-            .style("fill", "#000")
+            .style("fill", "#333333")// TODO change color to team color
+            .style("stroke", "blue")
+            .style("stroke-width", myTeamId == team.id ? 8:0)
         pattern.append("svg:image")
-            .attr("xlink:href", teams[i].logo)
+            .attr("xlink:href", team.logo)
             .attr("width", s)
             .attr("height", s)
             .attr("x", (s - r) / 2)
@@ -467,13 +481,13 @@ function drawSpiral(teams) {
             .attr("cx", x)
             .attr("cy", y)
             .attr("r", r)
-            .style("fill", "url(#pattern" + teams[i].id + ")")
+            .style("fill", "url(#pattern" + team.id + ")")
             .on("mouseenter", function() {
                 circle.transition()
                     .duration(200)
                     .attr("cx", cx + (x - cx) * 1.1)
                     .attr("cy", cy + (y - cy) * 1.1);
-                $('#teamName').html(teams[i].name)
+                $('#teamName').html(team.name)
             })
             .on("mouseleave", function() {
                 circle.transition()
@@ -499,8 +513,11 @@ function init() {
     $("#teamSelection").on("hidden.bs.modal", function() {
         const index = $('#teamSelectorCarousel li.active').attr('data-slide-to');
         locallyStoreFavoriteTeamId(index);
-        placeTeam("my", team(index));
+        draw();
     });
+
+    // Create the main transition
+    createMainTransition();
 
     // Everyting will be inside a SVG html element
     // Initialize myTeamSVG and myTeamG
@@ -510,11 +527,22 @@ function init() {
         .append("g")
         .attr("id", "myTeamG");
 
+    const defs = myTeamG.append('svg:defs');
+    const pattern = defs.append("svg:pattern")
+        .attr("id", "patternCompare")
+        .attr("width", 1)
+        .attr("height", 1);
     // Append the myTeamC circle and the myTeamL logo
+    pattern.append("circle")
+        .attr("id", "compareC")
+        .style("fill", "#333333"); // TODO change color to team color
+    pattern.append("svg:image")
+        .attr("id", "myTeamL");
+    pattern.append("svg:image")
+        .attr("id", "otherTeamL");
     myTeamG.append("circle")
-        .attr("id", "myTeamC")
-    myTeamG.append("image")
-        .attr("id", "myTeamL")
+        .attr("id", "compare");
+
 
     // Initialize spiral
     d3.select("#leftPanel")
@@ -617,4 +645,4 @@ $(window).resize(
     function() {
         draw();
     }
-);
+)
