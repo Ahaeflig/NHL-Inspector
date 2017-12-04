@@ -324,11 +324,10 @@ function placeTeam(prefix, team){
 function drawSpiral(teams){
 
     // Get the Spiral SVG and its dimensions
-    const spiralSVG = $('#spiralSVG');
+    let spiralSVG = $('#spiralSVG');
+    let spiralG = d3.select('#spiralG');
     const width = spiralSVG.width();
     const height = spiralSVG.height();
-
-    console.log("(W:"+width+", H:"+height+")");
 
     // Get the start of the spiral
     const cx = width/2 ;
@@ -353,8 +352,13 @@ function drawSpiral(teams){
     let oldX = cx;
     let oldY = cy;
 
+    // Clean the pills
+    spiralG.selectAll("circle").remove();
+    spiralG.selectAll("defs").remove();
+
+
     // Construct iterativelly all the pills from the center
-    const pills = [];
+    let defs = spiralG.append('svg:defs');
 
     for (let i = teamNumber-1; i >= 0; i--){
 
@@ -380,7 +384,39 @@ function drawSpiral(teams){
         const rCorr = r/2;
         const s = r+rCorr;
 
-        pills.push({x: x, y: y, r:r, s:s, logo:teams[i].logo, name:teams[i].name, id:teams[i].id});
+        const pattern = defs.append("svg:pattern")
+            .attr("id", "pattern"+teams[i].id)
+            .attr("width", 1)
+            .attr("height", 1)
+        pattern.append("circle")
+                .attr("cx", r)
+                .attr("cy", r)
+                .attr("r", r)
+                .style("fill", "#000")
+        pattern.append("svg:image")
+            .attr("xlink:href", teams[i].logo)
+            .attr("width", s)
+            .attr("height", s)
+            .attr("x", (s-r)/2)
+            .attr("y", (s-r)/2);
+
+        let circle = spiralG.append("circle")
+                .attr("cx", x)
+                .attr("cy", y)
+                .attr("r", r)
+                .style("fill", "url(#pattern"+teams[i].id+")")
+                .on("mouseenter", function(){
+                    circle.transition()
+                    .duration(200)
+                    .attr("cx", cx + (x-cx)*1.1)
+                    .attr("cy", cy + (y-cy)*1.1)
+                })
+                .on("mouseleave", function(){
+                    circle.transition()
+                      .duration(200)
+                      .attr("cx", x)
+                      .attr("cy", y)
+                  });
 
         // Update the previous value
         oldTheta = theta;
@@ -388,73 +424,6 @@ function drawSpiral(teams){
         oldX = x;
         oldY = y;
     }
-
-    // Get the spiral graphics
-    const spiralG = d3.select("#spiralG")
-    var defs = spiralSVG.append("defs");
-
-    spiralG.selectAll("circle").remove();
-    spiralG.selectAll("image").remove();
-
-    const test = spiralG.selectAll("circle").data(pills).enter();
-
-    var circle = test.append("circle")
-        .attr("id", function(d){
-          return d.id+"c";
-        })
-        .attr("cx", function (d) { return d.x; })
-        .attr("cy", function (d) { return d.y; })
-        .attr("r", function (d) { return d.r; });
-
-    test.selectAll("circle")
-        .attr('stroke', 'yellow')
-        .attr('stroke-width', 0);
-
-    test.append("image")
-        .attr("width", function (d) { return d.s;})
-        .attr("height", function (d) { return d.s;})
-        .attr("x", function (d) { return d.x - d.s/2; })
-        .attr("y", function (d) { return d.y - d.s/2; })
-        .attr("xlink:href", function (d){ return d.logo; })
-        //*
-        .on("mouseenter", function(){
-          //console.log("mouseenter");
-          d3.select(this)
-            .transition()
-            //.ease('elastic')
-            .duration(200)
-            .attr("width", function (d) { return d.s*2;})
-            .attr("height", function (d) { return d.s*2;})
-            .attr("x", function (d) { return d.x - d.s*2/2; })
-            .attr("y", function (d) { return d.y - d.s*2/2; });
-
-          d3.select(this).append("text")
-            .attr("id", function(d){return "t_"+d.id})
-            .attr("class", "nodetext")
-            .attr("x", function(d) { d.x - 30;})
-            .attr("y", function(d) { d.y - 15;})
-            .attr("fill", "black")
-            .text(function(d){
-              console.log(d.id);
-              return d.name;
-            })
-          })
-
-        //*/
-        .on("mouseleave", function(){
-          //console.log("mouseleave");
-          d3.select(this)
-              .transition()
-              //.ease('elastic')
-              .duration(200)
-              .attr("width", function (d) { return d.s;})
-              .attr("height", function (d) { return d.s;})
-              .attr("x", function (d) { return d.x - d.s/2; })
-              .attr("y", function (d) {return d.y - d.s/2; });
-
-          d3.select(this).selectAll(function(d){console.log("out " + d.id);return "#t_"+d.id;}).remove();
-            })
-
 }
 
 // Is called when the document is ready
@@ -497,7 +466,7 @@ function init() {
 
 
       // Initialize spiral
-      const spiralG = d3.select("#leftPanel")
+      d3.select("#leftPanel")
       .append("svg")
       .attr("id", "spiralSVG")
       .append("g")
