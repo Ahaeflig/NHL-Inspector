@@ -288,7 +288,7 @@ function createMainTransition() {
     const leftPl = $('#leftPanel');
 
     rightPl.click(function() {
-        if (leftPl.hasClass("active")) {
+        if (leftPl.hasClass("activePanel")) {
             rightPl.animate({
                 width: '100%',
                 height: '100%',
@@ -311,7 +311,7 @@ function createMainTransition() {
     });
 
     leftPl.click(function() {
-        if (rightPl.hasClass("active")) {
+        if (rightPl.hasClass("activePanel")) {
             leftPl.animate({
                 width: '100%',
                 height: '100%',
