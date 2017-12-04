@@ -62,8 +62,8 @@ nav{
     z-index: 99;
 }
 
-.active{
-    border-style: none !important; 
+.activePanel{
+    border-style: none !important;
     top: 0px !important;
     height: 100% !important;
     width: 100% !important;
