@@ -218,7 +218,7 @@ function createTeamSelectorInCarousel(teams) {
 
     for (let i = 0; i < teams.length; i++) {
         const active = i == 0 ? " active" : "";
-        indicators.append($('<li data-target="#teamSelectorCarousel" data-slide-to="' + i + '">').addClass(active));
+        indicators.append($('<li data-target="#teamSelectorCarousel" data-slide-to="' + i + '" data-index="'+teams[i].id+'">').addClass(active));
         inner.append($('<a>').addClass("slide carousel-item" + active)
             .append($('<img>').addClass("carousel-img d-block img-fluid").attr('src', teams[i].logo))
             .append($('<div>').addClass("carousel-caption d-none d-md-block")
@@ -511,7 +511,7 @@ function init() {
     if (MESSAGE) console.log("Document is Ready");
 
     $("#teamSelection").on("hidden.bs.modal", function() {
-        const index = $('#teamSelectorCarousel li.active').attr('data-slide-to');
+        const index = $('#teamSelectorCarousel li.active').attr('data-index');
         locallyStoreFavoriteTeamId(index);
         draw();
     });
