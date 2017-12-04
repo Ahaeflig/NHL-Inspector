@@ -218,7 +218,7 @@ function createTeamSelectorInCarousel(teams) {
 
     for (let i = 0; i < teams.length; i++) {
         const active = i == 0 ? " active" : "";
-        indicators.append($('<li data-target="#teamSelectorCarousel" data-slide-to="' + teams[i].id + '">').addClass(active));
+        indicators.append($('<li data-target="#teamSelectorCarousel" data-slide-to="' + i + '">').addClass(active));
         inner.append($('<a>').addClass("slide carousel-item" + active)
             .append($('<img>').addClass("carousel-img d-block img-fluid").attr('src', teams[i].logo))
             .append($('<div>').addClass("carousel-caption d-none d-md-block")
