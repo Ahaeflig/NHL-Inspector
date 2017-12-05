@@ -129,7 +129,6 @@ function getCleanedGlobalData(data) {
  * @return the cleaned data as an array of teams sorted by point decreasingly
  */
 function getCleanedTeams(data) {
-
     conferenceData = data.records
     var teams = [];
 
@@ -140,12 +139,17 @@ function getCleanedTeams(data) {
             let points = conferenceData[conf]["teamRecords"][i].points
             let id = conferenceData[conf]["teamRecords"][i].team.id
 
+            let team_conf = conferenceData[conf]["teamRecords"][i].team.conference.name
+            let div = conferenceData[conf]["teamRecords"][i].team.division.name
+
             teams.push({
                 name: teamName,
                 logo: LOGO_DICT[teamName][0],
                 point: points,
                 id: id,
                 color : LOGO_DICT[teamName][1],
+                conference : team_conf,
+                division : div,
             })
         }
     }
@@ -157,6 +161,23 @@ function getCleanedTeams(data) {
 
     return teams;
 }
+
+
+/**
+ * Store the current selected date in a Session
+ * @param date (string): the date to store
+ */
+function sessionStoreDate(date) {
+    localStorage.setItem("chosen_date", date);
+}
+
+/**
+ * Return chosen date
+ */
+function chosenDate() {
+    return localStorage.getItem("chosen_date");
+}
+
 
 /**
  * Locally store the id of the user favorite team
@@ -178,6 +199,7 @@ const myFavoriteTeamId = function() {
  * @param teams (Array of team): the array of team to stringify
  */
 function locallyStoreTeams(teams) {
+    localStorage.removeItem("teams")
     localStorage.setItem("teams", JSON.stringify(teams));
 }
 
@@ -309,7 +331,7 @@ function createMainTransition() {
                     leftPl.height("40%").width("20%").css({
                         top: '54px'
                     });
-                    drawSpiral(teams());
+                    drawSpiral(filterConf(teams()));
                 }
             });
         }
@@ -324,7 +346,7 @@ function createMainTransition() {
             }, {
                 duration: 300,
                 step: function() {
-                    drawSpiral(teams());
+                    drawSpiral(filterConf(teams()));
                 },
                 complete: function() {
                     leftPl.addClass('activePanel');
@@ -523,7 +545,7 @@ function init() {
     $("#teamSelection").on("hidden.bs.modal", function() {
         const index = $('#teamSelectorCarousel li.active').attr('data-index');
         locallyStoreFavoriteTeamId(index);
-        draw();
+        draw(teams());
     });
 
     // Create the main transition
@@ -594,13 +616,24 @@ function init() {
                 const dd = date.getDate();
                 const yyyy = date.getFullYear();
 
-                reloadAndDraw(yyyy + "-" + mm + "-" + dd)
+                dateString = yyyy + "-" + mm + "-" + dd
+                sessionStoreDate(dateString);
+                reloadAndDraw(dateString);
             }
         }
     });
     $('#timeSliderInput').trigger('change');
 
+    $( ".selectpicker").on({
+        change: function() {
+
+            reloadAndDraw(chosenDate());
+        }
+    })
+
+
     const today_string = today.getYear() + "-" + today.getMonth() + "-" + today.getDay();
+    sessionStoreDate(today_string);
 
     //Setup teamSelectorGrid once
     //TODO find best way to not pull data twice at
@@ -612,14 +645,45 @@ function init() {
         teamSelectorCarousel = createTeamSelectorInCarousel(cleanedTeams);
         teamSelectorGrid = createTeamSelectorInGrid(cleanedTeams)
 
+        // Store locally the teams values
+        locallyStoreTeams(cleanedTeams);
+
         // test contains the wanted json @Ismail
         test = getCleanedGlobalData(response)
         console.log(test); // simply test
 
+
+        draw(cleanedTeams);
     });
-    draw();
 
 }
+
+// Filter cleanedTeam with conference or division selector
+function filterConf(data) {
+
+    if  (myFavoriteTeamId() == null) {
+      return data
+    }
+
+    let current_conf = team(myFavoriteTeamId()).conference
+    let current_division = team(myFavoriteTeamId()).division
+
+    //0 = NHl, 1=Conference, 2=Division
+    let selected_val = $( ".selectpicker option:selected" ).val()
+
+    if (selected_val == 1) {
+      return data.filter( function(team) {
+          return team.conference == current_conf;
+      });
+    } else if (selected_val == 2) {
+      return data.filter( function(team) {
+          return team.division == current_division;
+      });
+    }
+
+    return data;
+}
+
 
 // Load Data
 function reloadAndDraw(date) {
@@ -628,13 +692,10 @@ function reloadAndDraw(date) {
     loadedData = loadNHLData(date);
     // Parse and clean the data into an array
     loadedData.done(function(response) {
+            teams_clean = getCleanedTeams(response);
 
-            cleanedTeams = getCleanedTeams(response);
-
-            // Store locally the teams values
-            locallyStoreTeams(cleanedTeams);
-
-            draw();
+            filteredTeams = filterConf(teams_clean);
+            draw(filteredTeams);
         }
 
     ).fail(console.log("failed"))
@@ -645,17 +706,17 @@ function reloadAndDraw(date) {
 * Draw complete UI
 * using @see placeTeam and @see drawSpiral functions.
 */
-function draw(){
+function draw(teamsToDraw) {
     // Place myTeamG in a dynamic way
     placeTeam("my", team(myFavoriteTeamId()));
     // Place spiralG in a dynamic way.
-    drawSpiral(teams());
+    drawSpiral(filterConf(teamsToDraw));
 }
 
 
 // When the window is resized
 $(window).resize(
     function() {
-        draw();
+        draw(teams());
     }
 )
