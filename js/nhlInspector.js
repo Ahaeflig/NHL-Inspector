@@ -9,37 +9,37 @@ const WARNING = true
 const ERROR = true;
 
 const LOGO_DICT = {
-    "Washington Capitals": "logos/Washington_Capitals_logo.svg",
-    "New Jersey Devils": "logos/New_Jersey_Devils_logo.svg",
-    "Columbus Blue Jackets": "logos/Columbus_Blue_Jackets_logo.svg",
-    "Philadelphia Flyers": "logos/Philadelphia_Flyers_logo.svg",
-    "Carolina Hurricanes": "logos/Carolina_Hurricanes_logo.svg",
-    "New York Islanders": "logos/New_York_Islanders_logo.svg",
-    "Pittsburgh Penguins": "logos/Pittsburgh_Penguins_logo.svg",
-    "New York Rangers": "logos/New_York_Rangers_logo.svg",
-    "Toronto Maple Leafs": "logos/Toronto_Maple_Leafs_logo.svg",
-    "Tampa Bay Lightning": "logos/Tampa_Bay_Lightning_logo.svg",
-    "Detroit Red Wings": "logos/Detroit_Red_Wings_logo.svg",
-    "Ottawa Senators": "logos/Ottawa_Senators_logo.svg",
-    "Boston Bruins": "logos/Boston_Bruins_logo.svg",
-    "Florida Panthers": "logos/Florida_Panthers_logo.svg",
-    "Montréal Canadiens": "logos/Montreal_Canadiens_logo.svg",
-    "Buffalo Sabres": "logos/Buffalo_Sabres_logo.svg",
-    "St. Louis Blues": "logos/St_Louis_Blues_logo.svg",
-    "Chicago Blackhawks": "logos/Chicago_Blackhawks_logo.svg",
-    "Colorado Avalanche": "logos/Colorado_Avalanche_logo.svg",
-    "Nashville Predators": "logos/Nashville_Predators_logo.svg",
-    "Winnipeg Jets": "logos/Winnipeg_Jets_logo.svg",
-    "Dallas Stars": "logos/Dallas_Stars_logo.svg",
-    "Minnesota Wild": "logos/Minnesota_Wild_logo.svg",
-    "Vegas Golden Knights": "logos/Vegas_Golden_Knights_logo.svg",
-    "Los Angeles Kings": "logos/Los_Angeles_Kings_logo.svg",
-    "Calgary Flames": "logos/Calgary_Flames_logo.svg",
-    "Vancouver Canucks": "logos/Vancouver_Canucks_logo.svg",
-    "Anaheim Ducks": "logos/Anaheim_Ducks_logo.svg",
-    "Edmonton Oilers": "logos/Edmonton_Oilers_logo.svg",
-    "Arizona Coyotes": "logos/Arizona_Coyotes_logo.svg",
-    "San Jose Sharks": "logos/San_Jose_Sharks_logo.svg"
+    "Washington Capitals": ["logos/Washington_Capitals_logo.svg", "#323b44"],
+    "New Jersey Devils": ["logos/New_Jersey_Devils_logo.svg", "#d71a36"],
+    "Columbus Blue Jackets": ["logos/Columbus_Blue_Jackets_logo.svg", "#171d37"],
+    "Philadelphia Flyers": ["logos/Philadelphia_Flyers_logo.svg", "#fe733a"],
+    "Carolina Hurricanes": ["logos/Carolina_Hurricanes_logo.svg", "#cd1a37"],
+    "New York Islanders": ["logos/New_York_Islanders_logo.svg", "#0a2c74"],
+    "Pittsburgh Penguins": ["logos/Pittsburgh_Penguins_logo.svg", "#110d0e"],
+    "New York Rangers": ["logos/New_York_Rangers_logo.svg", "#062d94"],
+    "Toronto Maple Leafs": ["logos/Toronto_Maple_Leafs_logo.svg", "#1d459d"],
+    "Tampa Bay Lightning": ["logos/Tampa_Bay_Lightning_logo.svg", "#09247d"],
+    "Detroit Red Wings": ["logos/Detroit_Red_Wings_logo.svg", "#da1934"],
+    "Ottawa Senators": ["logos/Ottawa_Senators_logo.svg", "#bf0421"],
+    "Boston Bruins": ["logos/Boston_Bruins_logo.svg", "#0a0f12"],
+    "Florida Panthers": ["logos/Florida_Panthers_logo.svg", "#ededed"],
+    "Montréal Canadiens": ["logos/Montreal_Canadiens_logo.svg", "#9e0c30"],
+    "Buffalo Sabres": ["logos/Buffalo_Sabres_logo.svg", "#1f2349"],
+    "St. Louis Blues": ["logos/St_Louis_Blues_logo.svg", "#273052"],
+    "Chicago Blackhawks": ["logos/Chicago_Blackhawks_logo.svg", "#e8243a"],
+    "Colorado Avalanche": ["logos/Colorado_Avalanche_logo.svg", "#941d3d"],
+    "Nashville Predators": ["logos/Nashville_Predators_logo.svg", "#eab943"],
+    "Winnipeg Jets": ["logos/Winnipeg_Jets_logo.svg", "#1b1d36"],
+    "Dallas Stars": ["logos/Dallas_Stars_logo.svg", "#199e5f"],
+    "Minnesota Wild": ["logos/Minnesota_Wild_logo.svg", "#1f594d"],
+    "Vegas Golden Knights": ["logos/Vegas_Golden_Knights_logo.svg",  "#424b50"],
+    "Los Angeles Kings": ["logos/Los_Angeles_Kings_logo.svg", "#141416"],
+    "Calgary Flames": ["logos/Calgary_Flames_logo.svg",  "#dc1430"],
+    "Vancouver Canucks": ["logos/Vancouver_Canucks_logo.svg", "#0c2f8d"],
+    "Anaheim Ducks": ["logos/Anaheim_Ducks_logo.svg", "#0f0e13"],
+    "Edmonton Oilers": ["logos/Edmonton_Oilers_logo.svg", "#ec824e"],
+    "Arizona Coyotes": ["logos/Arizona_Coyotes_logo.svg", "#b01f3e"],
+    "San Jose Sharks": ["logos/San_Jose_Sharks_logo.svg", "#036082"],
 }
 
 
@@ -91,11 +91,11 @@ function getCleanedGlobalData(data) {
             let conferenceRank = conferenceData[conf]["teamRecords"][i].conferenceRank
             let leagueRank = conferenceData[conf]["teamRecords"][i].leagueRank
             let wildCardRank = conferenceData[conf]["teamRecords"][i].wildCardRank
-            
+
             teams.push({
                 "name": teamName,
                 "data": {
-                    "logo": LOGO_DICT[teamName],
+                    "logo": LOGO_DICT[teamName][0],
                     "point": points,
                     "teamName": teamName,
                     "points": points,
@@ -139,11 +139,13 @@ function getCleanedTeams(data) {
             let teamName = conferenceData[conf]["teamRecords"][i].team.name
             let points = conferenceData[conf]["teamRecords"][i].points
             let id = conferenceData[conf]["teamRecords"][i].team.id
+
             teams.push({
                 name: teamName,
-                logo: LOGO_DICT[teamName],
+                logo: LOGO_DICT[teamName][0],
                 point: points,
-                id: id
+                id: id,
+                color : LOGO_DICT[teamName][1],
             })
         }
     }
@@ -367,7 +369,8 @@ function placeTeam(prefix, team) {
         d3.select("#compareC")
             .attr("cx", r)
             .attr("cy", r)
-            .attr("r", r);
+            .attr("r", r)
+            .attr("fill", team.color);
 
         d3.select("#myTeamL")
             .attr("xlink:href", team.logo)
@@ -470,7 +473,7 @@ function drawSpiral(teams) {
             .attr("cx", r)
             .attr("cy", r)
             .attr("r", r)
-            .style("fill", "#333333")// TODO change color to team color
+            .style("fill", team.color)
             .style("stroke", "blue")
             .style("stroke-width", myTeamId == team.id ? 8:0)
         pattern.append("svg:image")
@@ -538,7 +541,7 @@ function init() {
     // Append the myTeamC circle and the myTeamL logo
     pattern.append("circle")
         .attr("id", "compareC")
-        .style("fill", "#333333"); // TODO change color to team color
+        .style("fill", "#33333"); // TODO change color to team color
     pattern.append("svg:image")
         .attr("id", "myTeamL");
     pattern.append("svg:image")
