@@ -301,7 +301,7 @@ function createMainTransition() {
                 complete: function() {
                     rightPl.addClass('activePanel');
                     leftPl.removeClass('activePanel');
-                    leftPl.height(300).width(400).css({
+                    leftPl.height("40%").width("20%").css({
                         top: '54px'
                     });
                     drawSpiral(teams());
@@ -324,7 +324,7 @@ function createMainTransition() {
                 complete: function() {
                     leftPl.addClass('activePanel');
                     rightPl.removeClass('activePanel');
-                    rightPl.height(300).width(400).css({
+                    rightPl.height("40%").width("20%").css({
                         top: '54px'
                     });;
                     placeTeam("my", team(myFavoriteTeamId()));
