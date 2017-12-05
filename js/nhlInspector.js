@@ -92,8 +92,8 @@ function getCleanedGlobalData(data) {
             let leagueRank = conferenceData[conf]["teamRecords"][i].leagueRank
             let wildCardRank = conferenceData[conf]["teamRecords"][i].wildCardRank
 
-            teams.push({
-                "name": teamName,
+            a_team = []
+            a_team.push({
                 "logo": LOGO_DICT[teamName],
                 "point": points,
                 "teamName": teamName,
@@ -109,9 +109,15 @@ function getCleanedGlobalData(data) {
                 "leagueRank": leagueRank,
                 "wildCardRank": wildCardRank,
             })
+
+            teams.push({
+                "name": teamName,
+                "data": a_team
+              })
         }
     }
-    return data;
+
+    return JSON.parse(JSON.stringify(teams));
 }
 
 
@@ -601,8 +607,14 @@ function init() {
         cleanedTeams = getCleanedTeams(response);
         teamSelectorCarousel = createTeamSelectorInCarousel(cleanedTeams);
         teamSelectorGrid = createTeamSelectorInGrid(cleanedTeams)
+
+
+        // test contains the wanted json @Ismail
+        test = getCleanedGlobalData(response)
+        
     });
     draw();
+
 }
 
 // Load Data
