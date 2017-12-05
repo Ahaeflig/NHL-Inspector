@@ -91,7 +91,7 @@ function getCleanedGlobalData(data) {
             let conferenceRank = conferenceData[conf]["teamRecords"][i].conferenceRank
             let leagueRank = conferenceData[conf]["teamRecords"][i].leagueRank
             let wildCardRank = conferenceData[conf]["teamRecords"][i].wildCardRank
-            
+
             teams.push({
                 "name": teamName,
                 "data": {
@@ -453,10 +453,14 @@ function drawSpiral(teams) {
         //y = cy + b*theta*Math.sin(theta+a);
         while ((oldX - x) * (oldX - x) + (oldY - y) * (oldY - y) - d < 0) {
             theta = theta + step;
-            x = cx + -b * theta * Math.cos(theta + a);
-            y = cy + b * theta * Math.sin(theta + a);
+            x = cx -b * theta * Math.cos(theta + a);
+            y = cy +b * theta * Math.sin(theta + a);
             // TODO Adan please remove me !
         }
+
+        const norm = Math.sqrt((x-cx)*(x-cx) + (y-cy)*(y-cy));
+        const nx = (x-cx)/norm;
+        const ny = (y-cy)/norm;
 
         const rCorr = r / 2;
         const s = r + rCorr;
@@ -488,8 +492,8 @@ function drawSpiral(teams) {
             .on("mouseenter", function() {
                 circle.transition()
                     .duration(200)
-                    .attr("cx", cx + (x - cx) * 1.1)
-                    .attr("cy", cy + (y - cy) * 1.1);
+                    .attr("cx", x + nx * 20)
+                    .attr("cy", y + ny * 20);
                 $('#teamName').html(team.name)
             })
             .on("mouseleave", function() {
