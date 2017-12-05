@@ -501,7 +501,7 @@ function drawSpiral(teams) {
             })
             .on("mouseleave", function() {
                 circle.transition()
-                    .duration(200)
+                    .duration(800)
                     .attr("cx", x)
                     .attr("cy", y);
                 $('#teamName').html("");
