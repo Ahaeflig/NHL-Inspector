@@ -91,28 +91,25 @@ function getCleanedGlobalData(data) {
             let conferenceRank = conferenceData[conf]["teamRecords"][i].conferenceRank
             let leagueRank = conferenceData[conf]["teamRecords"][i].leagueRank
             let wildCardRank = conferenceData[conf]["teamRecords"][i].wildCardRank
-
-            a_team = []
-            a_team.push({
-                "logo": LOGO_DICT[teamName],
-                "point": points,
-                "teamName": teamName,
-                "points": points,
-                "gamesPlayed": gamesPlayed,
-                "wins": wins,
-                "overtime": overtime,
-                "losses ": losses,
-                "goalAgainst": goalAgainst,
-                "goalScored ": goalScored,
-                "divisionRank": divisionRank,
-                "conferenceRank": conferenceRank,
-                "leagueRank": leagueRank,
-                "wildCardRank": wildCardRank,
-            })
-
+            
             teams.push({
                 "name": teamName,
-                "data": a_team
+                "data": {
+                    "logo": LOGO_DICT[teamName],
+                    "point": points,
+                    "teamName": teamName,
+                    "points": points,
+                    "gamesPlayed": gamesPlayed,
+                    "wins": wins,
+                    "overtime": overtime,
+                    "losses ": losses,
+                    "goalAgainst": goalAgainst,
+                    "goalScored ": goalScored,
+                    "divisionRank": divisionRank,
+                    "conferenceRank": conferenceRank,
+                    "leagueRank": leagueRank,
+                    "wildCardRank": wildCardRank,
+                }
               })
         }
     }
@@ -608,10 +605,10 @@ function init() {
         teamSelectorCarousel = createTeamSelectorInCarousel(cleanedTeams);
         teamSelectorGrid = createTeamSelectorInGrid(cleanedTeams)
 
-
         // test contains the wanted json @Ismail
         test = getCleanedGlobalData(response)
-        
+        console.log(test); // simply test
+
     });
     draw();
 
@@ -631,9 +628,6 @@ function reloadAndDraw(date) {
             locallyStoreTeams(cleanedTeams);
 
             draw();
-
-            // TODO Adan ? why this line ?
-            cleanedTeams = getCleanedGlobalData(response);
         }
 
     ).fail(console.log("failed"))
