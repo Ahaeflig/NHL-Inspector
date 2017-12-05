@@ -5,8 +5,8 @@ html, body, .container-fluid {
 }
 nav{
     position: fixed !important;
-    right: 0;
     left: 0;
+    width: 100%; 
     z-index: 1030;
     background-color: black;
 }
