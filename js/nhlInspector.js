@@ -139,6 +139,12 @@ function getCleanedTeams(data) {
             let points = conferenceData[conf]["teamRecords"][i].points
             let id = conferenceData[conf]["teamRecords"][i].team.id
 
+            let goalScored = conferenceData[conf]["teamRecords"][i].goalsScored
+            let goalAgainst = conferenceData[conf]["teamRecords"][i].goalsAgainst
+
+            let wins = conferenceData[conf]["teamRecords"][i].leagueRecord.wins
+            let losses = conferenceData[conf]["teamRecords"][i].leagueRecord.losses
+
             let team_conf = conferenceData[conf]["teamRecords"][i].team.conference.name
             let div = conferenceData[conf]["teamRecords"][i].team.division.name
 
@@ -146,6 +152,10 @@ function getCleanedTeams(data) {
                 name: teamName,
                 logo: LOGO_DICT[teamName][0],
                 point: points,
+                teamGoalScored: goalScored,
+                teamGoalAgainst: goalAgainst,
+                teamWins: wins,
+                teamLosses: losses,
                 id: id,
                 color : LOGO_DICT[teamName][1],
                 conference : team_conf,
@@ -407,9 +417,13 @@ function placeTeam(prefix, team) {
             .attr("cy", cy)
             .attr("r", r)
             .style("fill", "url(#patternCompare)")
+
+        drawChart(teamSVG,team);
     } else {
         if (WARNING) console.log(prefix + "Team is null !")
     }
+
+
 
 }
 
@@ -465,6 +479,7 @@ function drawSpiral(teams) {
 
         const team = teams[i];
         const teamPoint = team.point;
+
 
         // Compute position of the pill and its logo and push the pill
         const r = (minSize + teamPoint) * sizeFactor;
@@ -711,6 +726,149 @@ function draw(teamsToDraw) {
     placeTeam("my", team(myFavoriteTeamId()));
     // Place spiralG in a dynamic way.
     drawSpiral(filterConf(teamsToDraw));
+}
+
+
+// BAR CHART IMPLEMENTATION //
+
+function drawChart(teamSVG, team){
+  const width = 960,
+    height = 500,
+    chartRadius = height / 2 - 40;
+
+    teamCopy = team;
+    delete teamCopy.name;
+    delete teamCopy.logo;
+    delete teamCopy.color;
+    delete teamCopy.conference;
+    delete teamCopy.division;
+    delete teamCopy.id;
+
+  const color = d3.scaleOrdinal(d3.schemeCategory10);
+
+    function teamToArray(d){
+      return {
+        point : d.point,
+        goalScored : d.teamGoalScored,
+        goalAgainst : d.teamGoalAgainst,
+        wins : d.teamWins,
+        losses : d.teamLosses
+      }
+    }
+    teamArray = teamToArray(teamCopy);
+
+    console.log(teamCopy);
+    let tooltip = d3.select('body').append('div')
+      .attr('class', 'tooltip');
+
+    const PI = Math.PI,
+      arcMinRadius = 10,
+      arcPadding = 10,
+      labelPadding = -5,
+      numTicks = 10;
+
+      let scale = d3.scaleLinear()
+          .domain([0, 130])
+          .range([0, 2 * PI]);
+
+        let ticks = scale.ticks(numTicks).slice(0, -1);
+        let keys = Object.keys(teamArray);
+        console.log(keys);
+        console.log(teamArray);
+        //number of arcs
+        const numArcs = keys.length;
+        const arcWidth = (chartRadius - arcMinRadius - numArcs * arcPadding) / numArcs;
+
+        let arc = d3.arc(width/2, height/2)
+          .innerRadius((d, i) => getInnerRadius(i))
+          .outerRadius((d, i) => getOuterRadius(i))
+          .startAngle(0)
+          .endAngle((d, i) => scale(d))
+
+        let radialAxis = d3.select('#myTeamG')
+          .append('g')
+          .attr('class', 'r axis')
+          .attr('cx', width/2)
+          .attr('cy', height/2)
+          .selectAll('g')
+            .data(teamArray)
+            .enter().append('g');
+
+        radialAxis.append('circle')
+          .attr('r', (d, i) => getOuterRadius(i) + arcPadding);
+
+
+        radialAxis.append('text')
+          .attr('x', labelPadding)
+          .attr('y', (d, i) => -getOuterRadius(i) + arcPadding)
+          .text(d => d.name);
+
+        let axialAxis = d3.select('#myTeamG')
+          .append('g')
+          .attr('class', 'a axis')
+          .attr('cx', width/2)
+          .attr('cy', height/2)
+          .selectAll('g')
+            .data(ticks)
+            .enter().append('g')
+              .attr('transform', d => 'rotate(' + (rad2deg(scale(d)) - 90) + ')');
+
+        axialAxis.append('line')
+          .attr('x2', chartRadius);
+
+        axialAxis.append('text')
+          .attr('x', chartRadius + 10)
+          .style('text-anchor', d => (scale(d) >= PI && scale(d) < 2 * PI ? 'end' : null))
+          .attr('transform', d => 'rotate(' + (90 - rad2deg(scale(d))) + ',' + (chartRadius + 10) + ',0)')
+          .text(d => d);
+
+        //data arcs
+        let arcs = d3.select('#myTeamG')
+          .append('g')
+          .attr('class', 'data')
+          .selectAll('path')
+            .data(teamArray)
+            .enter().append('path')
+            .attr('class', 'arc')
+            .style('fill', (d, i) => color(i))
+
+        arcs.transition()
+          .delay((d, i) => i * 200)
+          .duration(1000)
+          .attrTween('d', arcTween);
+
+        arcs.on('mousemove', showTooltip)
+        arcs.on('mouseout', hideTooltip)
+
+
+        function arcTween(d, i) {
+          let interpolate = d3.interpolate(0, d.value);
+          return t => arc(interpolate(t), i);
+        }
+
+        function showTooltip(d) {
+          tooltip.style('left', (d3.event.pageX + 10) + 'px')
+            .style('top', (d3.event.pageY - 25) + 'px')
+            .style('display', 'inline-block')
+            .html(d.value);
+        }
+
+        function hideTooltip() {
+          tooltip.style('display', 'none');
+        }
+
+        function rad2deg(angle) {
+          return angle * 180 / PI;
+        }
+
+        function getInnerRadius(index) {
+          return arcMinRadius + (numArcs - (index + 1)) * (arcWidth + arcPadding);
+        }
+
+        function getOuterRadius(index) {
+          return getInnerRadius(index) + arcWidth;
+        }
+
 }
 
 
