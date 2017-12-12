@@ -501,11 +501,11 @@ function drawSpiralCallBack(teams) {
           .attr("width", 1)
           .attr("height", 1)
 
-      pattern.append("rect")
-          .attr("x", 0)
-          .attr("y", 0)
-          .attr("width", 2*r)
-          .attr("height", 2*r)
+      pattern.append("ellipse")
+          .attr("cx", r)
+          .attr("cy", r)
+          .attr("rx", r)
+          .attr("ry", r)
           .style("fill", team.color)
           .style("stroke", myTeamId == team.id ? "blue" : "red")
           .style("stroke-width", myTeamId == team.id || myOppositeTeamId() == team.id ? 15:0)
@@ -537,8 +537,10 @@ function drawSpiralCallBack(teams) {
               $('#teamName').html("");
           })
           .on("click", function() {
-              locallyStoreOppositeTeamId(team.id)
-              draw(teams, false)
+              if (team.id != myFavoriteTeamId()) {
+                locallyStoreOppositeTeamId(team.id)
+                draw(teams, false)
+              }
           })
 
       // Update the previous value
