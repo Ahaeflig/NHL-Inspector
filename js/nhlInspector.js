@@ -21,7 +21,7 @@ const LOGO_DICT = {
     "Tampa Bay Lightning": ["logos/Tampa_Bay_Lightning_logo.svg", "#5d74b3"],
     "Detroit Red Wings": ["logos/Detroit_Red_Wings_logo.svg", "#da1934"],
     "Ottawa Senators": ["logos/Ottawa_Senators_logo.svg", "#bf0421"],
-    "Boston Bruins": ["logos/Boston_Bruins_logo.svg", "#0a0f12"],
+    "Boston Bruins": ["logos/Boston_Bruins_logo.svg", "#eab477"],
     "Florida Panthers": ["logos/Florida_Panthers_logo.svg", "#ededed"],
     "Montréal Canadiens": ["logos/Montreal_Canadiens_logo.svg", "#9e0c30"],
     "Buffalo Sabres": ["logos/Buffalo_Sabres_logo.svg", "#1f2349"],
