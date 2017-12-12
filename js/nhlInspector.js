@@ -188,6 +188,23 @@ function locallyStoreFavoriteTeamId(id) {
 }
 
 /**
+ * Locally store the id of the opposite team
+ * @param id (int): the id to store of the opposite team
+ */
+function locallyStoreOppositeTeamId(id) {
+    localStorage.setItem("opposite_id", id);
+}
+
+
+/**
+ * @return (int): the user favorite team id
+ */
+const myOppositeTeamId = function() {
+    return localStorage.getItem("opposite_id");
+}
+
+
+/**
  * @return (int): the user favorite team id
  */
 const myFavoriteTeamId = function() {
@@ -495,13 +512,14 @@ function drawSpiral(teams) {
             .attr("width", 1)
             .attr("height", 1)
 
+
         pattern.append("circle")
             .attr("cx", r)
             .attr("cy", r)
             .attr("r", r)
             .style("fill", team.color)
-            .style("stroke", "blue")
-            .style("stroke-width", myTeamId == team.id ? 8:0)
+            .style("stroke", myTeamId == team.id ? "blue" : "red")
+            .style("stroke-width", myTeamId == team.id || myOppositeTeamId() == team.id ? 8:0)
         pattern.append("svg:image")
             .attr("xlink:href", team.logo)
             .attr("width", s)
@@ -527,6 +545,10 @@ function drawSpiral(teams) {
                     .attr("cx", x)
                     .attr("cy", y);
                 $('#teamName').html("");
+            })
+            .on("click", function() {
+                locallyStoreOppositeTeamId(team.id)
+                reloadAndDraw(chosenDate())
             })
 
         // Update the previous value
@@ -626,7 +648,6 @@ function init() {
 
     $( ".selectpicker").on({
         change: function() {
-
             reloadAndDraw(chosenDate());
         }
     })
