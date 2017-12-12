@@ -567,8 +567,6 @@ function drawSpiral(teams, shouldTransit) {
       firstTime = false;
     } else if(shouldTransit) {
 
-      let t_time = 400
-
       // Get the Spiral SVG and its dimensions
       let spiralSVG = $('#spiralSVG');
       let spiralG = d3.select('#spiralG');
@@ -578,28 +576,34 @@ function drawSpiral(teams, shouldTransit) {
       const cx = width / 2;
       const cy = height / 2;
 
+      //Trick to remove the mouseenter that trigger transitions, overriding the
+      //callback transition down the road
       d3.selectAll("circle")
         .on("mouseenter", function() {
         })
         .on("mouseleave", function() {
         })
 
+      let t_time = 400
 
+      //TODO this can just be removed right? no need to transition
       spiralG.selectAll("defs").transition()
           .duration(t_time)
           .attr("cx", cx)
           .attr("cy", cy)
+          .style("opacity", 1)
           .remove();
-
 
       var transitions = 0;
       spiralG.selectAll("circle").transition()
           .duration(t_time)
           .attr("cx", cx)
           .attr("cy", cy)
+          .style("opacity", 0)
           .on("start", function() {transitions++;})
           .on("end", function() {
             if( --transitions === 0 ) {
+              //Callback when all transitions are done
               drawSpiralCallBack(teams);
             }
           })
@@ -618,7 +622,6 @@ function drawSpiral(teams, shouldTransit) {
 
         drawSpiralCallBack(teams);
       }
-
 }
 
 // Is called when the document is ready
@@ -768,7 +771,7 @@ function filterConf(data) {
 }
 
 
-// Load Data
+// Load Data and Draw UI
 function reloadAndDraw(date, shouldTransit) {
     // Load the teams using ajax
     loadedData = loadNHLData(date);
