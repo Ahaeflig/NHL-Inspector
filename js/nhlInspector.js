@@ -348,7 +348,7 @@ function createMainTransition() {
                     leftPl.height("40%").width("20%").css({
                         top: '54px'
                     });
-                    drawSpiral(filterConf(teams()));
+                    draw(filterConf(teams()), false)
                 }
             });
         }
@@ -363,7 +363,7 @@ function createMainTransition() {
             }, {
                 duration: 300,
                 step: function() {
-                    drawSpiral(filterConf(teams()));
+                    draw(filterConf(teams()), false)
                 },
                 complete: function() {
                     leftPl.addClass('activePanel');
@@ -430,6 +430,127 @@ function placeTeam(prefix, team) {
 
 }
 
+
+function drawSpiralCallBack(teams) {
+
+  // Get the Spiral SVG and its dimensions
+  let spiralSVG = $('#spiralSVG');
+  let spiralG = d3.select('#spiralG');
+  const width = spiralSVG.width();
+  const height = spiralSVG.height();
+
+  const myTeamId = myFavoriteTeamId();
+
+  // Get the start of the spiral
+  const cx = width / 2;
+  const cy = height / 2;
+
+  // Get the number of team, the minimum radius of each pills and a
+  // resizing factor.
+  const teamNumber = teams.length;
+
+  // Probably need to be computated in a clever way
+  const minSize = 10;
+  const sizeFactor = Math.min(width / 1100, 1);
+
+  // Spiral parameters
+  const a = 0;
+  const b = Math.min(30, width / 40)
+  const step = Math.PI / 100;
+
+  // Set initial position (and rotation) of the sprial
+  let oldTheta = 0;
+  let oldR = 0;
+  let oldX = cx;
+  let oldY = cy;
+
+  // Construct iterativelly all the pills from the center
+  let defs = spiralG.append('svg:defs');
+
+  for (let i = teamNumber - 1; i >= 0; i--) {
+
+      const team = teams[i];
+      const teamPoint = team.point;
+
+      // Compute position of the pill and its logo and push the pill
+      const r = (minSize + teamPoint) * sizeFactor;
+      const d = (r + oldR) * (r + oldR);
+      let x = oldX;
+      let y = oldY;
+      let theta = oldTheta;
+      // TODO replace the while loop below by the exact theta solution !
+      // Need to solve theta^2 -2theta(oldX*cos(theta) +oldY*sin(theta))+oldX^2+oldY^2
+      //x = cx + -b*theta*Math.cos(theta+a);
+      //y = cy + b*theta*Math.sin(theta+a);
+      while ((oldX - x) * (oldX - x) + (oldY - y) * (oldY - y) - d < 0) {
+          theta = theta + step;
+          x = cx -b * theta * Math.cos(theta + a);
+          y = cy +b * theta * Math.sin(theta + a);
+          // TODO Adan please remove me !
+      }
+
+      const norm = Math.sqrt((x-cx)*(x-cx) + (y-cy)*(y-cy));
+      const nx = (x-cx)/norm;
+      const ny = (y-cy)/norm;
+
+      const rCorr = r / 2;
+      const s = r + rCorr;
+
+      const pattern = defs.append("svg:pattern")
+          .attr("id", "pattern" + team.id)
+          .attr("width", 1)
+          .attr("height", 1)
+
+      pattern.append("rect")
+          .attr("x", 0)
+          .attr("y", 0)
+          .attr("width", 2*r)
+          .attr("height", 2*r)
+          .style("fill", team.color)
+          .style("stroke", myTeamId == team.id ? "blue" : "red")
+          .style("stroke-width", myTeamId == team.id || myOppositeTeamId() == team.id ? 15:0)
+
+      pattern.append("svg:image")
+          .attr("xlink:href", team.logo)
+          .attr("width", s)
+          .attr("height", s)
+          .attr("x", (s - r) / 2)
+          .attr("y", (s - r) / 2);
+
+      let circle = spiralG.append("circle")
+          .attr("cx", x)
+          .attr("cy", y)
+          .attr("r", r)
+          .style("fill", "url(#pattern" + team.id + ")")
+          .on("mouseenter", function() {
+              circle.transition()
+                  .duration(200)
+                  .attr("cx", x + nx * 20)
+                  .attr("cy", y + ny * 20);
+              $('#teamName').html(team.name)
+          })
+          .on("mouseleave", function() {
+              circle.transition()
+                  .duration(800)
+                  .attr("cx", x)
+                  .attr("cy", y);
+              $('#teamName').html("");
+          })
+          .on("click", function() {
+              locallyStoreOppositeTeamId(team.id)
+              draw(teams, false)
+          })
+
+      // Update the previous value
+      oldTheta = theta;
+      oldR = r;
+      oldX = x;
+      oldY = y;
+  }
+}
+
+let firstTime = true
+
 /**
  * Draw a "logo team" tunnel spiral in corresponding SVG
  * @assume #spiralSVG exists as a <svg> in html
@@ -437,126 +558,65 @@ function placeTeam(prefix, team) {
  * @param teams:
  * @return void:
  */
-function drawSpiral(teams) {
+function drawSpiral(teams, shouldTransit) {
 
-    // Get the Spiral SVG and its dimensions
-    let spiralSVG = $('#spiralSVG');
-    let spiralG = d3.select('#spiralG');
-    const width = spiralSVG.width();
-    const height = spiralSVG.height();
+    if (firstTime) {
+      drawSpiralCallBack(teams);
+      firstTime = false;
+    } else if(shouldTransit) {
 
-    const myTeamId = myFavoriteTeamId();
+      let t_time = 400
 
-    // Get the start of the spiral
-    const cx = width / 2;
-    const cy = height / 2;
+      // Get the Spiral SVG and its dimensions
+      let spiralSVG = $('#spiralSVG');
+      let spiralG = d3.select('#spiralG');
+      const width = spiralSVG.width();
+      const height = spiralSVG.height();
 
-    // Get the number of team, the minimum radius of each pills and a
-    // resizing factor.
-    const teamNumber = teams.length;
+      const cx = width / 2;
+      const cy = height / 2;
 
-    // Probably need to be computated in a clever way
-    const minSize = 10;
-    const sizeFactor = Math.min(width / 1100, 1);
-
-    // Spiral parameters
-    const a = 0;
-    const b = Math.min(30, width / 40)
-    const step = Math.PI / 100;
-
-    // Set initial position (and rotation) of the sprial
-    let oldTheta = 0;
-    let oldR = 0;
-    let oldX = cx;
-    let oldY = cy;
-
-    // Clean the pills
-    spiralG.selectAll("circle").remove();
-    spiralG.selectAll("defs").remove();
+      d3.selectAll("circle")
+        .on("mouseenter", function() {
+        })
+        .on("mouseleave", function() {
+        })
 
 
-    // Construct iterativelly all the pills from the center
-    let defs = spiralG.append('svg:defs');
-
-    for (let i = teamNumber - 1; i >= 0; i--) {
-
-        const team = teams[i];
-        const teamPoint = team.point;
-
-        // Compute position of the pill and its logo and push the pill
-        const r = (minSize + teamPoint) * sizeFactor;
-        const d = (r + oldR) * (r + oldR);
-        let x = oldX;
-        let y = oldY;
-        let theta = oldTheta;
-        // TODO replace the while loop below by the exact theta solution !
-        // Need to solve theta^2 -2theta(oldX*cos(theta) +oldY*sin(theta))+oldX^2+oldY^2
-        //x = cx + -b*theta*Math.cos(theta+a);
-        //y = cy + b*theta*Math.sin(theta+a);
-        while ((oldX - x) * (oldX - x) + (oldY - y) * (oldY - y) - d < 0) {
-            theta = theta + step;
-            x = cx -b * theta * Math.cos(theta + a);
-            y = cy +b * theta * Math.sin(theta + a);
-            // TODO Adan please remove me !
-        }
-
-        const norm = Math.sqrt((x-cx)*(x-cx) + (y-cy)*(y-cy));
-        const nx = (x-cx)/norm;
-        const ny = (y-cy)/norm;
-
-        const rCorr = r / 2;
-        const s = r + rCorr;
-
-        const pattern = defs.append("svg:pattern")
-            .attr("id", "pattern" + team.id)
-            .attr("width", 1)
-            .attr("height", 1)
+      spiralG.selectAll("defs").transition()
+          .duration(t_time)
+          .attr("cx", cx)
+          .attr("cy", cy)
+          .remove();
 
 
-        pattern.append("circle")
-            .attr("cx", r)
-            .attr("cy", r)
-            .attr("r", r)
-            .style("fill", team.color)
-            .style("stroke", myTeamId == team.id ? "blue" : "red")
-            .style("stroke-width", myTeamId == team.id || myOppositeTeamId() == team.id ? 8:0)
-        pattern.append("svg:image")
-            .attr("xlink:href", team.logo)
-            .attr("width", s)
-            .attr("height", s)
-            .attr("x", (s - r) / 2)
-            .attr("y", (s - r) / 2);
+      var transitions = 0;
+      spiralG.selectAll("circle").transition()
+          .duration(t_time)
+          .attr("cx", cx)
+          .attr("cy", cy)
+          .on("start", function() {transitions++;})
+          .on("end", function() {
+            if( --transitions === 0 ) {
+              drawSpiralCallBack(teams);
+            }
+          })
+          .remove();
 
-        let circle = spiralG.append("circle")
-            .attr("cx", x)
-            .attr("cy", y)
-            .attr("r", r)
-            .style("fill", "url(#pattern" + team.id + ")")
-            .on("mouseenter", function() {
-                circle.transition()
-                    .duration(200)
-                    .attr("cx", x + nx * 20)
-                    .attr("cy", y + ny * 20);
-                $('#teamName').html(team.name)
-            })
-            .on("mouseleave", function() {
-                circle.transition()
-                    .duration(800)
-                    .attr("cx", x)
-                    .attr("cy", y);
-                $('#teamName').html("");
-            })
-            .on("click", function() {
-                locallyStoreOppositeTeamId(team.id)
-                reloadAndDraw(chosenDate())
-            })
+      } else {
 
-        // Update the previous value
-        oldTheta = theta;
-        oldR = r;
-        oldX = x;
-        oldY = y;
-    }
+        // Get the Spiral SVG and its dimensions
+        let spiralSVG = $('#spiralSVG');
+        let spiralG = d3.select('#spiralG');
+        const width = spiralSVG.width();
+        const height = spiralSVG.height();
+
+        spiralG.selectAll("circle").remove();
+        spiralG.selectAll("defs").remove();
+
+        drawSpiralCallBack(teams);
+      }
+
 }
 
 // Is called when the document is ready
@@ -640,15 +700,15 @@ function init() {
 
                 dateString = yyyy + "-" + mm + "-" + dd
                 sessionStoreDate(dateString);
-                reloadAndDraw(dateString);
+                reloadAndDraw(dateString, true);
             }
         }
     });
     $('#timeSliderInput').trigger('change');
 
-    $( ".selectpicker").on({
+    $(".selectpicker").on({
         change: function() {
-            reloadAndDraw(chosenDate());
+            reloadAndDraw(chosenDate(), true);
         }
     })
 
@@ -707,8 +767,7 @@ function filterConf(data) {
 
 
 // Load Data
-function reloadAndDraw(date) {
-
+function reloadAndDraw(date, shouldTransit) {
     // Load the teams using ajax
     loadedData = loadNHLData(date);
     // Parse and clean the data into an array
@@ -716,7 +775,7 @@ function reloadAndDraw(date) {
             teams_clean = getCleanedTeams(response);
 
             filteredTeams = filterConf(teams_clean);
-            draw(filteredTeams);
+            draw(filteredTeams, shouldTransit);
         }
 
     ).fail(console.log("failed"))
@@ -727,17 +786,17 @@ function reloadAndDraw(date) {
 * Draw complete UI
 * using @see placeTeam and @see drawSpiral functions.
 */
-function draw(teamsToDraw) {
+function draw(teamsToDraw, shouldTransit) {
     // Place myTeamG in a dynamic way
     placeTeam("my", team(myFavoriteTeamId()));
     // Place spiralG in a dynamic way.
-    drawSpiral(filterConf(teamsToDraw));
+    drawSpiral(filterConf(teamsToDraw), shouldTransit);
 }
 
 
 // When the window is resized
 $(window).resize(
     function() {
-        draw(teams());
+        draw(teams(), false);
     }
 )
