@@ -432,31 +432,27 @@ function placeTeam(prefix, team_) {
                 });
           }
 
-          padding = 25
-          r_ = r - padding
-          let arcGen1 = getArcGen(0, r)
-          let arcGen2 = getArcGen(0, r)
+          let arcGen = getArcGen(0, r)
 
-          var arcData1 = [
-            {startAngleOfMyArc: Math.PI/4, endAngleOfMyArc: Math.PI + Math.PI/4},
-          ];
-          var arcData2 = [
+          let arcData1 = [
             {startAngleOfMyArc: Math.PI + Math.PI/4, endAngleOfMyArc: 2 * Math.PI + Math.PI / 4}
           ];
 
-          var defs = d3.select('#myTeamDoubleRainbow').selectAll("g").append('defs')
-          let pattern = defs.append("svg:pattern")
+          let arcData2 = [
+            {startAngleOfMyArc: Math.PI/4, endAngleOfMyArc: Math.PI + Math.PI/4},
+          ];
+
+          var def1 = d3.select('#myTeamDoubleRainbow').select("#t1").append('defs')
+          let pattern = def1.append("svg:pattern")
           .attr("id", "teamlogo1")
           .attr("width", 1)
-          .attr("height", 1)
+          .attr("height", 1);
 
           pattern.append("circle")
               .attr("cx", r)
               .attr("cy", r)
               .attr("r", r)
-              .style("fill", team_.color)
-              .style("stroke", team_.color)
-              .style("stroke-width",15)
+              .style("fill", team_.color);
 
           pattern.append("svg:image")
               .attr("xlink:href", team_.logo)
@@ -465,7 +461,8 @@ function placeTeam(prefix, team_) {
               .attr("x", (s - r) / 2)
               .attr("y", (s - r) / 2);
 
-          let pattern2 = defs.append("svg:pattern")
+          var def2 = d3.select('#myTeamDoubleRainbow').select("#t2").append('defs')
+          let pattern2 = def2.append("svg:pattern")
           .attr("id", "teamlogo2")
           .attr("width", 1)
           .attr("height", 1)
@@ -473,48 +470,39 @@ function placeTeam(prefix, team_) {
           pattern2.append("circle")
               .attr("cx", r)
               .attr("cy", r)
-              .attr("r", r)
-              .style("fill", team(myOppositeTeamId()).color)
-              .style("stroke", team(myOppositeTeamId()).color)
-              .style("stroke-width",15)
+              .attr("r", r*2)
+              .style("fill", team(myOppositeTeamId()).color);
 
           pattern2.append("svg:image")
               .attr("xlink:href", team(myOppositeTeamId()).logo)
               .attr("width", s)
               .attr("height", s)
-              .attr("x", (s - r) / 2)
-              .attr("y", (s - r) / 2);
+              .attr("x",  -9)
+              .attr("y",  -9);
 
-            // Create a path element and set its d attribute
            d3.select('#t1')
+             .selectAll('path')
+             .data(arcData1)
+             .enter()
+             .append('path')
+             .attr('d', arcGen)
+             .attr("fill", "url(#teamlogo1)")
+             .attr("transform","translate("+cx+","+cy+")");
+
+           d3.select('#t2')
              .selectAll('path')
              .data(arcData2)
              .enter()
              .append('path')
-             .attr('d', arcGen1)
-             .attr("fill", "url(#teamlogo1)");
+             .attr('d', arcGen)
+             .attr("fill", "url(#teamlogo2)")
+             .attr("transform","translate("+cx+","+cy+")");
 
-            // Create a path element and set its d attribute
-            d3.select('#t2')
-              .selectAll('path')
-              .data(arcData1)
-              .enter()
-              .append('path')
-              .attr('d', arcGen2)
-              .attr("fill", "url(#teamlogo2)");
-
-
-            d3.select('#myTeamDoubleRainbow').selectAll('path')
-                 .attr("transform","translate("+cx+","+cy+")")
-
-
-        drawChart(team);
+           drawChart(team);
 
     } else {
         if (WARNING) console.log(prefix + "Team is null !")
     }
-
-
 
 }
 
@@ -734,7 +722,7 @@ function init() {
         .append("g")
         .attr("id", "myTeamG");
 
-    // for cool stacked logo in half circles, could
+    // for cool stacked logo in half circles
     d3.select("#myTeamSVG")
         .append('svg')
         .attr("id", "myTeamDoubleRainbow")
@@ -746,37 +734,6 @@ function init() {
     d3.select("#myTeamDoubleRainbow")
         .append("g")
         .attr("id", "t2");
-
-    d3.select("#myTeamDoubleRainbow")
-        .append("g")
-        .attr("id", "c1");
-
-    d3.select("#myTeamDoubleRainbow")
-        .append("g")
-        .attr("id", "c2");
-
-
-
-    /*const defs = myTeamG.append('svg:defs');
-    const pattern = defs.append("svg:pattern")
-        .attr("id", "patternCompare")
-        .attr("width", 1)
-        .attr("height", 1);
-
-    // Append the myTeamC circle and the myTeamL logo
-    pattern.append("circle")
-        .attr("id", "compareC")
-        .style("fill", "#33333"); // TODO change color to team color
-    pattern.append("svg:image")
-        .attr("id", "myTeamL");
-    pattern.append("svg:image")
-        .attr("id", "otherTeamL");
-    myTeamG.append("circle")
-        .attr("id", "compare");*/
-
-
-
-
 
     // Initialize spiral
     d3.select("#leftPanel")

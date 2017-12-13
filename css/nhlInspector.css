@@ -85,6 +85,11 @@ path.spiral {
     stroke-width: 3px;
 }
 
+#myTeamDoubleRainbow path {
+  stroke: white;
+  stroke-width: 0.5;
+    }
+
 #teamName{
     position: absolute;
     color: #fff;
