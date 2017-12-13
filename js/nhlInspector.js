@@ -822,11 +822,12 @@ function drawChart(){
     d3.selectAll("path").remove();
 
     const svg = $('#myTeamSVG');
+    visualizationMode = "stack"; //other mode : adjacent
 
     const width = svg.width();
     const height = svg.height();
     const r = Math.min(width, height) / 4;
-    var arcWidth = (1/40)*height;
+    var arcWidth = (1/60)*height;
     var padding = (1/5)*arcWidth;
     //const color = d3.scaleOrdinal(d3.schemeCategory10);
 
@@ -842,26 +843,41 @@ function drawChart(){
       if(dOpposite!=null)
       {
         console.log("Opposite not null");
-        return [
-          {"value" : d.point < dOpposite.point ? d.point : dOpposite.point, "stat" : "Points", "color" : d.point < dOpposite.point ? "blue" : "red", "index" : "0", "offset" : "0"},
-          {"value" : d.point < dOpposite.point ? dOpposite.point - d.point : d.point - dOpposite.point, "stat" : "Points", "color" : d.point < dOpposite.point ? "red" : "blue", "index" : "0", "offset" : d.point < dOpposite.point ? d.point : dOpposite.point},
-          {"value" : d.teamGoalScored < dOpposite.teamGoalScored ? d.teamGoalScored : dOpposite.teamGoalScored, "stat" : "Goals Scored", "color" : d.teamGoalScored < dOpposite.teamGoalScored ? "blue" : "red", "index" : "1", "offset": "0"},
-          {"value" : d.teamGoalScored < dOpposite.teamGoalScored ? dOpposite.teamGoalScored - d.teamGoalScored : d.teamGoalScored - dOpposite.teamGoalScored, "stat" : "Goals Scored", "color" : d.teamGoalScored < dOpposite.teamGoalScored ? "red" : "blue", "index" : "1", "offset" : d.teamGoalScored < dOpposite.teamGoalScored ? d.teamGoalScored : dOpposite.teamGoalScored},
-          {"value" : d.teamGoalAgainst < dOpposite.teamGoalAgainst ? d.teamGoalAgainst : dOpposite.teamGoalAgainst, "stat" : "Goals Against", "color" :d.teamGoalAgainst < dOpposite.teamGoalAgainst ? "blue" : "red", "index" : "2", "offset" : "0"},
-          {"value" : d.teamGoalAgainst < dOpposite.teamGoalAgainst ? dOpposite.teamGoalAgainst - d.teamGoalAgainst : dOpposite.teamGoalAgainst, "stat" : "Goals Against", "color" :d.teamGoalAgainst < dOpposite.teamGoalAgainst ? "red" : "blue", "index" : "2", "offset" : d.teamGoalAgainst < dOpposite.teamGoalAgainst ? d.teamGoalAgainst : dOpposite.teamGoalAgainst},
-          {"value" : d.teamWins < dOpposite.teamWins ? d.teamWins : dOpposite.teamWins, "stat" : "Wins", "color" : d.teamWins < dOpposite.teamWins ? "blue" : "red", "index" : "3", "offset":"0"},
-          {"value" : d.teamWins < dOpposite.teamWins ? dOpposite.teamWins - d.teamWins : d.teamWins - dOpposite.teamWins, "stat" : "Wins", "color" : d.teamWins < dOpposite.teamWins ? "red" : "blue", "index" : "3", "offset":d.teamWins < dOpposite.teamWins ? d.teamWins : dOpposite.teamWins},
-          {"value" : d.teamLosses < dOpposite.teamLosses ? d.teamLosses : dOpposite.teamLosses, "stat" : "Losses", "color" : d.teamLosses < dOpposite.teamLosses ? "blue" : "red", "index" : "4", "offset":"0"},
-          {"value" : d.teamLosses < dOpposite.teamLosses ? dOpposite.teamLosses - d.teamLosses : d.teamLosses - dOpposite.teamLosses, "stat" : "Losses", "color" : d.teamLosses < dOpposite.teamLosses ? "red" : "blue", "index" : "4", "offset":d.teamLosses < dOpposite.teamLosses ? d.teamLosses : dOpposite.teamLosses},
-        ]
+        if(visualizationMode == "adjacent"){
+          return [
+            {"value" : d.point < dOpposite.point ? d.point : dOpposite.point, "stat" : "Points", "color" : d.point < dOpposite.point ? d.color : dOpposite.color, "index" : "0", "offset" : "0"},
+            {"value" : d.point < dOpposite.point ? dOpposite.point - d.point : d.point - dOpposite.point, "stat" : "Points", "color" : d.point < dOpposite.point ? dOpposite.color : d.color, "index" : "0", "offset" : d.point < dOpposite.point ? d.point : dOpposite.point},
+            {"value" : d.teamGoalScored < dOpposite.teamGoalScored ? d.teamGoalScored : dOpposite.teamGoalScored, "stat" : "Goals Scored", "color" : d.teamGoalScored < dOpposite.teamGoalScored ? d.color : dOpposite.color, "index" : "1", "offset": "0"},
+            {"value" : d.teamGoalScored < dOpposite.teamGoalScored ? dOpposite.teamGoalScored - d.teamGoalScored : d.teamGoalScored - dOpposite.teamGoalScored, "stat" : "Goals Scored", "color" : d.teamGoalScored < dOpposite.teamGoalScored ? dOpposite.color : d.color, "index" : "1", "offset" : d.teamGoalScored < dOpposite.teamGoalScored ? d.teamGoalScored : dOpposite.teamGoalScored},
+            {"value" : d.teamGoalAgainst < dOpposite.teamGoalAgainst ? d.teamGoalAgainst : dOpposite.teamGoalAgainst, "stat" : "Goals Against", "color" :d.teamGoalAgainst < dOpposite.teamGoalAgainst ? d.color : dOpposite.color, "index" : "2", "offset" : "0"},
+            {"value" : d.teamGoalAgainst < dOpposite.teamGoalAgainst ? dOpposite.teamGoalAgainst - d.teamGoalAgainst : dOpposite.teamGoalAgainst, "stat" : "Goals Against", "color" :d.teamGoalAgainst < dOpposite.teamGoalAgainst ? dOpposite.color : d.color, "index" : "2", "offset" : d.teamGoalAgainst < dOpposite.teamGoalAgainst ? d.teamGoalAgainst : dOpposite.teamGoalAgainst},
+            {"value" : d.teamWins < dOpposite.teamWins ? d.teamWins : dOpposite.teamWins, "stat" : "Wins", "color" : d.teamWins < dOpposite.teamWins ? d.color : dOpposite.color, "index" : "3", "offset":"0"},
+            {"value" : d.teamWins < dOpposite.teamWins ? dOpposite.teamWins - d.teamWins : d.teamWins - dOpposite.teamWins, "stat" : "Wins", "color" : d.teamWins < dOpposite.teamWins ? dOpposite.color : d.color, "index" : "3", "offset":d.teamWins < dOpposite.teamWins ? d.teamWins : dOpposite.teamWins},
+            {"value" : d.teamLosses < dOpposite.teamLosses ? d.teamLosses : dOpposite.teamLosses, "stat" : "Losses", "color" : d.teamLosses < dOpposite.teamLosses ? d.color : dOpposite.color, "index" : "4", "offset":"0"},
+            {"value" : d.teamLosses < dOpposite.teamLosses ? dOpposite.teamLosses - d.teamLosses : d.teamLosses - dOpposite.teamLosses, "stat" : "Losses", "color" : d.teamLosses < dOpposite.teamLosses ? dOpposite.color : d.color, "index" : "4", "offset":d.teamLosses < dOpposite.teamLosses ? d.teamLosses : dOpposite.teamLosses},
+          ]
+        }else{
+          return [
+            {"value" : d.point, "stat" : "Points", "color" : d.color, "index" : "0", "offset" : "0"},
+            {"value" : dOpposite.point, "stat" : "Points", "color" : dOpposite.color, "indOppositeex" : "0", "offset" : "0"},
+            {"value" : d.teamGoalScored, "stat" : "Goals Scored", "color" : d.color, "index" : "1", "offset" : "0"},
+            {"value" : dOpposite.teamGoalScored, "stat" : "Goals Scored", "color" : dOpposite.color, "index" : "1", "offset" : "0"},
+            {"value" : d.teamGoalAgainst, "stat" : "Goals Against", "color" : d.color, "index" : "2", "offset" : "0"},
+            {"value" : dOpposite.teamGoalAgainst, "stat" : "Goals Against", "color" : dOpposite.color, "index" : "2", "offset" : "0"},
+            {"value" : d.teamWins, "stat" : "Wins", "color" : d.color, "index" : "3", "offset" : "0"},
+            {"value" : dOpposite.teamWins, "stat" : "Wins", "color" : dOpposite.color, "index" : "3", "offset" : "0"},
+            {"value" : d.teamLosses, "stat" : "Losses", "color" : d.color, "index" : "4", "offset" : "0"},
+            {"value" : dOpposite.teamLosses, "stat" : "Losses", "color" : dOpposite.color, "index" : "4", "offset" : "0"}
+          ]
+        }
       }else{
         console.log("Opposite null");
         return [
-          {"value" : d.point, "stat" : "Points", "color" : "blue", "index" : "0", "offset" : "0"},
-          {"value" : d.teamGoalScored, "stat" : "Goals Scored", "color" : "blue", "index" : "1", "offset" : "0"},
-          {"value" : d.teamGoalAgainst, "stat" : "Goals Against", "color" : "blue", "index" : "2", "offset" : "0"},
-          {"value" : d.teamWins, "stat" : "Wins", "color" : "blue", "index" : "3", "offset" : "0"},
-          {"value" : d.teamLosses, "stat" : "Losses", "color" : "blue", "index" : "4", "offset" : "0"}
+          {"value" : d.point, "stat" : "Points", "color" : d.color, "index" : "0", "offset" : "0"},
+          {"value" : d.teamGoalScored, "stat" : "Goals Scored", "color" : d.color, "index" : "1", "offset" : "0"},
+          {"value" : d.teamGoalAgainst, "stat" : "Goals Against", "color" : d.color, "index" : "2", "offset" : "0"},
+          {"value" : d.teamWins, "stat" : "Wins", "color" : d.color, "index" : "3", "offset" : "0"},
+          {"value" : d.teamLosses, "stat" : "Losses", "color" : d.color, "index" : "4", "offset" : "0"}
         ]
       }
     }
@@ -870,7 +886,6 @@ function drawChart(){
       if(d!=null){
         delete d.name;
         delete d.logo;
-        delete d.color;
         delete d.conference;
         delete d.division;
         delete d.id;
@@ -887,8 +902,8 @@ function drawChart(){
     //console.log("Teams Array : " +dataOffsets);
 
     var arc = d3.arc()
-    .innerRadius((d,i)=>computeInnerRadius(d.index))
-    .outerRadius((d,i)=>computeOuterRadius(d.index))
+    .innerRadius((d,i)=>computeInnerRadius(visualizationMode == "adjacent" ? d.index : i))
+    .outerRadius((d,i)=>computeOuterRadius(visualizationMode == "adjacent" ? d.index : i))
     .startAngle((d,i)=>computeAngle(d.offset))
     .endAngle((d,i)=>computeAngle(d.offset)+computeAngle(d.value));
 
@@ -905,11 +920,30 @@ function drawChart(){
       .on('mouseout', hideTooltip);
 
       function computeInnerRadius(index) {
+        if(visualizationMode == "adjacent"){
+          return r+padding+index*(arcWidth);
+        }else{
+          pad = index % 2 == 0 || oppositeTeam==null ? padding : 0;
+          return r+pad+padding+index*(arcWidth);
+        }
+      }
+      function computeOuterRadius(index) {
+        if(visualizationMode == "adjacent"){
+          return r+arcWidth+index*(arcWidth);
+        }else{
+          pad = index % 2 == 0 ? padding : 0;
+          return r+arcWidth+pad+index*(arcWidth);
+        }
+      }
+
+      /*
+      function computeInnerRadius(index) {
           return r+padding+index*(arcWidth);
       }
       function computeOuterRadius(index) {
           return r+arcWidth+index*(arcWidth);
       }
+      */
 
       function showTooltip(d) {
       tooltip.style('left', (d3.event.pageX + 10) + 'px')
