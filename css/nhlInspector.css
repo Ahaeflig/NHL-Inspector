@@ -124,10 +124,12 @@ path.spiral {
     background: #0000;
 }
 
+
 /* BAR CHARTS */
 path.arc {
   opacity: 0.9;
   transition: opacity 0.5s;
+  fill: blue;
 }
 
 path.arc:hover {

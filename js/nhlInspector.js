@@ -418,7 +418,7 @@ function placeTeam(prefix, team) {
             .attr("r", r)
             .style("fill", "url(#patternCompare)")
 
-        drawChart(teamSVG,team);
+        drawChart(team);
     } else {
         if (WARNING) console.log(prefix + "Team is null !")
     }
@@ -665,7 +665,7 @@ function init() {
 
         // test contains the wanted json @Ismail
         test = getCleanedGlobalData(response)
-        console.log(test); // simply test
+        //console.log(test); // simply test
 
 
         draw(cleanedTeams);
@@ -711,6 +711,8 @@ function reloadAndDraw(date) {
 
             filteredTeams = filterConf(teams_clean);
             draw(filteredTeams);
+
+            drawChart(filteredTeams[myFavoriteTeamId()]);
         }
 
     ).fail(console.log("failed"))
@@ -729,148 +731,85 @@ function draw(teamsToDraw) {
 }
 
 
-// BAR CHART IMPLEMENTATION //
+// Arc CHART IMPLEMENTATION //
+function drawChart(team){
+  d3.selectAll("path").remove();
 
-function drawChart(teamSVG, team){
-  const width = 960,
-    height = 500,
-    chartRadius = height / 2 - 40;
+  const svg = $('#myTeamSVG');
 
-    teamCopy = team;
-    delete teamCopy.name;
-    delete teamCopy.logo;
-    delete teamCopy.color;
-    delete teamCopy.conference;
-    delete teamCopy.division;
-    delete teamCopy.id;
-
+  const width = svg.width();
+  const height = svg.height();
+  const r = Math.min(width, height) / 4;
+  var arcWidth = (1/40)*height;
+  var padding = (1/5)*arcWidth;
   const color = d3.scaleOrdinal(d3.schemeCategory10);
 
-    function teamToArray(d){
-      return {
-        point : d.point,
-        goalScored : d.teamGoalScored,
-        goalAgainst : d.teamGoalAgainst,
-        wins : d.teamWins,
-        losses : d.teamLosses
-      }
+  let tooltip = d3.select('body').append('div')
+  .attr('class', 'tooltipChart');
+
+  teamCopy = team;
+  delete teamCopy.name;
+  delete teamCopy.logo;
+  delete teamCopy.color;
+  delete teamCopy.conference;
+  delete teamCopy.division;
+  delete teamCopy.id;
+
+  function teamToArray(d){
+    return [
+      {"value" : d.point, "stat" : "Points"},
+      {"value" : d.teamGoalScored, "stat" : "Goals Scored"},
+      {"value" : d.teamGoalAgainst, "stat" : "Goals Against"},
+      {"value" : d.teamWins, "stat" : "Wins"},
+      {"value" : d.teamLosses, "stat" : "Losses"}
+    ]
+  }
+  teamArray = teamToArray(teamCopy);
+
+  dataLabels = teamArray.map((d,i)=>d.stat);
+  dataValues = Object.values(teamArray);
+
+  var arc = d3.arc()
+  .innerRadius((d,i)=>getInnerRadius(i))
+  .outerRadius((d,i)=>getOuterRadius(i))
+  .startAngle(0)
+  .endAngle((d,i)=>getEndAngle(d.value));
+
+
+  var arcs = d3.select('#myTeamG')
+  .selectAll('path')
+    .data(teamArray)
+    .enter().append("svg:path")
+    .attr("d",arc)
+    .attr("transform","translate("+width/2+","+height/2+")")
+    .style("fill", (d,i)=> color(i));
+
+    arcs.on('mouseenter', showTooltip)
+    .on('mouseout', hideTooltip);
+
+    function getInnerRadius(index) {
+        return r+padding+index*(arcWidth);
     }
-    teamArray = teamToArray(teamCopy);
+    function getOuterRadius(index) {
+        return r+arcWidth+index*(arcWidth);
+    }
 
-    console.log(teamCopy);
-    let tooltip = d3.select('body').append('div')
-      .attr('class', 'tooltip');
+    function showTooltip(d) {
+    tooltip.style('left', (d3.event.pageX + 10) + 'px')
+      .style('top', (d3.event.pageY - 25) + 'px')
+      .style('display', 'inline-block')
+      .html(d.value);
+  }
 
-    const PI = Math.PI,
-      arcMinRadius = 10,
-      arcPadding = 10,
-      labelPadding = -5,
-      numTicks = 10;
+  function hideTooltip() {
+    tooltip.style('display', 'none');
+  }
 
-      let scale = d3.scaleLinear()
-          .domain([0, 130])
-          .range([0, 2 * PI]);
-
-        let ticks = scale.ticks(numTicks).slice(0, -1);
-        let keys = Object.keys(teamArray);
-        console.log(keys);
-        console.log(teamArray);
-        //number of arcs
-        const numArcs = keys.length;
-        const arcWidth = (chartRadius - arcMinRadius - numArcs * arcPadding) / numArcs;
-
-        let arc = d3.arc(width/2, height/2)
-          .innerRadius((d, i) => getInnerRadius(i))
-          .outerRadius((d, i) => getOuterRadius(i))
-          .startAngle(0)
-          .endAngle((d, i) => scale(d))
-
-        let radialAxis = d3.select('#myTeamG')
-          .append('g')
-          .attr('class', 'r axis')
-          .attr('cx', width/2)
-          .attr('cy', height/2)
-          .selectAll('g')
-            .data(teamArray)
-            .enter().append('g');
-
-        radialAxis.append('circle')
-          .attr('r', (d, i) => getOuterRadius(i) + arcPadding);
-
-
-        radialAxis.append('text')
-          .attr('x', labelPadding)
-          .attr('y', (d, i) => -getOuterRadius(i) + arcPadding)
-          .text(d => d.name);
-
-        let axialAxis = d3.select('#myTeamG')
-          .append('g')
-          .attr('class', 'a axis')
-          .attr('cx', width/2)
-          .attr('cy', height/2)
-          .selectAll('g')
-            .data(ticks)
-            .enter().append('g')
-              .attr('transform', d => 'rotate(' + (rad2deg(scale(d)) - 90) + ')');
-
-        axialAxis.append('line')
-          .attr('x2', chartRadius);
-
-        axialAxis.append('text')
-          .attr('x', chartRadius + 10)
-          .style('text-anchor', d => (scale(d) >= PI && scale(d) < 2 * PI ? 'end' : null))
-          .attr('transform', d => 'rotate(' + (90 - rad2deg(scale(d))) + ',' + (chartRadius + 10) + ',0)')
-          .text(d => d);
-
-        //data arcs
-        let arcs = d3.select('#myTeamG')
-          .append('g')
-          .attr('class', 'data')
-          .selectAll('path')
-            .data(teamArray)
-            .enter().append('path')
-            .attr('class', 'arc')
-            .style('fill', (d, i) => color(i))
-
-        arcs.transition()
-          .delay((d, i) => i * 200)
-          .duration(1000)
-          .attrTween('d', arcTween);
-
-        arcs.on('mousemove', showTooltip)
-        arcs.on('mouseout', hideTooltip)
-
-
-        function arcTween(d, i) {
-          let interpolate = d3.interpolate(0, d.value);
-          return t => arc(interpolate(t), i);
-        }
-
-        function showTooltip(d) {
-          tooltip.style('left', (d3.event.pageX + 10) + 'px')
-            .style('top', (d3.event.pageY - 25) + 'px')
-            .style('display', 'inline-block')
-            .html(d.value);
-        }
-
-        function hideTooltip() {
-          tooltip.style('display', 'none');
-        }
-
-        function rad2deg(angle) {
-          return angle * 180 / PI;
-        }
-
-        function getInnerRadius(index) {
-          return arcMinRadius + (numArcs - (index + 1)) * (arcWidth + arcPadding);
-        }
-
-        function getOuterRadius(index) {
-          return getInnerRadius(index) + arcWidth;
-        }
-
+  function getEndAngle(value){
+    return (1/100)*value*(10/6)*Math.PI;
+  }
+  ;
 }
-
 
 // When the window is resized
 $(window).resize(
