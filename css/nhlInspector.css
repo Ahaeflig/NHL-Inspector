@@ -6,7 +6,7 @@ html, body, .container-fluid {
 nav{
     position: fixed !important;
     left: 0;
-    width: 100%; 
+    width: 100%;
     z-index: 1030;
     background-color: black;
 }
@@ -122,4 +122,39 @@ path.spiral {
 
 .panels .right{
     background: #0000;
+}
+
+
+/* BAR CHARTS */
+path.arc {
+  opacity: 0.9;
+  transition: opacity 0.5s;
+  fill: blue;
+}
+
+path.arc:hover {
+  opacity: 0.7;
+}
+
+.axis line, .axis circle  {
+  stroke: #cccccc;
+  stroke-width: 1px
+}
+
+.axis circle {
+  fill: none;
+}
+
+.r.axis text {
+  text-anchor: end
+}
+
+.tooltipChart {
+  position: absolute;
+  display: none;
+  background: rgba(0, 0, 0, 0.6);
+  border-radius: 3px;
+  box-shadow: -3px 3px 15px #888;
+  color: white;
+  padding: 6px;
 }
