@@ -815,10 +815,15 @@ function draw(teamsToDraw, shouldTransit) {
 }
 
 
-// Arc CHART IMPLEMENTATION //
+/**
+*Draw circle chart for stat comparison
+*using @see team() , @see myFavoriteTeamId() and @see myOppositeTeamId()
+*/
 function drawChart(){
 
+  //If favorite team chosen make a deep copy for drawing the chart
   myTeam = team(myFavoriteTeamId()) != null ? jQuery.extend(true, {}, team(myFavoriteTeamId())) : null;
+
 
   if(myTeam!=null){
     d3.selectAll("path").remove();
@@ -826,8 +831,10 @@ function drawChart(){
     visualizationMode = "stack"; //available modes : stack / adjacent
 
     const svg = $('#myTeamSVG');
+
     const width = svg.width();
     const height = svg.height();
+
     const r = Math.min(width, height) / 4;
     const arcWidth = (1/60)*height;
     const padding = (1/5)*arcWidth;
@@ -835,8 +842,10 @@ function drawChart(){
     let tooltip = d3.select('body').append('div')
         .attr('class', 'tooltipChart');
 
+    //make deep copy of oppositeTeam
     oppositeTeam = team(myOppositeTeamId())!=null ? jQuery.extend(true, {}, team(myOppositeTeamId())) : null;
 
+    //load reformated data
     teamsArray = teamsToArray(filterTeamFields(myTeam), filterTeamFields(oppositeTeam));
 
     dataLabels = teamsArray.map((d,i)=>d.stat);
@@ -863,6 +872,10 @@ function drawChart(){
 
 
 //DRAW CHART HELPER FUNCTIONS
+
+    /**
+    * Compute inner radius of arc based on stat values
+    */
     function computeInnerRadius(index) {
       if(visualizationMode == "adjacent"){
         return r+padding+index*(arcWidth);
@@ -872,15 +885,28 @@ function drawChart(){
       }
     }
 
+    /**
+    * Compute outer radius of arc based on stat values
+    */
     function computeOuterRadius(index) {
       if(visualizationMode == "adjacent"){
         return r+arcWidth+index*(arcWidth);
       }else{
-        pad = index % 2 == 0 ? padding : 0;
+        pad = index % 2 == 0 && oppositeTeam!=null ? padding : 0;
         return r+arcWidth+pad+index*(arcWidth);
       }
     }
 
+    /**
+    * Compute arc angle based on stat values
+    */
+    function computeAngle(value){
+      return (1/200)*value*(10/6)*Math.PI;
+    }
+
+    /**
+    * display tooltip on mouse hover
+    */
     function showTooltip(d) {
       tooltip.style('left', (d3.event.pageX + 10) + 'px')
         .style('top', (d3.event.pageY - 25) + 'px')
@@ -888,14 +914,16 @@ function drawChart(){
         .html(d.value);
     }
 
+    /**
+    * hide tooltip on mouse out
+    */
     function hideTooltip() {
       tooltip.style('display', 'none');
     }
 
-    function computeAngle(value){
-      return (1/200)*value*(10/6)*Math.PI;
-    }
-
+    /**
+    * Reformat team data for chart drawing
+    */
     function teamsToArray(d, dOpposite){
       if(dOpposite!=null)
       {
@@ -937,6 +965,9 @@ function drawChart(){
       }
     }
 
+    /**
+    * Filter out useless team data fields for chart drawing
+    */
     function filterTeamFields(d){
       if(d!=null){
         delete d.name;
