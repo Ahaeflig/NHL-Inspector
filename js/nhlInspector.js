@@ -853,10 +853,10 @@ function drawChart(team){
   dataValues = Object.values(teamArray);
 
   var arc = d3.arc()
-  .innerRadius((d,i)=>getInnerRadius(i))
-  .outerRadius((d,i)=>getOuterRadius(i))
+  .innerRadius((d,i)=>computeInnerRadius(i))
+  .outerRadius((d,i)=>computeOuterRadius(i))
   .startAngle(0)
-  .endAngle((d,i)=>getEndAngle(d.value));
+  .endAngle((d,i)=>computeEndAngle(d.value));
 
 
   var arcs = d3.select('#myTeamG')
@@ -870,10 +870,10 @@ function drawChart(team){
     arcs.on('mouseenter', showTooltip)
     .on('mouseout', hideTooltip);
 
-    function getInnerRadius(index) {
+    function computeInnerRadius(index) {
         return r+padding+index*(arcWidth);
     }
-    function getOuterRadius(index) {
+    function computeOuterRadius(index) {
         return r+arcWidth+index*(arcWidth);
     }
 
@@ -888,7 +888,7 @@ function drawChart(team){
     tooltip.style('display', 'none');
   }
 
-  function getEndAngle(value){
+  function computeEndAngle(value){
     return (1/100)*value*(10/6)*Math.PI;
   }
   ;
