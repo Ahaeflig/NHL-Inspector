@@ -792,10 +792,11 @@ function reloadAndDraw(date, shouldTransit) {
     // Parse and clean the data into an array
     loadedData.done(function(response) {
             teams_clean = getCleanedTeams(response);
-
+            locallyStoreTeams(teams_clean);
+            
             filteredTeams = filterConf(teams_clean);
             draw(filteredTeams, shouldTransit);
-            drawChart(filteredTeams[myFavoriteTeamId()]);
+            drawChart(team[myFavoriteTeamId()]);
         }
 
     ).fail(console.log("failed"))
@@ -816,82 +817,84 @@ function draw(teamsToDraw, shouldTransit) {
 
 // Arc CHART IMPLEMENTATION //
 function drawChart(team){
-  d3.selectAll("path").remove();
+  if(team!=null){
+    d3.selectAll("path").remove();
 
-  const svg = $('#myTeamSVG');
+    const svg = $('#myTeamSVG');
 
-  const width = svg.width();
-  const height = svg.height();
-  const r = Math.min(width, height) / 4;
-  var arcWidth = (1/40)*height;
-  var padding = (1/5)*arcWidth;
-  const color = d3.scaleOrdinal(d3.schemeCategory10);
+    const width = svg.width();
+    const height = svg.height();
+    const r = Math.min(width, height) / 4;
+    var arcWidth = (1/40)*height;
+    var padding = (1/5)*arcWidth;
+    const color = d3.scaleOrdinal(d3.schemeCategory10);
 
-  let tooltip = d3.select('body').append('div')
-  .attr('class', 'tooltipChart');
+    let tooltip = d3.select('body').append('div')
+    .attr('class', 'tooltipChart');
 
-  teamCopy = team;
-  delete teamCopy.name;
-  delete teamCopy.logo;
-  delete teamCopy.color;
-  delete teamCopy.conference;
-  delete teamCopy.division;
-  delete teamCopy.id;
+    teamCopy = jQuery.extend(true, {}, team);
+    delete teamCopy.name;
+    delete teamCopy.logo;
+    delete teamCopy.color;
+    delete teamCopy.conference;
+    delete teamCopy.division;
+    delete teamCopy.id;
 
-  function teamToArray(d){
-    return [
-      {"value" : d.point, "stat" : "Points"},
-      {"value" : d.teamGoalScored, "stat" : "Goals Scored"},
-      {"value" : d.teamGoalAgainst, "stat" : "Goals Against"},
-      {"value" : d.teamWins, "stat" : "Wins"},
-      {"value" : d.teamLosses, "stat" : "Losses"}
-    ]
-  }
-  teamArray = teamToArray(teamCopy);
-
-  dataLabels = teamArray.map((d,i)=>d.stat);
-  dataValues = Object.values(teamArray);
-
-  var arc = d3.arc()
-  .innerRadius((d,i)=>computeInnerRadius(i))
-  .outerRadius((d,i)=>computeOuterRadius(i))
-  .startAngle(0)
-  .endAngle((d,i)=>computeEndAngle(d.value));
-
-
-  var arcs = d3.select('#myTeamG')
-  .selectAll('path')
-    .data(teamArray)
-    .enter().append("svg:path")
-    .attr("d",arc)
-    .attr("transform","translate("+width/2+","+height/2+")")
-    .style("fill", (d,i)=> color(i));
-
-    arcs.on('mouseenter', showTooltip)
-    .on('mouseout', hideTooltip);
-
-    function computeInnerRadius(index) {
-        return r+padding+index*(arcWidth);
+    function teamToArray(d){
+      return [
+        {"value" : d.point, "stat" : "Points"},
+        {"value" : d.teamGoalScored, "stat" : "Goals Scored"},
+        {"value" : d.teamGoalAgainst, "stat" : "Goals Against"},
+        {"value" : d.teamWins, "stat" : "Wins"},
+        {"value" : d.teamLosses, "stat" : "Losses"}
+      ]
     }
-    function computeOuterRadius(index) {
-        return r+arcWidth+index*(arcWidth);
+    teamArray = teamToArray(teamCopy);
+
+    dataLabels = teamArray.map((d,i)=>d.stat);
+    dataValues = Object.values(teamArray);
+
+    var arc = d3.arc()
+    .innerRadius((d,i)=>computeInnerRadius(i))
+    .outerRadius((d,i)=>computeOuterRadius(i))
+    .startAngle(0)
+    .endAngle((d,i)=>computeEndAngle(d.value));
+
+
+    var arcs = d3.select('#myTeamG')
+    .selectAll('path')
+      .data(teamArray)
+      .enter().append("svg:path")
+      .attr("d",arc)
+      .attr("transform","translate("+width/2+","+height/2+")")
+      .style("fill", (d,i)=> color(i));
+
+      arcs.on('mouseenter', showTooltip)
+      .on('mouseout', hideTooltip);
+
+      function computeInnerRadius(index) {
+          return r+padding+index*(arcWidth);
+      }
+      function computeOuterRadius(index) {
+          return r+arcWidth+index*(arcWidth);
+      }
+
+      function showTooltip(d) {
+      tooltip.style('left', (d3.event.pageX + 10) + 'px')
+        .style('top', (d3.event.pageY - 25) + 'px')
+        .style('display', 'inline-block')
+        .html(d.value);
     }
 
-    function showTooltip(d) {
-    tooltip.style('left', (d3.event.pageX + 10) + 'px')
-      .style('top', (d3.event.pageY - 25) + 'px')
-      .style('display', 'inline-block')
-      .html(d.value);
-  }
+    function hideTooltip() {
+      tooltip.style('display', 'none');
+    }
 
-  function hideTooltip() {
-    tooltip.style('display', 'none');
+    function computeEndAngle(value){
+      return (1/100)*value*(10/6)*Math.PI;
+    }
+    ;
   }
-
-  function computeEndAngle(value){
-    return (1/100)*value*(10/6)*Math.PI;
-  }
-  ;
 }
 
 // When the window is resized
