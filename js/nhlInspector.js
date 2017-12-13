@@ -817,31 +817,88 @@ function draw(teamsToDraw, shouldTransit) {
 
 // Arc CHART IMPLEMENTATION //
 function drawChart(){
-  myTeam = team(myFavoriteTeamId());
+
+  myTeam = team(myFavoriteTeamId()) != null ? jQuery.extend(true, {}, team(myFavoriteTeamId())) : null;
+
   if(myTeam!=null){
     d3.selectAll("path").remove();
 
-    const svg = $('#myTeamSVG');
     visualizationMode = "stack"; //available modes : stack / adjacent
 
+    const svg = $('#myTeamSVG');
     const width = svg.width();
     const height = svg.height();
     const r = Math.min(width, height) / 4;
-    var arcWidth = (1/60)*height;
-    var padding = (1/5)*arcWidth;
+    const arcWidth = (1/60)*height;
+    const padding = (1/5)*arcWidth;
 
     let tooltip = d3.select('body').append('div')
-    .attr('class', 'tooltipChart');
-    oppositeTeam = null;
-    selectedTeam = jQuery.extend(true, {}, myTeam);
-    console.log("Opp ID : "+myOppositeTeamId());
-    if(team(myOppositeTeamId())!=null){
-      oppositeTeam = jQuery.extend(true, {}, team(myOppositeTeamId()));
+        .attr('class', 'tooltipChart');
+
+    oppositeTeam = team(myOppositeTeamId())!=null ? jQuery.extend(true, {}, team(myOppositeTeamId())) : null;
+
+    teamsArray = teamsToArray(filterTeamFields(myTeam), filterTeamFields(oppositeTeam));
+
+    dataLabels = teamsArray.map((d,i)=>d.stat);
+    dataOffsets = teamsArray.map((d,i)=>d.offset);
+    dataValues = teamsArray.map((d,i)=>d.value);
+
+    var arc = d3.arc()
+      .innerRadius((d,i)=>computeInnerRadius(visualizationMode == "adjacent" ? d.index : i))
+      .outerRadius((d,i)=>computeOuterRadius(visualizationMode == "adjacent" ? d.index : i))
+      .startAngle((d,i)=>computeAngle(d.offset))
+      .endAngle((d,i)=>computeAngle(d.offset)+computeAngle(d.value));
+
+
+    var arcs = d3.select('#myTeamG')
+    .selectAll('path')
+      .data(teamsArray)
+      .enter().append("svg:path")
+      .attr("d",arc)
+      .attr("transform","translate("+width/2+","+height/2+")")
+      .style("fill", (d,i)=> d.color);
+
+    arcs.on('mouseenter', showTooltip)
+      .on('mouseout', hideTooltip);
+
+
+//DRAW CHART HELPER FUNCTIONS
+    function computeInnerRadius(index) {
+      if(visualizationMode == "adjacent"){
+        return r+padding+index*(arcWidth);
+      }else{
+        pad = index % 2 == 0 || oppositeTeam==null ? padding : 0;
+        return r+pad+padding+index*(arcWidth);
+      }
     }
+
+    function computeOuterRadius(index) {
+      if(visualizationMode == "adjacent"){
+        return r+arcWidth+index*(arcWidth);
+      }else{
+        pad = index % 2 == 0 ? padding : 0;
+        return r+arcWidth+pad+index*(arcWidth);
+      }
+    }
+
+    function showTooltip(d) {
+      tooltip.style('left', (d3.event.pageX + 10) + 'px')
+        .style('top', (d3.event.pageY - 25) + 'px')
+        .style('display', 'inline-block')
+        .html(d.value);
+    }
+
+    function hideTooltip() {
+      tooltip.style('display', 'none');
+    }
+
+    function computeAngle(value){
+      return (1/200)*value*(10/6)*Math.PI;
+    }
+
     function teamsToArray(d, dOpposite){
       if(dOpposite!=null)
       {
-        console.log("Opposite not null");
         if(visualizationMode == "adjacent"){
           return [
             {"value" : d.point < dOpposite.point ? d.point : dOpposite.point, "stat" : "Points", "color" : d.point < dOpposite.point ? d.color : dOpposite.color, "index" : "0", "offset" : "0"},
@@ -870,7 +927,6 @@ function drawChart(){
           ]
         }
       }else{
-        console.log("Opposite null");
         return [
           {"value" : d.point, "stat" : "Points", "color" : d.color, "index" : "0", "offset" : "0"},
           {"value" : d.teamGoalScored, "stat" : "Goals Scored", "color" : d.color, "index" : "1", "offset" : "0"},
@@ -891,63 +947,6 @@ function drawChart(){
       }
       return d;
     }
-    teamsArray = teamsToArray(filterTeamFields(selectedTeam), filterTeamFields(oppositeTeam));
-
-    dataLabels = teamsArray.map((d,i)=>d.stat);
-    dataOffsets = teamsArray.map((d,i)=>d.offset);
-    dataValues = teamsArray.map((d,i)=>d.value);
-
-    var arc = d3.arc()
-    .innerRadius((d,i)=>computeInnerRadius(visualizationMode == "adjacent" ? d.index : i))
-    .outerRadius((d,i)=>computeOuterRadius(visualizationMode == "adjacent" ? d.index : i))
-    .startAngle((d,i)=>computeAngle(d.offset))
-    .endAngle((d,i)=>computeAngle(d.offset)+computeAngle(d.value));
-
-
-    var arcs = d3.select('#myTeamG')
-    .selectAll('path')
-      .data(teamsArray)
-      .enter().append("svg:path")
-      .attr("d",arc)
-      .attr("transform","translate("+width/2+","+height/2+")")
-      .style("fill", (d,i)=> d.color);
-
-      arcs.on('mouseenter', showTooltip)
-      .on('mouseout', hideTooltip);
-
-      function computeInnerRadius(index) {
-        if(visualizationMode == "adjacent"){
-          return r+padding+index*(arcWidth);
-        }else{
-          pad = index % 2 == 0 || oppositeTeam==null ? padding : 0;
-          return r+pad+padding+index*(arcWidth);
-        }
-      }
-      function computeOuterRadius(index) {
-        if(visualizationMode == "adjacent"){
-          return r+arcWidth+index*(arcWidth);
-        }else{
-          pad = index % 2 == 0 ? padding : 0;
-          return r+arcWidth+pad+index*(arcWidth);
-        }
-      }
-
-      function showTooltip(d) {
-      tooltip.style('left', (d3.event.pageX + 10) + 'px')
-        .style('top', (d3.event.pageY - 25) + 'px')
-        .style('display', 'inline-block')
-        .html(d.value);
-    }
-
-    function hideTooltip() {
-      tooltip.style('display', 'none');
-    }
-
-
-    function computeAngle(value){
-      return (1/200)*value*(10/6)*Math.PI;
-    }
-    ;
   }
 }
 
