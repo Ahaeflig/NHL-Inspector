@@ -822,14 +822,13 @@ function drawChart(){
     d3.selectAll("path").remove();
 
     const svg = $('#myTeamSVG');
-    visualizationMode = "stack"; //other mode : adjacent
+    visualizationMode = "stack"; //available modes : stack / adjacent
 
     const width = svg.width();
     const height = svg.height();
     const r = Math.min(width, height) / 4;
     var arcWidth = (1/60)*height;
     var padding = (1/5)*arcWidth;
-    //const color = d3.scaleOrdinal(d3.schemeCategory10);
 
     let tooltip = d3.select('body').append('div')
     .attr('class', 'tooltipChart');
@@ -893,13 +892,10 @@ function drawChart(){
       return d;
     }
     teamsArray = teamsToArray(filterTeamFields(selectedTeam), filterTeamFields(oppositeTeam));
-    dataLabels = teamsArray.map((d,i)=>d.value);
+
+    dataLabels = teamsArray.map((d,i)=>d.stat);
     dataOffsets = teamsArray.map((d,i)=>d.offset);
-
-    dataValues = Object.values(teamsArray);
-
-    //console.log("Teams Array : " +dataLabels);
-    //console.log("Teams Array : " +dataOffsets);
+    dataValues = teamsArray.map((d,i)=>d.value);
 
     var arc = d3.arc()
     .innerRadius((d,i)=>computeInnerRadius(visualizationMode == "adjacent" ? d.index : i))
@@ -935,15 +931,6 @@ function drawChart(){
           return r+arcWidth+pad+index*(arcWidth);
         }
       }
-
-      /*
-      function computeInnerRadius(index) {
-          return r+padding+index*(arcWidth);
-      }
-      function computeOuterRadius(index) {
-          return r+arcWidth+index*(arcWidth);
-      }
-      */
 
       function showTooltip(d) {
       tooltip.style('left', (d3.event.pageX + 10) + 'px')
