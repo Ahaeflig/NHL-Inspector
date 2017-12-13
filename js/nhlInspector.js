@@ -793,7 +793,7 @@ function reloadAndDraw(date, shouldTransit) {
     loadedData.done(function(response) {
             teams_clean = getCleanedTeams(response);
             locallyStoreTeams(teams_clean);
-            
+
             filteredTeams = filterConf(teams_clean);
             draw(filteredTeams, shouldTransit);
             drawChart(team[myFavoriteTeamId()]);
@@ -816,8 +816,9 @@ function draw(teamsToDraw, shouldTransit) {
 
 
 // Arc CHART IMPLEMENTATION //
-function drawChart(team){
-  if(team!=null){
+function drawChart(){
+  myTeam = team(myFavoriteTeamId());
+  if(myTeam!=null){
     d3.selectAll("path").remove();
 
     const svg = $('#myTeamSVG');
@@ -827,47 +828,78 @@ function drawChart(team){
     const r = Math.min(width, height) / 4;
     var arcWidth = (1/40)*height;
     var padding = (1/5)*arcWidth;
-    const color = d3.scaleOrdinal(d3.schemeCategory10);
+    //const color = d3.scaleOrdinal(d3.schemeCategory10);
 
     let tooltip = d3.select('body').append('div')
     .attr('class', 'tooltipChart');
-
-    teamCopy = jQuery.extend(true, {}, team);
-    delete teamCopy.name;
-    delete teamCopy.logo;
-    delete teamCopy.color;
-    delete teamCopy.conference;
-    delete teamCopy.division;
-    delete teamCopy.id;
-
-    function teamToArray(d){
-      return [
-        {"value" : d.point, "stat" : "Points"},
-        {"value" : d.teamGoalScored, "stat" : "Goals Scored"},
-        {"value" : d.teamGoalAgainst, "stat" : "Goals Against"},
-        {"value" : d.teamWins, "stat" : "Wins"},
-        {"value" : d.teamLosses, "stat" : "Losses"}
-      ]
+    oppositeTeam = null;
+    selectedTeam = jQuery.extend(true, {}, myTeam);
+    console.log("Opp ID : "+myOppositeTeamId());
+    if(team(myOppositeTeamId())!=null){
+      oppositeTeam = jQuery.extend(true, {}, team(myOppositeTeamId()));
     }
-    teamArray = teamToArray(teamCopy);
+    function teamsToArray(d, dOpposite){
+      if(dOpposite!=null)
+      {
+        console.log("Opposite not null");
+        return [
+          {"value" : d.point < dOpposite.point ? d.point : dOpposite.point, "stat" : "Points", "color" : d.point < dOpposite.point ? "blue" : "red", "index" : "0", "offset" : "0"},
+          {"value" : d.point < dOpposite.point ? dOpposite.point - d.point : d.point - dOpposite.point, "stat" : "Points", "color" : d.point < dOpposite.point ? "red" : "blue", "index" : "0", "offset" : d.point < dOpposite.point ? d.point : dOpposite.point},
+          {"value" : d.teamGoalScored < dOpposite.teamGoalScored ? d.teamGoalScored : dOpposite.teamGoalScored, "stat" : "Goals Scored", "color" : d.teamGoalScored < dOpposite.teamGoalScored ? "blue" : "red", "index" : "1", "offset": "0"},
+          {"value" : d.teamGoalScored < dOpposite.teamGoalScored ? dOpposite.teamGoalScored - d.teamGoalScored : d.teamGoalScored - dOpposite.teamGoalScored, "stat" : "Goals Scored", "color" : d.teamGoalScored < dOpposite.teamGoalScored ? "red" : "blue", "index" : "1", "offset" : d.teamGoalScored < dOpposite.teamGoalScored ? d.teamGoalScored : dOpposite.teamGoalScored},
+          {"value" : d.teamGoalAgainst < dOpposite.teamGoalAgainst ? d.teamGoalAgainst : dOpposite.teamGoalAgainst, "stat" : "Goals Against", "color" :d.teamGoalAgainst < dOpposite.teamGoalAgainst ? "blue" : "red", "index" : "2", "offset" : "0"},
+          {"value" : d.teamGoalAgainst < dOpposite.teamGoalAgainst ? dOpposite.teamGoalAgainst - d.teamGoalAgainst : dOpposite.teamGoalAgainst, "stat" : "Goals Against", "color" :d.teamGoalAgainst < dOpposite.teamGoalAgainst ? "red" : "blue", "index" : "2", "offset" : d.teamGoalAgainst < dOpposite.teamGoalAgainst ? d.teamGoalAgainst : dOpposite.teamGoalAgainst},
+          {"value" : d.teamWins < dOpposite.teamWins ? d.teamWins : dOpposite.teamWins, "stat" : "Wins", "color" : d.teamWins < dOpposite.teamWins ? "blue" : "red", "index" : "3", "offset":"0"},
+          {"value" : d.teamWins < dOpposite.teamWins ? dOpposite.teamWins - d.teamWins : d.teamWins - dOpposite.teamWins, "stat" : "Wins", "color" : d.teamWins < dOpposite.teamWins ? "red" : "blue", "index" : "3", "offset":d.teamWins < dOpposite.teamWins ? d.teamWins : dOpposite.teamWins},
+          {"value" : d.teamLosses < dOpposite.teamLosses ? d.teamLosses : dOpposite.teamLosses, "stat" : "Losses", "color" : d.teamLosses < dOpposite.teamLosses ? "blue" : "red", "index" : "4", "offset":"0"},
+          {"value" : d.teamLosses < dOpposite.teamLosses ? dOpposite.teamLosses - d.teamLosses : d.teamLosses - dOpposite.teamLosses, "stat" : "Losses", "color" : d.teamLosses < dOpposite.teamLosses ? "red" : "blue", "index" : "4", "offset":d.teamLosses < dOpposite.teamLosses ? d.teamLosses : dOpposite.teamLosses},
+        ]
+      }else{
+        console.log("Opposite null");
+        return [
+          {"value" : d.point, "stat" : "Points", "color" : "blue", "index" : "0", "offset" : "0"},
+          {"value" : d.teamGoalScored, "stat" : "Goals Scored", "color" : "blue", "index" : "1", "offset" : "0"},
+          {"value" : d.teamGoalAgainst, "stat" : "Goals Against", "color" : "blue", "index" : "2", "offset" : "0"},
+          {"value" : d.teamWins, "stat" : "Wins", "color" : "blue", "index" : "3", "offset" : "0"},
+          {"value" : d.teamLosses, "stat" : "Losses", "color" : "blue", "index" : "4", "offset" : "0"}
+        ]
+      }
+    }
 
-    dataLabels = teamArray.map((d,i)=>d.stat);
-    dataValues = Object.values(teamArray);
+    function filterTeamFields(d){
+      if(d!=null){
+        delete d.name;
+        delete d.logo;
+        delete d.color;
+        delete d.conference;
+        delete d.division;
+        delete d.id;
+      }
+      return d;
+    }
+    teamsArray = teamsToArray(filterTeamFields(selectedTeam), filterTeamFields(oppositeTeam));
+    dataLabels = teamsArray.map((d,i)=>d.value);
+    dataOffsets = teamsArray.map((d,i)=>d.offset);
+
+    dataValues = Object.values(teamsArray);
+
+    //console.log("Teams Array : " +dataLabels);
+    //console.log("Teams Array : " +dataOffsets);
 
     var arc = d3.arc()
-    .innerRadius((d,i)=>computeInnerRadius(i))
-    .outerRadius((d,i)=>computeOuterRadius(i))
-    .startAngle(0)
-    .endAngle((d,i)=>computeEndAngle(d.value));
+    .innerRadius((d,i)=>computeInnerRadius(d.index))
+    .outerRadius((d,i)=>computeOuterRadius(d.index))
+    .startAngle((d,i)=>computeAngle(d.offset))
+    .endAngle((d,i)=>computeAngle(d.offset)+computeAngle(d.value));
 
 
     var arcs = d3.select('#myTeamG')
     .selectAll('path')
-      .data(teamArray)
+      .data(teamsArray)
       .enter().append("svg:path")
       .attr("d",arc)
       .attr("transform","translate("+width/2+","+height/2+")")
-      .style("fill", (d,i)=> color(i));
+      .style("fill", (d,i)=> d.color);
 
       arcs.on('mouseenter', showTooltip)
       .on('mouseout', hideTooltip);
@@ -890,8 +922,9 @@ function drawChart(team){
       tooltip.style('display', 'none');
     }
 
-    function computeEndAngle(value){
-      return (1/100)*value*(10/6)*Math.PI;
+
+    function computeAngle(value){
+      return (1/200)*value*(10/6)*Math.PI;
     }
     ;
   }
