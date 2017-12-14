@@ -350,7 +350,7 @@ function createMainTransition() {
             }, {
                 duration: 300,
                 step: function() {
-                    placeTeam("my", team(myFavoriteTeamId()));
+                    placeTeam(team(myFavoriteTeamId()));
                 },
                 complete: function() {
                     rightPl.addClass('activePanel');
@@ -381,7 +381,7 @@ function createMainTransition() {
                     rightPl.height("40%").width("20%").css({
                         top: '54px'
                     });;
-                    placeTeam("my", team(myFavoriteTeamId()));
+                    placeTeam(team(myFavoriteTeamId()));
                 }
             });
         }
@@ -393,14 +393,12 @@ function createMainTransition() {
  * It addapts the logo size to fit a circle
  * @assume #myTeamSVG or #otherTeamSVG exists as <svg>
  * @assume (#myTeamC and #myTeamL) or (#otherTeamC and #otherTeamL) exists as <circle> and <image>
- * @param prefix (String): contains the SVG id prefix (i.e "my" or "other")
  * @param team (): the team as a js object @see  teams.legetCleanedTeams
  * @return void:
  */
- //TODO remove arch with prefix, not useful anymore
-function placeTeam(prefix, team_) {
+function placeTeam(team_) {
 
-    const teamSVG = $('#' + prefix + 'TeamSVG');
+    const teamSVG = $('#myTeamSVG');
 
     // Get the current SVG dimensions
     const width = teamSVG.width();
@@ -501,7 +499,7 @@ function placeTeam(prefix, team_) {
            drawChart(team);
 
     } else {
-        if (WARNING) console.log(prefix + "Team is null !")
+        if (WARNING) console.log("Team is null !")
     }
 
 }
@@ -867,7 +865,7 @@ function reloadAndDraw(date, shouldTransit) {
 */
 function draw(teamsToDraw, shouldTransit) {
     // Place myTeamG in a dynamic way
-    placeTeam("my", team(myFavoriteTeamId()));
+    placeTeam(team(myFavoriteTeamId()));
     // Place spiralG in a dynamic way.
     drawSpiral(filterConf(teamsToDraw), shouldTransit);
 }
