@@ -410,7 +410,7 @@ function placeTeam(team_) {
     const cx = width / 2;
     const cy = height / 2;
 
-    if (team_ != null) {
+    if (team_ != null && myOppositeTeamId() != null) {
         // Compute the Logo dimension and
         const s = r + rCorr;
 
