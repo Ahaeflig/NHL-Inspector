@@ -674,6 +674,8 @@ function drawSpiral(teams, shouldTransit) {
         })
         .on("mouseleave", function() {
         })
+        .on("click", function() {
+        })
 
       for (let i = 0; i < teams.length; i++) {
         let d = newSpiralPoint[i]
@@ -698,7 +700,12 @@ function drawSpiral(teams, shouldTransit) {
                     .attr("cx", d.x)
                     .attr("cy", d.y)
                 $('#teamName').html("");
-            })
+            }).on("click", function() {
+                       if (d.team.id != myFavoriteTeamId()) {
+                         locallyStoreOppositeTeamId(d.team.id)
+                         draw(teams, false)
+                       }
+             })
           })
 
         d3.select("#ellipse"+d.team.id)
@@ -748,8 +755,13 @@ function drawSpiral(teams, shouldTransit) {
                     .duration(800)
                     .attr("cx", d.x)
                     .attr("cy", d.y)
-                $('#teamName').html("");
-            })
+                $('#teamName').html("")
+            }).on("click", function() {
+                     if (d.team.id != myFavoriteTeamId()) {
+                       locallyStoreOppositeTeamId(d.team.id)
+                       draw(teams, false)
+                     }
+                 })
 
           d3.select("#ellipse"+d.team.id)
             .attr("cx",  d.r)
