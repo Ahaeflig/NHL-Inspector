@@ -956,6 +956,7 @@ function drawChart(){
   if(myTeam!=null){
      d3.select('#myTeamG').selectAll("path").remove();
      d3.selectAll('.tooltipChart').remove()
+     d3.select('#myTeamG').selectAll('text').remove();
 
     visualizationMode = "stack"; //available modes : stack / adjacent
 
@@ -977,7 +978,7 @@ function drawChart(){
     //load reformated data
     teamsArray = teamsToArray(filterTeamFields(myTeam), filterTeamFields(oppositeTeam));
 
-    dataLabels = teamsArray.map((d,i)=>d.stat);
+    dataLabels = removeDuplicates(teamsArray.map((d,i)=>d.stat));
     dataOffsets = teamsArray.map((d,i)=>d.offset);
     dataValues = teamsArray.map((d,i)=>d.value);
 
@@ -994,13 +995,55 @@ function drawChart(){
       .enter().append("svg:path")
       .attr("d",arc)
       .attr("transform","translate("+width/2+","+height/2+")")
-      .style("fill", (d,i)=> d.color);
+      .style("fill", (d,i)=> d.color)
+
+    //console.log(arcs);
+    /*arcs.transition()
+      .delay((d,i)=>i*200)
+      .duration(1000)
+      .attrTween('d', (d,i)=>{
+        console.log(d)
+        let interpolator = d3.interpolate(0, d.value);
+        return t =>{
+          d1 = [{value : interpolator(t).toString(), stat : d.stat, color : d.color, index : d.index, offset : d.offset},]
+          console.log(d1)
+          arc(d1,i);
+        }
+      });*/
+    var labels = d3.select('#myTeamG')
+    .selectAll('text')
+    .data(dataLabels)
+    .enter()
+      .append('text')
+      .text((d,i)=>d)
+      .style('fill', 'white')
+      .style('font-size', "12px")
+      .attr("transform",(d,i)=>("translate("+(width/2-20+","+(height/2-computeOuterRadius(2*i)+2.5)+")")));
 
     arcs.on('mouseenter', showTooltip)
-      .on('mouseout', hideTooltip);
+        .on('mouseout', hideTooltip);
 
 
 //DRAW CHART HELPER FUNCTIONS
+
+function arcTween(d,i){
+  let interpolator = d3.interpolate(0, d.value);
+  return t =>{
+    d1 = [{"value" : interpolator(t).toString(), "stat" : d.stat, "color" : d.color, "index" : d.index, "offset" : d.offset},]
+    arc(d1,i);
+  }
+}
+
+//Used for removing duplicate stat labels in dataLabels array
+function removeDuplicates(arr){
+    let unique_array = []
+    for(let i = 0;i < arr.length; i++){
+        if(unique_array.indexOf(arr[i]) == -1){
+            unique_array.push(arr[i])
+        }
+    }
+    return unique_array
+}
 
     /**
     * Compute inner radius of arc based on stat values
@@ -1040,7 +1083,7 @@ function drawChart(){
       tooltip.style('left', (d3.event.pageX + 10) + 'px')
         .style('top', (d3.event.pageY - 25) + 'px')
         .style('display', 'inline-block')
-        .html(d.value);
+        .html(d.stat+" : "+d.value);
     }
 
     /**
@@ -1058,38 +1101,38 @@ function drawChart(){
       {
         if(visualizationMode == "adjacent"){
           return [
-            {"value" : d.point < dOpposite.point ? d.point : dOpposite.point, "stat" : "Points", "color" : d.point < dOpposite.point ? d.color : dOpposite.color, "index" : "0", "offset" : "0"},
-            {"value" : d.point < dOpposite.point ? dOpposite.point - d.point : d.point - dOpposite.point, "stat" : "Points", "color" : d.point < dOpposite.point ? dOpposite.color : d.color, "index" : "0", "offset" : d.point < dOpposite.point ? d.point : dOpposite.point},
-            {"value" : d.teamGoalScored < dOpposite.teamGoalScored ? d.teamGoalScored : dOpposite.teamGoalScored, "stat" : "Goals Scored", "color" : d.teamGoalScored < dOpposite.teamGoalScored ? d.color : dOpposite.color, "index" : "1", "offset": "0"},
-            {"value" : d.teamGoalScored < dOpposite.teamGoalScored ? dOpposite.teamGoalScored - d.teamGoalScored : d.teamGoalScored - dOpposite.teamGoalScored, "stat" : "Goals Scored", "color" : d.teamGoalScored < dOpposite.teamGoalScored ? dOpposite.color : d.color, "index" : "1", "offset" : d.teamGoalScored < dOpposite.teamGoalScored ? d.teamGoalScored : dOpposite.teamGoalScored},
-            {"value" : d.teamGoalAgainst < dOpposite.teamGoalAgainst ? d.teamGoalAgainst : dOpposite.teamGoalAgainst, "stat" : "Goals Against", "color" :d.teamGoalAgainst < dOpposite.teamGoalAgainst ? d.color : dOpposite.color, "index" : "2", "offset" : "0"},
-            {"value" : d.teamGoalAgainst < dOpposite.teamGoalAgainst ? dOpposite.teamGoalAgainst - d.teamGoalAgainst : dOpposite.teamGoalAgainst, "stat" : "Goals Against", "color" :d.teamGoalAgainst < dOpposite.teamGoalAgainst ? dOpposite.color : d.color, "index" : "2", "offset" : d.teamGoalAgainst < dOpposite.teamGoalAgainst ? d.teamGoalAgainst : dOpposite.teamGoalAgainst},
-            {"value" : d.teamWins < dOpposite.teamWins ? d.teamWins : dOpposite.teamWins, "stat" : "Wins", "color" : d.teamWins < dOpposite.teamWins ? d.color : dOpposite.color, "index" : "3", "offset":"0"},
-            {"value" : d.teamWins < dOpposite.teamWins ? dOpposite.teamWins - d.teamWins : d.teamWins - dOpposite.teamWins, "stat" : "Wins", "color" : d.teamWins < dOpposite.teamWins ? dOpposite.color : d.color, "index" : "3", "offset":d.teamWins < dOpposite.teamWins ? d.teamWins : dOpposite.teamWins},
-            {"value" : d.teamLosses < dOpposite.teamLosses ? d.teamLosses : dOpposite.teamLosses, "stat" : "Losses", "color" : d.teamLosses < dOpposite.teamLosses ? d.color : dOpposite.color, "index" : "4", "offset":"0"},
-            {"value" : d.teamLosses < dOpposite.teamLosses ? dOpposite.teamLosses - d.teamLosses : d.teamLosses - dOpposite.teamLosses, "stat" : "Losses", "color" : d.teamLosses < dOpposite.teamLosses ? dOpposite.color : d.color, "index" : "4", "offset":d.teamLosses < dOpposite.teamLosses ? d.teamLosses : dOpposite.teamLosses},
+            {"value" : d.point < dOpposite.point ? d.point : dOpposite.point, "stat" : "Pts", "color" : d.point < dOpposite.point ? d.color : dOpposite.color, "index" : "0", "offset" : "0"},
+            {"value" : d.point < dOpposite.point ? dOpposite.point - d.point : d.point - dOpposite.point, "stat" : "Pts", "color" : d.point < dOpposite.point ? dOpposite.color : d.color, "index" : "0", "offset" : d.point < dOpposite.point ? d.point : dOpposite.point},
+            {"value" : d.teamGoalScored < dOpposite.teamGoalScored ? d.teamGoalScored : dOpposite.teamGoalScored, "stat" : "GF", "color" : d.teamGoalScored < dOpposite.teamGoalScored ? d.color : dOpposite.color, "index" : "1", "offset": "0"},
+            {"value" : d.teamGoalScored < dOpposite.teamGoalScored ? dOpposite.teamGoalScored - d.teamGoalScored : d.teamGoalScored - dOpposite.teamGoalScored, "stat" : "GF", "color" : d.teamGoalScored < dOpposite.teamGoalScored ? dOpposite.color : d.color, "index" : "1", "offset" : d.teamGoalScored < dOpposite.teamGoalScored ? d.teamGoalScored : dOpposite.teamGoalScored},
+            {"value" : d.teamGoalAgainst < dOpposite.teamGoalAgainst ? d.teamGoalAgainst : dOpposite.teamGoalAgainst, "stat" : "GA", "color" :d.teamGoalAgainst < dOpposite.teamGoalAgainst ? d.color : dOpposite.color, "index" : "2", "offset" : "0"},
+            {"value" : d.teamGoalAgainst < dOpposite.teamGoalAgainst ? dOpposite.teamGoalAgainst - d.teamGoalAgainst : dOpposite.teamGoalAgainst, "stat" : "GA", "color" :d.teamGoalAgainst < dOpposite.teamGoalAgainst ? dOpposite.color : d.color, "index" : "2", "offset" : d.teamGoalAgainst < dOpposite.teamGoalAgainst ? d.teamGoalAgainst : dOpposite.teamGoalAgainst},
+            {"value" : d.teamWins < dOpposite.teamWins ? d.teamWins : dOpposite.teamWins, "stat" : "W", "color" : d.teamWins < dOpposite.teamWins ? d.color : dOpposite.color, "index" : "3", "offset":"0"},
+            {"value" : d.teamWins < dOpposite.teamWins ? dOpposite.teamWins - d.teamWins : d.teamWins - dOpposite.teamWins, "stat" : "W", "color" : d.teamWins < dOpposite.teamWins ? dOpposite.color : d.color, "index" : "3", "offset":d.teamWins < dOpposite.teamWins ? d.teamWins : dOpposite.teamWins},
+            {"value" : d.teamLosses < dOpposite.teamLosses ? d.teamLosses : dOpposite.teamLosses, "stat" : "L", "color" : d.teamLosses < dOpposite.teamLosses ? d.color : dOpposite.color, "index" : "4", "offset":"0"},
+            {"value" : d.teamLosses < dOpposite.teamLosses ? dOpposite.teamLosses - d.teamLosses : d.teamLosses - dOpposite.teamLosses, "stat" : "L", "color" : d.teamLosses < dOpposite.teamLosses ? dOpposite.color : d.color, "index" : "4", "offset":d.teamLosses < dOpposite.teamLosses ? d.teamLosses : dOpposite.teamLosses},
           ]
         }else{
           return [
-            {"value" : d.point, "stat" : "Points", "color" : d.color, "index" : "0", "offset" : "0"},
-            {"value" : dOpposite.point, "stat" : "Points", "color" : dOpposite.color, "indOppositeex" : "0", "offset" : "0"},
-            {"value" : d.teamGoalScored, "stat" : "Goals Scored", "color" : d.color, "index" : "1", "offset" : "0"},
-            {"value" : dOpposite.teamGoalScored, "stat" : "Goals Scored", "color" : dOpposite.color, "index" : "1", "offset" : "0"},
-            {"value" : d.teamGoalAgainst, "stat" : "Goals Against", "color" : d.color, "index" : "2", "offset" : "0"},
-            {"value" : dOpposite.teamGoalAgainst, "stat" : "Goals Against", "color" : dOpposite.color, "index" : "2", "offset" : "0"},
-            {"value" : d.teamWins, "stat" : "Wins", "color" : d.color, "index" : "3", "offset" : "0"},
-            {"value" : dOpposite.teamWins, "stat" : "Wins", "color" : dOpposite.color, "index" : "3", "offset" : "0"},
-            {"value" : d.teamLosses, "stat" : "Losses", "color" : d.color, "index" : "4", "offset" : "0"},
-            {"value" : dOpposite.teamLosses, "stat" : "Losses", "color" : dOpposite.color, "index" : "4", "offset" : "0"}
+            {"value" : d.point, "stat" : "Pts", "color" : d.color, "index" : "0", "offset" : "0"},
+            {"value" : dOpposite.point, "stat" : "Pts", "color" : dOpposite.color, "index" : "0", "offset" : "0"},
+            {"value" : d.teamGoalScored, "stat" : "GF", "color" : d.color, "index" : "1", "offset" : "0"},
+            {"value" : dOpposite.teamGoalScored, "stat" : "GF", "color" : dOpposite.color, "index" : "1", "offset" : "0"},
+            {"value" : d.teamGoalAgainst, "stat" : "GA", "color" : d.color, "index" : "2", "offset" : "0"},
+            {"value" : dOpposite.teamGoalAgainst, "stat" : "GA", "color" : dOpposite.color, "index" : "2", "offset" : "0"},
+            {"value" : d.teamWins, "stat" : "W", "color" : d.color, "index" : "3", "offset" : "0"},
+            {"value" : dOpposite.teamWins, "stat" : "W", "color" : dOpposite.color, "index" : "3", "offset" : "0"},
+            {"value" : d.teamLosses, "stat" : "L", "color" : d.color, "index" : "4", "offset" : "0"},
+            {"value" : dOpposite.teamLosses, "stat" : "L", "color" : dOpposite.color, "index" : "4", "offset" : "0"}
           ]
         }
       }else{
         return [
-          {"value" : d.point, "stat" : "Points", "color" : d.color, "index" : "0", "offset" : "0"},
-          {"value" : d.teamGoalScored, "stat" : "Goals Scored", "color" : d.color, "index" : "1", "offset" : "0"},
-          {"value" : d.teamGoalAgainst, "stat" : "Goals Against", "color" : d.color, "index" : "2", "offset" : "0"},
-          {"value" : d.teamWins, "stat" : "Wins", "color" : d.color, "index" : "3", "offset" : "0"},
-          {"value" : d.teamLosses, "stat" : "Losses", "color" : d.color, "index" : "4", "offset" : "0"}
+          {"value" : d.point, "stat" : "Pts", "color" : d.color, "index" : "0", "offset" : "0"},
+          {"value" : d.teamGoalScored, "stat" : "GF", "color" : d.color, "index" : "1", "offset" : "0"},
+          {"value" : d.teamGoalAgainst, "stat" : "GA", "color" : d.color, "index" : "2", "offset" : "0"},
+          {"value" : d.teamWins, "stat" : "W", "color" : d.color, "index" : "3", "offset" : "0"},
+          {"value" : d.teamLosses, "stat" : "L", "color" : d.color, "index" : "4", "offset" : "0"}
         ]
       }
     }
