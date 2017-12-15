@@ -664,12 +664,12 @@ function drawSpiral(teams_, shouldTransit) {
     const cy = height / 2;
 
     //transition time TODO fine tune value
-    let t_time = 3500
+    let t_time = 2250
 
     //Compute new points
     let newSpiralPoint = computeSpiralData(teams_, width, height);
 
-    //Sets team that are not in the div/conf to invisible
+    //Sets everything to invisible, selected team will have a new transition set
     spiralG.selectAll("circle").transition()
                     .duration(t_time/3).style('opacity', 0);
     spiralG.selectAll("ellipse").transition()
@@ -869,7 +869,6 @@ function init() {
     $('#timeSliderInput').on({
         change: function(ui) {
 
-            // TODO find less hacky way to fix on change called when initialized
             if (ui.value != null) {
                 let newSliderVal = ui.value['newValue']
                 const date = new Date(championshipStartDate.valueOf());
@@ -914,9 +913,11 @@ function init() {
       });
 }
 
-// Filter cleanedTeam with conference or division selector
+/*
+* Filter cleanedTeam with conference or division selector
+* @return only teams that are in either nhl/division/conferece
+*/
 function filterConf(data) {
-
     if  (myFavoriteTeamId() == null) {
       return data
     }
@@ -955,7 +956,7 @@ function reloadAndDraw(date, shouldTransit) {
             drawChart(team[myFavoriteTeamId()]);
         }
 
-    ).fail(console.log("failed"))
+    ).fail(console.log("data not yet loaded"))
 }
 
 
