@@ -8,7 +8,7 @@ const DEBUG = true;
 const WARNING = true
 const ERROR = true;
 
-const LOGO_DICT = {
+const TEAM_DICT = {
     "Washington Capitals": ["logos/Washington_Capitals_logo.svg", "#323b44"],
     "New Jersey Devils": ["logos/New_Jersey_Devils_logo.svg", "#d71a36"],
     "Columbus Blue Jackets": ["logos/Columbus_Blue_Jackets_logo.svg", "#171d37"],
@@ -95,7 +95,7 @@ function getCleanedGlobalData(data) {
             teams.push({
                 "name": teamName,
                 "data": {
-                    "logo": LOGO_DICT[teamName][0],
+                    "logo": TEAM_DICT[teamName][0],
                     "point": points,
                     "teamName": teamName,
                     "points": points,
@@ -150,14 +150,14 @@ function getCleanedTeams(data) {
 
             teams.push({
                 name: teamName,
-                logo: LOGO_DICT[teamName][0],
+                logo: TEAM_DICT[teamName][0],
                 point: points,
                 teamGoalScored: goalScored,
                 teamGoalAgainst: goalAgainst,
                 teamWins: wins,
                 teamLosses: losses,
                 id: id,
-                color : LOGO_DICT[teamName][1],
+                color : TEAM_DICT[teamName][1],
                 conference : team_conf,
                 division : div,
             })
@@ -328,6 +328,85 @@ function createTeamSelectorInGrid(teams) {
     }
     return $('#teamSelectorGrid').append($grid);
 }
+
+/*
+* Create the spiral SVG element
+* @assume Should be called only once in the init phase
+*/
+function initSpiralSVG(teams) {
+  // Get the Spiral SVG and its dimensions
+  let spiralSVG = $('#spiralSVG');
+  let spiralG = d3.select('#spiralG');
+  const width = spiralSVG.width();
+  const height = spiralSVG.height();
+
+  // Get the start of the spiral
+  const cx = width / 2;
+  const cy = height / 2;
+
+  let spiral_data = computeSpiralData(teams, width, height)
+
+  // Construct iterativelly all the pills from the center
+  let patternSelector = spiralG.append('svg:defs').selectAll("defs")
+            .data(spiral_data)
+            .enter()
+              .append('svg:pattern')
+              .attr("id", function(d) { return "pattern" + d.team.id;} )
+              .attr("width", d => 1)
+              .attr("height", d => 1);
+
+  patternSelector.append("ellipse")
+      .attr("id", function(d) { return "ellipse"+d.team.id; })
+      .attr("cx", function(d) { return d.r; })
+      .attr("cy", function(d) { return d.r; })
+      .attr("rx", function(d) { return d.r; })
+      .attr("ry", function(d) { return d.r; })
+      .style("fill", function(d) { return d.team.color; })
+      .style("stroke", function(d) { return myFavoriteTeamId() == d.team.id ? "blue" : "red"; })
+      .style("stroke-width",  function(d) { return  myFavoriteTeamId() == d.team.id || myOppositeTeamId() == d.team.id ? 15:0; });
+
+  patternSelector.append("svg:image")
+        .attr("id", function(d) { return "circle_image"+d.team.id; })
+        .attr("xlink:href", function(d) { return d.team.logo })
+        .attr("width", function(d) { return d.s; })
+        .attr("height", function(d) { return d.s; })
+        .attr("x", function(d) { return (d.s - d.r) / 2; })
+        .attr("y", function(d) { return (d.s - d.r) / 2; })
+
+    let circle = spiralG.selectAll("circle")
+         .data(spiral_data)
+         .enter()
+         .append("circle")
+         .attr("id", function(d) { return "circle"+d.team.id; })
+         .attr("cx", function(d) { return d.x; })
+         .attr("cy", function(d) { return d.y; })
+         .attr("r", function(d) { return d.r; })
+         .style("fill", function(d) { return "url(#pattern" + d.team.id + ")"; })
+         .on("mouseenter", function(d) {
+             d3.selectAll("#circle"+d.team.id).transition()
+                 .duration(200)
+                 .attr("cx", function(d) { return d.x + d.nx * 20; })
+                 .attr("cy", function(d) { return d.y + d.ny * 20; })
+             $('#teamName').html(d.team.name)
+         })
+         .on("mouseleave", function(d) {
+             d3.selectAll("#circle"+d.team.id).transition()
+                 .duration(800)
+                 .attr("cx", function(d) {return d.x})
+                 .attr("cy", function(d) {return d.y})
+             $('#teamName').html("");
+         })
+         .on("click", function(d) {
+             if (d.team.id != myFavoriteTeamId()) {
+               locallyStoreOppositeTeamId(d.team.id)
+               draw(teams, false)
+             }
+         })
+
+  draw(cleanedTeams);
+}
+
+
 
 /**
 * Create the Miniature-FullScreen transition between
@@ -505,7 +584,7 @@ function placeTeam(team_) {
 }
 
 
-function computeSpiralPoint(teams, width, height) {
+function computeSpiralData(teams, width, height) {
   // Get the start of the spiral
   const cx = width / 2;
   const cy = height / 2;
@@ -566,90 +645,14 @@ function computeSpiralPoint(teams, width, height) {
   return spiral_data;
 }
 
-
-/*
-* Function called to init spiral structure and svg element TODO make this in init
-*/
-function drawSpiralInit(teams) {
-  // Get the Spiral SVG and its dimensions
-  let spiralSVG = $('#spiralSVG');
-  let spiralG = d3.select('#spiralG');
-  const width = spiralSVG.width();
-  const height = spiralSVG.height();
-
-  // Get the start of the spiral
-  const cx = width / 2;
-  const cy = height / 2;
-
-  let spiral_data = computeSpiralPoint(teams, width, height)
-
-  // Construct iterativelly all the pills from the center
-  let patternSelector = spiralG.append('svg:defs').selectAll("defs")
-            .data(spiral_data)
-            .enter()
-              .append('svg:pattern')
-              .attr("id", function(d) { return "pattern" + d.team.id;} )
-              .attr("width", d => 1)
-              .attr("height", d => 1);
-
-  patternSelector.append("ellipse")
-      .attr("id", function(d) { return "ellipse"+d.team.id; })
-      .attr("cx", function(d) { return d.r; })
-      .attr("cy", function(d) { return d.r; })
-      .attr("rx", function(d) { return d.r; })
-      .attr("ry", function(d) { return d.r; })
-      .style("fill", function(d) { return d.team.color; })
-      .style("stroke", function(d) { return myFavoriteTeamId() == d.team.id ? "blue" : "red"; })
-      .style("stroke-width",  function(d) { return  myFavoriteTeamId() == d.team.id || myOppositeTeamId() == d.team.id ? 15:0; });
-
-  patternSelector.append("svg:image")
-        .attr("id", function(d) { return "circle_image"+d.team.id; })
-        .attr("xlink:href", function(d) { return d.team.logo })
-        .attr("width", function(d) { return d.s; })
-        .attr("height", function(d) { return d.s; })
-        .attr("x", function(d) { return (d.s - d.r) / 2; })
-        .attr("y", function(d) { return (d.s - d.r) / 2; })
-
-    let circle = spiralG.selectAll("circle")
-         .data(spiral_data)
-         .enter()
-         .append("circle")
-         .attr("id", function(d) { return "circle"+d.team.id; })
-         .attr("cx", function(d) { return d.x; })
-         .attr("cy", function(d) { return d.y; })
-         .attr("r", function(d) { return d.r; })
-         .style("fill", function(d) { return "url(#pattern" + d.team.id + ")"; })
-         .on("mouseenter", function(d) {
-             d3.selectAll("#circle"+d.team.id).transition()
-                 .duration(200)
-                 .attr("cx", function(d) { return d.x + d.nx * 20; })
-                 .attr("cy", function(d) { return d.y + d.ny * 20; })
-             $('#teamName').html(d.team.name)
-         })
-         .on("mouseleave", function(d) {
-             d3.selectAll("#circle"+d.team.id).transition()
-                 .duration(800)
-                 .attr("cx", function(d) {return d.x})
-                 .attr("cy", function(d) {return d.y})
-             $('#teamName').html("");
-         })
-         .on("click", function(d) {
-             if (d.team.id != myFavoriteTeamId()) {
-               locallyStoreOppositeTeamId(d.team.id)
-               draw(teams, false)
-             }
-         })
-}
-
-let firstTime = true
 /**
  * Draw a "logo team" tunnel spiral in corresponding SVG
  * @assume #spiralSVG exists as a <svg> in html
- * @assume the teams are sorted in decreasing number of point
- * @param teams:
- * @return void:
+ * @assume the teams_ are sorted in decreasing number of point
+ * @param teams_: data
+ * @param shouldTransit: boolean telling if transition should be enabled when drawing the new spiral
  */
-function drawSpiral(teams, shouldTransit) {
+function drawSpiral(teams_, shouldTransit) {
 
     // Get the Spiral SVG and its dimensions
     let spiralSVG = $('#spiralSVG');
@@ -660,15 +663,22 @@ function drawSpiral(teams, shouldTransit) {
     const cx = width / 2;
     const cy = height / 2;
 
-    let t_time = 4000
-    if (firstTime) {
-      drawSpiralInit(teams);
-      firstTime = false;
-    } else if (shouldTransit) {
+    //transition time TODO fine tune value
+    let t_time = 3500
 
-      let newSpiralPoint = computeSpiralPoint(teams, width, height);
+    //Compute new points
+    let newSpiralPoint = computeSpiralData(teams_, width, height);
 
-      //Trick to remove the mouseenter that trigger transitions while we transition the circles
+    //Sets team that are not in the div/conf to invisible
+    spiralG.selectAll("circle").transition()
+                    .duration(t_time/3).style('opacity', 0);
+    spiralG.selectAll("ellipse").transition()
+                    .duration(t_time/3).style('opacity', 0);
+    spiralG.selectAll("circle_image").transition()
+                    .duration(t_time/3).style('opacity', 0);
+
+    if (shouldTransit) {
+      //Trick to remove the mouseenter that trigger transitions while we play the main transition of the circles
       d3.selectAll("circle")
         .on("mouseenter", function() {
         })
@@ -677,72 +687,82 @@ function drawSpiral(teams, shouldTransit) {
         .on("click", function() {
         })
 
-      for (let i = 0; i < teams.length; i++) {
-        let d = newSpiralPoint[i]
-        d3.select("#circle"+d.team.id)
-          .transition()
-          .duration(t_time)
-          .attr("cx", d.x)
-          .attr("cy", d.y)
-          .attr("r", d.r)
-          .on("end", function() {
-            d3.select(this)
-            .on("mouseenter", function() {
-                d3.select(this).transition()
-                    .duration(200)
-                    .attr("cx", d.x + d.nx * 20)
-                    .attr("cy", d.y + d.ny * 20)
-                $('#teamName').html(d.team.name)
-            })
-            .on("mouseleave", function() {
-                d3.select(this).transition()
-                    .duration(800)
-                    .attr("cx", d.x)
-                    .attr("cy", d.y)
-                $('#teamName').html("");
-            }).on("click", function() {
-                       if (d.team.id != myFavoriteTeamId()) {
-                         locallyStoreOppositeTeamId(d.team.id)
-                         draw(teams, false)
-                       }
-             })
-          })
+      //Might be a way to do this with an .data().enter()?
+      for (let i = 0; i < teams_.length; i++) {
+          //Check if we should draw this team or if it is not in the conf/division
+              let d = newSpiralPoint[i]
+              d3.select("#circle"+d.team.id)
+                .transition()
+                .duration(t_time)
+                .attr("cx", d.x)
+                .attr("cy", d.y)
+                .attr("r", d.r)
+                .style('opacity', 1)
+                .on("end", function() {
+                  d3.select(this)
+                  .on("mouseenter", function() {
+                      d3.select(this).transition()
+                          .duration(200)
+                          .attr("cx", d.x + d.nx * 20)
+                          .attr("cy", d.y + d.ny * 20)
+                      $('#teamName').html(d.team.name)
+                  })
+                  .on("mouseleave", function() {
+                      d3.select(this).transition()
+                          .duration(800)
+                          .attr("cx", d.x)
+                          .attr("cy", d.y)
+                      $('#teamName').html("");
+                  }).on("click", function() {
+                             if (d.team.id != myFavoriteTeamId()) {
+                               locallyStoreOppositeTeamId(d.team.id)
+                               draw(teams_, false)
+                             }
+                   })
+                })
 
-        d3.select("#ellipse"+d.team.id)
-          .transition()
-          .duration(t_time)
-          .attr("cx",  d.r)
-          .attr("cy", d.r)
-          .attr("rx", d.r)
-          .attr("ry", d.r)
-          .style("fill",  d.team.color)
-          .style("stroke", myFavoriteTeamId() == d.team.id ? "blue" : "red")
-          .style("stroke-width",  myFavoriteTeamId() == d.team.id || myOppositeTeamId() == d.team.id ? 15:0);
+              d3.select("#ellipse"+d.team.id)
+                .transition()
+                .duration(t_time)
+                .attr("cx",  d.r)
+                .attr("cy", d.r)
+                .attr("rx", d.r)
+                .attr("ry", d.r)
+                .style('opacity', 1)
+                .style("fill",  d.team.color)
+                .style("stroke", myFavoriteTeamId() == d.team.id ? "blue" : "red")
+                .style("stroke-width",  myFavoriteTeamId() == d.team.id || myOppositeTeamId() == d.team.id ? 15:0);
 
-        d3.select("#circle_image"+d.team.id)
-          .transition()
-          .duration(t_time)
-          .attr("width", d.s)
-          .attr("height", d.s)
-          .attr("x", (d.s - d.r) / 2)
-          .attr("y", (d.s - d.r) / 2)
-        }
+              d3.select("#circle_image"+d.team.id)
+                .transition()
+                .duration(t_time)
+                .attr("width", d.s)
+                .attr("height", d.s)
+                .style('opacity', 1)
+                .attr("x", (d.s - d.r) / 2)
+                .attr("y", (d.s - d.r) / 2)
 
+
+          }
       } else {
 
-        //First cancel all pending transitionn, note the sweet d3.v4 syntax
-        d3.selectAll("circle").interrupt();
-        d3.selectAll("ellipse").interrupt();
-        d3.selectAll("image").interrupt();
+        //d3.selectAll("circle").interrupt();
+        //d3.selectAll("ellipse").interrupt();
+        //d3.selectAll("image").interrupt();
 
-        let newSpiralPoint = computeSpiralPoint(teams, width, height);
-
-        for (let i = 0; i < teams.length; i++) {
+        for (let i = 0; i < teams_.length; i++) {
           let d = newSpiralPoint[i]
+
+          //First cancel all pending transition
+          d3.select("#circle"+d.team.id).interrupt();
+          d3.select("#ellipse"+d.team.id).interrupt();
+          d3.select("#circle_image"+d.team.id).interrupt();
+
           d3.select("#circle"+d.team.id)
             .attr("cx", d.x)
             .attr("cy", d.y)
             .attr("r", d.r)
+            .style('opacity', 1)
             .on("mouseenter", function() {
                 d3.select(this).transition()
                     .duration(200)
@@ -759,7 +779,7 @@ function drawSpiral(teams, shouldTransit) {
             }).on("click", function() {
                      if (d.team.id != myFavoriteTeamId()) {
                        locallyStoreOppositeTeamId(d.team.id)
-                       draw(teams, false)
+                       draw(teams_, false)
                      }
                  })
 
@@ -768,6 +788,7 @@ function drawSpiral(teams, shouldTransit) {
             .attr("cy", d.r)
             .attr("rx", d.r)
             .attr("ry", d.r)
+            .style('opacity', 1)
             .style("fill",  d.team.color)
             .style("stroke", myFavoriteTeamId() == d.team.id ? "blue" : "red")
             .style("stroke-width",  myFavoriteTeamId() == d.team.id || myOppositeTeamId() == d.team.id ? 15:0);
@@ -777,6 +798,7 @@ function drawSpiral(teams, shouldTransit) {
             .attr("height", d.s)
             .attr("x", (d.s - d.r) / 2)
             .attr("y", (d.s - d.r) / 2)
+            .style('opacity', 1)
 
           }
       }
@@ -871,31 +893,25 @@ function init() {
         }
     })
 
-
     const today_string = today.getYear() + "-" + today.getMonth() + "-" + today.getDay();
     sessionStoreDate(today_string);
 
-    //Setup teamSelectorGrid once
-    //TODO find best way to not pull data twice at
-    // init even though we don't really care too much
+    //Setup teamSelectorGrid and other elements that need data once
     loadedData = loadNHLData(today_string);
-    // Parse and clean the data into an array
     loadedData.done(function(response) {
         cleanedTeams = getCleanedTeams(response);
-        teamSelectorCarousel = createTeamSelectorInCarousel(cleanedTeams);
-        teamSelectorGrid = createTeamSelectorInGrid(cleanedTeams)
-
         // Store locally the teams values
         locallyStoreTeams(cleanedTeams);
 
-        // test contains the wanted json @Ismail
-        test = getCleanedGlobalData(response)
-        //console.log(test); // simply test
+        teamSelectorCarousel = createTeamSelectorInCarousel(cleanedTeams);
+        teamSelectorGrid = createTeamSelectorInGrid(cleanedTeams)
 
+        // Draw initial spiral
+        initSpiralSVG(cleanedTeams)
 
-        draw(cleanedTeams);
-    });
+        draw(cleanedTeams, false)
 
+      });
 }
 
 // Filter cleanedTeam with conference or division selector
@@ -1037,7 +1053,6 @@ function drawChart(){
 
 
 //DRAW CHART HELPER FUNCTIONS
-
 function arcTween(d,i){
   let interpolator = d3.interpolate(0, d.value);
   return t =>{
