@@ -42,6 +42,9 @@ const TEAM_DICT = {
     "San Jose Sharks": ["logos/San_Jose_Sharks_logo.svg", "#036082"],
 }
 
+const blueSelectorColor = "#3dc1ff";
+const redSelectorColor = "#ff5238";
+
 
 /**
  * Load NHL data from statsapi.web.nhl.com
@@ -362,8 +365,8 @@ function initSpiralSVG(teams) {
       .attr("rx", function(d) { return d.r; })
       .attr("ry", function(d) { return d.r; })
       .style("fill", function(d) { return d.team.color; })
-      .style("stroke", function(d) { return myFavoriteTeamId() == d.team.id ? "blue" : "red"; })
-      .style("stroke-width",  function(d) { return  myFavoriteTeamId() == d.team.id || myOppositeTeamId() == d.team.id ? 15:0; });
+      .style("stroke", function(d) { return myFavoriteTeamId() == d.team.id ? blueSelectorColor : redSelectorColor; })
+      .style("stroke-width",  function(d) { return  myFavoriteTeamId() == d.team.id || myOppositeTeamId() == d.team.id ? 12:0; });
 
   patternSelector.append("svg:image")
         .attr("id", function(d) { return "circle_image"+d.team.id; })
@@ -730,7 +733,7 @@ function drawSpiral(teams_, shouldTransit) {
                 .attr("ry", d.r)
                 .style('opacity', 1)
                 .style("fill",  d.team.color)
-                .style("stroke", myFavoriteTeamId() == d.team.id ? "blue" : "red")
+                .style("stroke", myFavoriteTeamId() == d.team.id ? blueSelectorColor : redSelectorColor)
                 .style("stroke-width",  myFavoriteTeamId() == d.team.id || myOppositeTeamId() == d.team.id ? 15:0);
 
               d3.select("#circle_image"+d.team.id)
@@ -790,7 +793,7 @@ function drawSpiral(teams_, shouldTransit) {
             .attr("ry", d.r)
             .style('opacity', 1)
             .style("fill",  d.team.color)
-            .style("stroke", myFavoriteTeamId() == d.team.id ? "blue" : "red")
+            .style("stroke", myFavoriteTeamId() == d.team.id ? blueSelectorColor : redSelectorColor)
             .style("stroke-width",  myFavoriteTeamId() == d.team.id || myOppositeTeamId() == d.team.id ? 15:0);
 
           d3.select("#circle_image"+d.team.id)

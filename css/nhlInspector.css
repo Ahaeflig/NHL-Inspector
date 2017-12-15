@@ -85,10 +85,15 @@ path.spiral {
     stroke-width: 3px;
 }
 
-#myTeamDoubleRainbow path {
-  stroke: white;
-  stroke-width: 0.5;
+#myTeamDoubleRainbow #t1 path {
+  stroke:  white;
+  stroke-width: 0.25%;
     }
+
+  #myTeamDoubleRainbow #t2 path {
+    stroke: white;
+    stroke-width: 0.25%;
+      }
 
 #teamName{
     position: absolute;
