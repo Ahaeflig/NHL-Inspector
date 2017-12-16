@@ -704,6 +704,7 @@ function drawSpiral(teams_, shouldTransit) {
                 .attr("r", d.r)
                 .style('opacity', 1)
                 .on("end", function() {
+
                   d3.select(this)
                   .on("mouseenter", function() {
                       d3.select(this).transition()
@@ -724,6 +725,10 @@ function drawSpiral(teams_, shouldTransit) {
                                draw(teams_, false)
                              }
                    })
+                   // Be sure to call it only once
+                   if(i == teams_.length-1){
+                       sliderAnim.moveSliderRight();
+                   }
                 })
 
               d3.select("#ellipse"+d.team.id)
@@ -809,6 +814,30 @@ function drawSpiral(teams_, shouldTransit) {
       }
 }
 
+const sliderAnim = {
+    slider: $("#timeSliderInput"),
+    isAnimPlay: false,
+    toggleSliderAnim: function (){
+        this.isAnimPlay = !this.isAnimPlay;
+        this.moveSliderRight();
+    },
+    pauseAnim: function(){
+        this.isAnimPlay = false;
+    },
+    sliderAnimIsPlay: function(){
+        return isAnimPlay;
+    },
+    moveSliderRight: function(){
+        if(this.isAnimPlay){
+            const value = this.slider.slider('getValue');
+            const maxValue = this.slider.slider('getAttribute', 'max');
+            console.log(maxValue);
+            const newValue = value == maxValue ? 1: value+1;
+            this.slider.slider('setValue', newValue, false, true);
+        }
+    }
+}
+
 // Is called when the document is ready
 function init() {
 
@@ -873,7 +902,7 @@ function init() {
 
     $('#timeSliderInput').on({
         change: function(ui) {
-
+            console.log("MMM")
             if (ui.value != null) {
                 let newSliderVal = ui.value['newValue']
                 const date = new Date(championshipStartDate.valueOf());
@@ -887,8 +916,17 @@ function init() {
                 sessionStoreDate(dateString);
                 reloadAndDraw(dateString, true);
             }
+        },
+        slideStart: function(ui){
+            sliderAnim.pauseAnim();
+            const button = $('#playResume'); 
+            button.removeClass('pauseButton');
+            button.addClass('playButton');
         }
     });
+
+
+
     $('#timeSliderInput').trigger('change');
 
     $(".selectpicker").on({
@@ -896,6 +934,20 @@ function init() {
             reloadAndDraw(chosenDate(), true);
         }
     })
+
+    $('#playResume').click(function(e){
+        const button = $(this);
+
+        if(button.hasClass("playButton")){
+            button.removeClass('playButton');
+            button.addClass('pauseButton');
+        }else{
+            button.removeClass('pauseButton');
+            button.addClass('playButton');
+        }
+        sliderAnim.toggleSliderAnim();
+    });
+
 
     const today_string = today.getYear() + "-" + today.getMonth() + "-" + today.getDay();
     sessionStoreDate(today_string);
