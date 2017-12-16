@@ -54,6 +54,8 @@ nav{
     border-radius: 5px;
     border-color: #28a745;
     background: #111111;
+    background-image: url("images/nhl-background.jpg");
+    background-position: center;
     /*height: 300px;
     width: 400px;*/
     height: 40%;
@@ -62,7 +64,6 @@ nav{
     top: 54px;
     right: 0px;
     z-index: 99;
-    background-image: url("images/nhl-background.jpg");
 }
 
 .activePanel{

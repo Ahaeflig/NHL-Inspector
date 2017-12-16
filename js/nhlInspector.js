@@ -599,7 +599,7 @@ function computeSpiralData(teams, width, height) {
   const teamNumber = teams.length;
 
   // Probably need to be computated in a clever way
-  const minSize = 10;
+  const minSize = 28;
   const sizeFactor = Math.min(width / 1100, 1);
 
   // Spiral parameters
@@ -619,7 +619,7 @@ function computeSpiralData(teams, width, height) {
      const team = teams[i];
      const teamPoint = team.point;
 
-     const r = (minSize + teamPoint) * sizeFactor;
+     const r = (minSize + teamNumber - i) * sizeFactor;
      const d = (r + oldR) * (r + oldR);
      let x = oldX;
      let y = oldY;
@@ -919,7 +919,7 @@ function init() {
         },
         slideStart: function(ui){
             sliderAnim.pauseAnim();
-            const button = $('#playResume'); 
+            const button = $('#playResume');
             button.removeClass('pauseButton');
             button.addClass('playButton');
         }
