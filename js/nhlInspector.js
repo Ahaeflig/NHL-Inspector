@@ -75,25 +75,27 @@ function loadNHLData(date) {
 function getCleanedGlobalData(data) {
 
     conferenceData = data.records
-    var teams = [];
+    let teams = [];
 
     //Fill Array with team values
     for (let conf = 0; conf < conferenceData.length; ++conf) {
         for (let i = 0; i < conferenceData[conf]["teamRecords"].length; ++i) {
 
+            const teamRecords = conferenceData[conf]["teamRecords"][i];
+            const leagueRecord = conferenceData[conf]["teamRecords"][i]["leagueRecord"]
             // TODO refactor if needed and chose correct stats
-            let teamName = conferenceData[conf]["teamRecords"][i].team.name
-            let points = conferenceData[conf]["teamRecords"][i].points
-            let gamesPlayed = conferenceData[conf]["teamRecords"][i]["gamesPlayed"]
-            let wins = conferenceData[conf]["teamRecords"][i]["leagueRecord"].wins
-            let overtime = conferenceData[conf]["teamRecords"][i]["leagueRecord"].ot
-            let losses = conferenceData[conf]["teamRecords"][i]["leagueRecord"].losses
-            let goalAgainst = conferenceData[conf]["teamRecords"][i].goalsAgainst
-            let goalScored = conferenceData[conf]["teamRecords"][i].goalsScored
-            let divisionRank = conferenceData[conf]["teamRecords"][i].divisionRank
-            let conferenceRank = conferenceData[conf]["teamRecords"][i].conferenceRank
-            let leagueRank = conferenceData[conf]["teamRecords"][i].leagueRank
-            let wildCardRank = conferenceData[conf]["teamRecords"][i].wildCardRank
+            const teamName = records.team.name;
+            const points = records.points;
+            const gamesPlayed = records["gamesPlayed"];
+            const wins = leagueRecord.wins;
+            const overtime = leagueRecord.ot;
+            const losses = leagueRecord.losses;
+            const goalAgainst = teamRecords.goalsAgainst;
+            const goalScored = teamRecords.goalsScored;
+            const divisionRank = teamRecords.divisionRank;
+            const conferenceRank = teamRecords.conferenceRank;
+            const leagueRank = teamRecords.leagueRank;
+            const wildCardRank = teamRecords.wildCardRank;
 
             teams.push({
                 "name": teamName,
@@ -113,7 +115,7 @@ function getCleanedGlobalData(data) {
                     "leagueRank": leagueRank,
                     "wildCardRank": wildCardRank,
                 }
-              })
+            });
         }
     }
 
@@ -133,23 +135,23 @@ function getCleanedGlobalData(data) {
  */
 function getCleanedTeams(data) {
     conferenceData = data.records
-    var teams = [];
+    let teams = [];
 
     //Fill Array with team values
     for (let conf = 0; conf < conferenceData.length; ++conf) {
         for (let i = 0; i < conferenceData[conf]["teamRecords"].length; ++i) {
-            let teamName = conferenceData[conf]["teamRecords"][i].team.name
-            let points = conferenceData[conf]["teamRecords"][i].points
-            let id = conferenceData[conf]["teamRecords"][i].team.id
 
-            let goalScored = conferenceData[conf]["teamRecords"][i].goalsScored
-            let goalAgainst = conferenceData[conf]["teamRecords"][i].goalsAgainst
+            const teamRecords = conferenceData[conf]["teamRecords"][i];
 
-            let wins = conferenceData[conf]["teamRecords"][i].leagueRecord.wins
-            let losses = conferenceData[conf]["teamRecords"][i].leagueRecord.losses
-
-            let team_conf = conferenceData[conf]["teamRecords"][i].team.conference.name
-            let div = conferenceData[conf]["teamRecords"][i].team.division.name
+            const teamName = teamRecords.team.name;
+            const points = teamRecords.points;
+            const id = teamRecords.team.id;
+            const goalScored = teamRecords.goalsScored;
+            const goalAgainst = teamRecords.goalsAgainst;
+            const wins = teamRecords.leagueRecord.wins;
+            const losses = teamRecords.leagueRecord.losses;
+            const team_conf = teamRecords.team.conference.name;
+            const div = teamRecords.team.division.name;
 
             teams.push({
                 name: teamName,
@@ -163,7 +165,7 @@ function getCleanedTeams(data) {
                 color : TEAM_DICT[teamName][1],
                 conference : team_conf,
                 division : div,
-            })
+            });
         }
     }
 
@@ -522,7 +524,7 @@ function placeTeam(team_) {
             {startAngleOfMyArc: Math.PI/4, endAngleOfMyArc: Math.PI + Math.PI/4},
           ];
 
-          var def1 = d3.select('#myTeamDoubleRainbow').select("#t1").append('defs')
+          let def1 = d3.select('#myTeamDoubleRainbow').select("#t1").append('defs')
           let pattern = def1.append("svg:pattern")
           .attr("id", "teamlogo1")
           .attr("width", 1)
@@ -541,7 +543,7 @@ function placeTeam(team_) {
               .attr("x", (s - r) / 2)
               .attr("y", (s - r) / 2);
 
-          var def2 = d3.select('#myTeamDoubleRainbow').select("#t2").append('defs')
+          let def2 = d3.select('#myTeamDoubleRainbow').select("#t2").append('defs')
           let pattern2 = def2.append("svg:pattern")
           .attr("id", "teamlogo2")
           .attr("width", 1)
@@ -1014,14 +1016,14 @@ function drawChart(){
     dataOffsets = teamsArray.map((d,i)=>d.offset);
     dataValues = teamsArray.map((d,i)=>d.value);
 
-    var arc = d3.arc()
+    let arc = d3.arc()
       .innerRadius((d,i)=>computeInnerRadius(visualizationMode == "adjacent" ? d.index : i))
       .outerRadius((d,i)=>computeOuterRadius(visualizationMode == "adjacent" ? d.index : i))
       .startAngle((d,i)=>computeAngle(d.offset))
       .endAngle((d,i)=>computeAngle(d.offset)+computeAngle(d.value));
 
 
-    var arcs = d3.select('#myTeamG')
+    let arcs = d3.select('#myTeamG')
     .selectAll('path')
       .data(teamsArray)
       .enter().append("svg:path")
@@ -1042,7 +1044,7 @@ function drawChart(){
           arc(d1,i);
         }
       });*/
-    var labels = d3.select('#myTeamG')
+    let labels = d3.select('#myTeamG')
     .selectAll('text')
     .data(dataLabels)
     .enter()
