@@ -1062,7 +1062,8 @@ function drawChart(myTeam, oppositeTeam) {
         .append('text')
         .text((d, i) => d)
         .style('fill', 'white')
-        .style('font-size', "12px")
+        .style('font-size', "14px")
+        .style('font-weight', '700')
         .attr("transform", (d, i) => ("translate(" + (width / 2 - 20 + "," + (height / 2 - computeOuterRadius(2 * i) + 2.5) + ")")));
 
     arcs.on('mouseenter', showTooltip)
