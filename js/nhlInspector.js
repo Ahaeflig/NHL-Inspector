@@ -902,7 +902,7 @@ function init() {
 
     $('#timeSliderInput').on({
         change: function(ui) {
-            console.log("MMM")
+            //console.log("MMM")
             if (ui.value != null) {
                 let newSliderVal = ui.value['newValue']
                 const date = new Date(championshipStartDate.valueOf());
@@ -948,8 +948,7 @@ function init() {
         sliderAnim.toggleSliderAnim();
     });
 
-
-    const today_string = today.getYear() + "-" + today.getMonth() + "-" + today.getDay();
+    const today_string = today.getFullYear() + "-" + today.getMonth() + "-" + today.getDate();
     sessionStoreDate(today_string);
 
     //Setup teamSelectorGrid and other elements that need data once
