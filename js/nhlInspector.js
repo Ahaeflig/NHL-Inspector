@@ -66,64 +66,6 @@ function loadNHLData(date) {
 }
 
 /**
- * Get and clean some global data from the input data
- * @assume data is the output of @see loadNHLData
- * @param data (): whole JSON data
- * @return the cleaned global data as a JS Object which contains:
- *    -TBD
- */
-function getCleanedGlobalData(data) {
-
-    conferenceData = data.records
-    let teams = [];
-
-    //Fill Array with team values
-    for (let conf = 0; conf < conferenceData.length; ++conf) {
-        for (let i = 0; i < conferenceData[conf]["teamRecords"].length; ++i) {
-
-            const teamRecords = conferenceData[conf]["teamRecords"][i];
-            const leagueRecord = conferenceData[conf]["teamRecords"][i]["leagueRecord"]
-            // TODO refactor if needed and chose correct stats
-            const teamName = records.team.name;
-            const points = records.points;
-            const gamesPlayed = records["gamesPlayed"];
-            const wins = leagueRecord.wins;
-            const overtime = leagueRecord.ot;
-            const losses = leagueRecord.losses;
-            const goalAgainst = teamRecords.goalsAgainst;
-            const goalScored = teamRecords.goalsScored;
-            const divisionRank = teamRecords.divisionRank;
-            const conferenceRank = teamRecords.conferenceRank;
-            const leagueRank = teamRecords.leagueRank;
-            const wildCardRank = teamRecords.wildCardRank;
-
-            teams.push({
-                "name": teamName,
-                "data": {
-                    "logo": TEAM_DICT[teamName][0],
-                    "point": points,
-                    "teamName": teamName,
-                    "points": points,
-                    "gamesPlayed": gamesPlayed,
-                    "wins": wins,
-                    "overtime": overtime,
-                    "losses ": losses,
-                    "goalAgainst": goalAgainst,
-                    "goalScored ": goalScored,
-                    "divisionRank": divisionRank,
-                    "conferenceRank": conferenceRank,
-                    "leagueRank": leagueRank,
-                    "wildCardRank": wildCardRank,
-                }
-            });
-        }
-    }
-
-    return JSON.parse(JSON.stringify(teams));
-}
-
-
-/**
  * Get and Clean the teams data inside the received input data and return an
  * array of teams where a team is a JS Object which contains:
  * - name : the name of the team
@@ -136,11 +78,9 @@ function getCleanedGlobalData(data) {
 function getCleanedTeams(data) {
     conferenceData = data.records
     let teams = [];
-
     //Fill Array with team values
     for (let conf = 0; conf < conferenceData.length; ++conf) {
         for (let i = 0; i < conferenceData[conf]["teamRecords"].length; ++i) {
-
             const teamRecords = conferenceData[conf]["teamRecords"][i];
 
             const teamName = teamRecords.team.name;
@@ -187,12 +127,11 @@ function sessionStoreDate(date) {
 }
 
 /**
- * Return chosen date
+ * @return Return chosen date
  */
 function chosenDate() {
     return localStorage.getItem("chosen_date");
 }
-
 
 /**
  * Locally store the id of the user favorite team
@@ -335,95 +274,96 @@ function createTeamSelectorInGrid(teams) {
 }
 
 /*
-* Create the spiral SVG element
-* @assume Should be called only once in the init phase
-*/
+ * Create the spiral SVG element
+ * @assume Should be called only once in the init phase
+ */
 function initSpiralSVG(teams) {
-  // Get the Spiral SVG and its dimensions
-  let spiralSVG = $('#spiralSVG');
-  let spiralG = d3.select('#spiralG');
-  const width = spiralSVG.width();
-  const height = spiralSVG.height();
+    // Get the Spiral SVG and its dimensions
+    let spiralSVG = $('#spiralSVG');
+    let spiralG = d3.select('#spiralG');
+    const width = spiralSVG.width();
+    const height = spiralSVG.height();
 
-  // Get the start of the spiral
-  const cx = width / 2;
-  const cy = height / 2;
+    // Get the start of the spiral
+    const cx = width / 2;
+    const cy = height / 2;
 
-  let spiral_data = computeSpiralData(teams, width, height)
+    let spiral_data = computeSpiralData(teams, width, height)
 
-  // Construct iterativelly all the pills from the center
-  let patternSelector = spiralG.append('svg:defs').selectAll("defs")
-            .data(spiral_data)
-            .enter()
-              .append('svg:pattern')
-              .attr("id", function(d) { return "pattern" + d.team.id;} )
-              .attr("width", d => 1)
-              .attr("height", d => 1);
+    // Construct iterativelly all the pills from the center
+    let patternSelector = spiralG.append('svg:defs').selectAll("defs")
+        .data(spiral_data)
+        .enter()
+        .append('svg:pattern')
+        .attr("id", function(d) {
+            return "pattern" + d.team.id;
+        })
+        .attr("width", d => 1)
+        .attr("height", d => 1);
 
-  patternSelector.append("ellipse")
-      .attr("id", function(d) { return "ellipse"+d.team.id; })
-      .attr("cx", function(d) { return d.r; })
-      .attr("cy", function(d) { return d.r; })
-      .attr("rx", function(d) { return d.r; })
-      .attr("ry", function(d) { return d.r; })
-      .style("fill", function(d) { return d.team.color; })
-      .style("stroke", function(d) { return myFavoriteTeamId() == d.team.id ? blueSelectorColor : redSelectorColor; })
-      .style("stroke-width",  function(d) { return  myFavoriteTeamId() == d.team.id || myOppositeTeamId() == d.team.id ? 12:0; });
+    patternSelector.append("ellipse")
+        .attr("id", function(d) {return "ellipse" + d.team.id;})
+        .attr("cx", function(d) {return d.r;})
+        .attr("cy", function(d) {return d.r;})
+        .attr("rx", function(d) {return d.r;})
+        .attr("ry", function(d) {return d.r;})
+        .style("fill", function(d) {return d.team.color;})
+        .style("stroke", function(d) {return myFavoriteTeamId() == d.team.id ? blueSelectorColor : redSelectorColor;})
+        .style("stroke-width", function(d) {return myFavoriteTeamId() == d.team.id || myOppositeTeamId() == d.team.id ? 12 : 0;});
 
-  patternSelector.append("svg:image")
-        .attr("id", function(d) { return "circle_image"+d.team.id; })
-        .attr("xlink:href", function(d) { return d.team.logo })
-        .attr("width", function(d) { return d.s; })
-        .attr("height", function(d) { return d.s; })
-        .attr("x", function(d) { return (d.s - d.r) / 2; })
-        .attr("y", function(d) { return (d.s - d.r) / 2; })
+    patternSelector.append("svg:image")
+        .attr("id", function(d) {return "circle_image" + d.team.id;})
+        .attr("xlink:href", function(d) {return d.team.logo})
+        .attr("width", function(d) {return d.s;})
+        .attr("height", function(d) {return d.s;})
+        .attr("x", function(d) {return (d.s - d.r) / 2;})
+        .attr("y", function(d) {return (d.s - d.r) / 2;});
 
     let circle = spiralG.selectAll("circle")
-         .data(spiral_data)
-         .enter()
-         .append("circle")
-         .attr("id", function(d) { return "circle"+d.team.id; })
-         .attr("cx", function(d) { return d.x; })
-         .attr("cy", function(d) { return d.y; })
-         .attr("r", function(d) { return d.r; })
-         .style("fill", function(d) { return "url(#pattern" + d.team.id + ")"; })
-         .on("mouseenter", function(d) {
-             d3.selectAll("#circle"+d.team.id).transition()
-                 .duration(200)
-                 .attr("cx", function(d) { return d.x + d.nx * 20; })
-                 .attr("cy", function(d) { return d.y + d.ny * 20; })
-             $('#teamName').html(d.team.name)
-         })
-         .on("mouseleave", function(d) {
-             d3.selectAll("#circle"+d.team.id).transition()
-                 .duration(800)
-                 .attr("cx", function(d) {return d.x})
-                 .attr("cy", function(d) {return d.y})
-             $('#teamName').html("");
-         })
-         .on("click", function(d) {
-             if (d.team.id != myFavoriteTeamId()) {
-               locallyStoreOppositeTeamId(d.team.id)
-               draw(teams, false)
-             }
-         })
-
-  draw(cleanedTeams);
+        .data(spiral_data)
+        .enter()
+        .append("circle")
+        .attr("id", function(d) {return "circle" + d.team.id;})
+        .attr("cx", function(d) {return d.x;})
+        .attr("cy", function(d) {return d.y;})
+        .attr("r", function(d) {return d.r;})
+        .style("fill", function(d) {return "url(#pattern" + d.team.id + ")";})
+        .on("mouseenter", function(d) {
+            d3.selectAll("#circle" + d.team.id).transition()
+                .duration(200)
+                .attr("cx", function(d) {return d.x + d.nx * 20;})
+                .attr("cy", function(d) {return d.y + d.ny * 20;})
+            $('#teamName').html(d.team.name)
+        })
+        .on("mouseleave", function(d) {
+            d3.selectAll("#circle" + d.team.id).transition()
+                .duration(800)
+                .attr("cx", function(d) {return d.x})
+                .attr("cy", function(d) {return d.y})
+            $('#teamName').html("");
+        })
+        .on("click", function(d) {
+            if (d.team.id != myFavoriteTeamId()) {
+                locallyStoreOppositeTeamId(d.team.id)
+                draw(teams, false)
+            }
+        })
 }
-
 
 
 /**
 * Create the Miniature-FullScreen transition between
 * the left and right panels.
-* Call the @see placeTeam and @see drawSpiral function periodiacally
+* Call the @see placeTeams and @see drawSpiral function periodiacally
 * during transition
 * @assume rightPanel and leftPanel exists
 */
 function createMainTransition() {
 
     const rightPl = $('#rightPanel');
+    const rightTitle = $("#teamVersus");
     const leftPl = $('#leftPanel');
+    const leftTitle = $("#teamName");
 
     rightPl.click(function() {
         if (leftPl.hasClass("activePanel")) {
@@ -434,7 +374,7 @@ function createMainTransition() {
             }, {
                 duration: 300,
                 step: function() {
-                    placeTeam(team(myFavoriteTeamId()));
+                    placeTeams();
                 },
                 complete: function() {
                     rightPl.addClass('activePanel');
@@ -442,6 +382,9 @@ function createMainTransition() {
                     leftPl.height("40%").width("20%").css({
                         top: '54px'
                     });
+                    rightTitle.addClass('activeTool')
+                    leftTitle.removeClass('activeTool')
+
                     draw(filterConf(teams()), false)
                 }
             });
@@ -464,8 +407,10 @@ function createMainTransition() {
                     rightPl.removeClass('activePanel');
                     rightPl.height("40%").width("20%").css({
                         top: '54px'
-                    });;
-                    placeTeam(team(myFavoriteTeamId()));
+                    });
+                    leftTitle.addClass('activeTool')
+                    rightTitle.removeClass('activeTool')
+                    placeTeams();
                 }
             });
         }
@@ -477,24 +422,30 @@ function createMainTransition() {
  * It addapts the logo size to fit a circle
  * @assume #myTeamSVG or #otherTeamSVG exists as <svg>
  * @assume (#myTeamC and #myTeamL) or (#otherTeamC and #otherTeamL) exists as <circle> and <image>
- * @param team (): the team as a js object @see  teams.legetCleanedTeams
  * @return void:
  */
-function placeTeam(team_) {
+function placeTeams() {
 
-    const teamSVG = $('#myTeamSVG');
+    const myId = myFavoriteTeamId();
+    const oppositeId = myOppositeTeamId();
 
-    // Get the current SVG dimensions
-    const width = teamSVG.width();
-    const height = teamSVG.height();
+    if (myId != null) {
 
-    // Compute the circle radius and center from container dimensions
-    const r = Math.min(width, height) / 4;
-    const rCorr = r / 2;
-    const cx = width / 2;
-    const cy = height / 2;
+        const myTeam = team(myId);
+        const oppositeTeam = oppositeId != null ? team(oppositeId) : myTeam;
 
-    if (team_ != null && myOppositeTeamId() != null) {
+        const teamSVG = $('#myTeamSVG');
+
+        // Get the current SVG dimensions
+        const width = teamSVG.width();
+        const height = teamSVG.height();
+
+        // Compute the circle radius and center from container dimensions
+        const r = Math.min(width, height) / 4;
+        const rCorr = r / 2;
+        const cx = width / 2;
+        const cy = height / 2;
+
         // Compute the Logo dimension and
         const s = r + rCorr;
 
@@ -507,85 +458,94 @@ function placeTeam(team_) {
                 .innerRadius(inner)
                 .outerRadius(outer)
                 .startAngle(function(d) {
-                  return d.startAngleOfMyArc;
+                    return d.startAngleOfMyArc;
                 })
                 .endAngle(function(d) {
-                  return d.endAngleOfMyArc;
+                    return d.endAngleOfMyArc;
                 });
-          }
+        }
 
-          let arcGen = getArcGen(0, r)
+        let arcGen = getArcGen(0, r)
 
-          let arcData1 = [
-            {startAngleOfMyArc: Math.PI + Math.PI/4, endAngleOfMyArc: 2 * Math.PI + Math.PI / 4}
-          ];
+        let arcData1 = [{
+            startAngleOfMyArc: Math.PI + Math.PI / 4,
+            endAngleOfMyArc: 2 * Math.PI + Math.PI / 4
+        }];
 
-          let arcData2 = [
-            {startAngleOfMyArc: Math.PI/4, endAngleOfMyArc: Math.PI + Math.PI/4},
-          ];
+        let arcData2 = [{
+            startAngleOfMyArc: Math.PI / 4,
+            endAngleOfMyArc: Math.PI + Math.PI / 4
+        }, ];
 
-          let def1 = d3.select('#myTeamDoubleRainbow').select("#t1").append('defs')
-          let pattern = def1.append("svg:pattern")
-          .attr("id", "teamlogo1")
-          .attr("width", 1)
-          .attr("height", 1);
+        let def1 = d3.select('#myTeamDoubleRainbow').select("#t1").append('defs')
+        let pattern = def1.append("svg:pattern")
+            .attr("id", "teamlogo1")
+            .attr("width", 1)
+            .attr("height", 1);
 
-          pattern.append("circle")
-              .attr("cx", r)
-              .attr("cy", r)
-              .attr("r", r)
-              .style("fill", team_.color);
+        pattern.append("circle")
+            .attr("cx", r)
+            .attr("cy", r)
+            .attr("r", r)
+            .style("fill", myTeam.color);
 
-          pattern.append("svg:image")
-              .attr("xlink:href", team_.logo)
-              .attr("width", s)
-              .attr("height", s)
-              .attr("x", (s - r) / 2)
-              .attr("y", (s - r) / 2);
+        pattern.append("svg:image")
+            .attr("xlink:href", myTeam.logo)
+            .attr("width", s)
+            .attr("height", s)
+            .attr("x", (s - r) / 2)
+            .attr("y", (s - r) / 2);
 
-          let def2 = d3.select('#myTeamDoubleRainbow').select("#t2").append('defs')
-          let pattern2 = def2.append("svg:pattern")
-          .attr("id", "teamlogo2")
-          .attr("width", 1)
-          .attr("height", 1)
+        d3.select('#t1')
+            .selectAll('path')
+            .data(arcData1)
+            .enter()
+            .append('path')
+            .attr('d', arcGen)
+            .attr("fill", "url(#teamlogo1)")
+            .attr("transform", "translate(" + cx + "," + cy + ")");
 
-          pattern2.append("circle")
-              .attr("cx", r)
-              .attr("cy", r)
-              .attr("r", r*2)
-              .style("fill", team(myOppositeTeamId()).color);
+        let def2 = d3.select('#myTeamDoubleRainbow').select("#t2").append('defs')
+        let pattern2 = def2.append("svg:pattern")
+            .attr("id", "teamlogo2")
+            .attr("width", 1)
+            .attr("height", 1)
 
-          pattern2.append("svg:image")
-              .attr("xlink:href", team(myOppositeTeamId()).logo)
-              .attr("width", s)
-              .attr("height", s)
-              .attr("x",  -9)
-              .attr("y",  -9);
+        pattern2.append("circle")
+            .attr("cx", r)
+            .attr("cy", r)
+            .attr("r", r * 2)
+            .style("fill", oppositeTeam.color);
 
-           d3.select('#t1')
-             .selectAll('path')
-             .data(arcData1)
-             .enter()
-             .append('path')
-             .attr('d', arcGen)
-             .attr("fill", "url(#teamlogo1)")
-             .attr("transform","translate("+cx+","+cy+")");
+        pattern2.append("svg:image")
+            .attr("xlink:href", oppositeTeam.logo)
+            .attr("width", s)
+            .attr("height", s)
+            .attr("x", -9)
+            .attr("y", -9);
 
-           d3.select('#t2')
-             .selectAll('path')
-             .data(arcData2)
-             .enter()
-             .append('path')
-             .attr('d', arcGen)
-             .attr("fill", "url(#teamlogo2)")
-             .attr("transform","translate("+cx+","+cy+")");
+        d3.select('#t2')
+            .selectAll('path')
+            .data(arcData2)
+            .enter()
+            .append('path')
+            .attr('d', arcGen)
+            .attr("fill", "url(#teamlogo2)")
+            .attr("transform", "translate(" + cx + "," + cy + ")");
 
-           drawChart(team);
+        drawChart(myTeam, oppositeTeam);
+
+        // Display the versus name into the right panel
+        if (myTeam.name != oppositeTeam.name){
+            $("#teamVersus").html(myTeam.name +"<br>v.s.<br>"+oppositeTeam.name);
+        }else{
+            $("#teamVersus").html(myTeam.name);
+        }
 
     } else {
-        if (WARNING) console.log("Team is null !")
+        if (WARNING) console.log("Favorite team is null !");
+        $("#teamSelection").modal("show");
     }
-
 }
 
 
@@ -846,7 +806,7 @@ function init() {
     $("#teamSelection").on("hidden.bs.modal", function() {
         const index = $('#teamSelectorCarousel li.active').attr('data-index');
         locallyStoreFavoriteTeamId(index);
-        draw(teams());
+        draw(teams(), false);
     });
 
     // Create the main transition
@@ -924,7 +884,6 @@ function init() {
             button.addClass('playButton');
         }
     });
-
 
 
     $('#timeSliderInput').trigger('change');
@@ -1009,7 +968,6 @@ function reloadAndDraw(date, shouldTransit) {
 
             filteredTeams = filterConf(teams_clean);
             draw(filteredTeams, shouldTransit);
-            drawChart(team[myFavoriteTeamId()]);
         }
 
     ).fail(console.log("data not yet loaded"))
@@ -1018,32 +976,29 @@ function reloadAndDraw(date, shouldTransit) {
 
 /**
 * Draw complete UI
-* using @see placeTeam and @see drawSpiral functions.
+* using @see placeTeams and @see drawSpiral functions.
 */
 function draw(teamsToDraw, shouldTransit) {
     // Place myTeamG in a dynamic way
-    placeTeam(team(myFavoriteTeamId()));
+    placeTeams();
     // Place spiralG in a dynamic way.
     drawSpiral(filterConf(teamsToDraw), shouldTransit);
 }
 
 
 /**
-*Draw circle chart for stat comparison
-*using @see team() , @see myFavoriteTeamId() and @see myOppositeTeamId()
-*/
-function drawChart(){
+ * Draw circle chart for stat comparison
+ * @param myTeam: @assume notnull. If myTeam is not selected, then this function is never called
+ * @param oppositeTeam : @assume notnull. If oppositeteam is not selected, then oppositeTeam=myTeam
+ */
+function drawChart(myTeam, oppositeTeam) {
 
-  //If favorite team chosen make a deep copy for drawing the chart
-  myTeam = team(myFavoriteTeamId()) != null ? jQuery.extend(true, {}, team(myFavoriteTeamId())) : null;
+    //If favorite team chosen make a deep copy for drawing the chart
+    myTeam = jQuery.extend(true, {}, myTeam);
 
-
-  if(myTeam!=null){
-     d3.select('#myTeamG').selectAll("path").remove();
-     d3.selectAll('.tooltipChart').remove()
-     d3.select('#myTeamG').selectAll('text').remove();
-
-    visualizationMode = "stack"; //available modes : stack / adjacent
+    d3.select('#myTeamG').selectAll("path").remove();
+    d3.selectAll('.tooltipChart').remove()
+    d3.select('#myTeamG').selectAll('text').remove();
 
     const svg = $('#myTeamSVG');
 
@@ -1051,36 +1006,36 @@ function drawChart(){
     const height = svg.height();
 
     const r = Math.min(width, height) / 4;
-    const arcWidth = (1/60)*height;
-    const padding = (1/5)*arcWidth;
+    const arcWidth = (1 / 60) * height;
+    const padding = (1 / 5) * arcWidth;
 
     let tooltip = d3.select('body').append('div')
         .attr('class', 'tooltipChart');
 
     //make deep copy of oppositeTeam
-    oppositeTeam = team(myOppositeTeamId())!=null ? jQuery.extend(true, {}, team(myOppositeTeamId())) : null;
+    oppositeTeam = jQuery.extend(true, {}, oppositeTeam);
 
     //load reformated data
     teamsArray = teamsToArray(filterTeamFields(myTeam), filterTeamFields(oppositeTeam));
 
-    dataLabels = removeDuplicates(teamsArray.map((d,i)=>d.stat));
-    dataOffsets = teamsArray.map((d,i)=>d.offset);
-    dataValues = teamsArray.map((d,i)=>d.value);
+    dataLabels = removeDuplicates(teamsArray.map((d, i) => d.stat));
+    dataOffsets = teamsArray.map((d, i) => d.offset);
+    dataValues = teamsArray.map((d, i) => d.value);
 
     let arc = d3.arc()
-      .innerRadius((d,i)=>computeInnerRadius(visualizationMode == "adjacent" ? d.index : i))
-      .outerRadius((d,i)=>computeOuterRadius(visualizationMode == "adjacent" ? d.index : i))
-      .startAngle((d,i)=>computeAngle(d.offset))
-      .endAngle((d,i)=>computeAngle(d.offset)+computeAngle(d.value));
+        .innerRadius((d, i) => computeInnerRadius(i))
+        .outerRadius((d, i) => computeOuterRadius(i))
+        .startAngle((d, i) => computeAngle(d.offset))
+        .endAngle((d, i) => computeAngle(d.offset) + computeAngle(d.value));
 
 
     let arcs = d3.select('#myTeamG')
-    .selectAll('path')
-      .data(teamsArray)
-      .enter().append("svg:path")
-      .attr("d",arc)
-      .attr("transform","translate("+width/2+","+height/2+")")
-      .style("fill", (d,i)=> d.color)
+        .selectAll('path')
+        .data(teamsArray)
+        .enter().append("svg:path")
+        .attr("d", arc)
+        .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")")
+        .style("fill", (d, i) => d.color)
 
     //console.log(arcs);
     /*arcs.transition()
@@ -1096,145 +1051,126 @@ function drawChart(){
         }
       });*/
     let labels = d3.select('#myTeamG')
-    .selectAll('text')
-    .data(dataLabels)
-    .enter()
-      .append('text')
-      .text((d,i)=>d)
-      .style('fill', 'white')
-      .style('font-size', "12px")
-      .attr("transform",(d,i)=>("translate("+(width/2-20+","+(height/2-computeOuterRadius(2*i)+2.5)+")")));
+        .selectAll('text')
+        .data(dataLabels)
+        .enter()
+        .append('text')
+        .text((d, i) => d)
+        .style('fill', 'white')
+        .style('font-size', "12px")
+        .attr("transform", (d, i) => ("translate(" + (width / 2 - 20 + "," + (height / 2 - computeOuterRadius(2 * i) + 2.5) + ")")));
 
     arcs.on('mouseenter', showTooltip)
         .on('mouseout', hideTooltip);
 
 
-//DRAW CHART HELPER FUNCTIONS
-function arcTween(d,i){
-  let interpolator = d3.interpolate(0, d.value);
-  return t =>{
-    d1 = [{"value" : interpolator(t).toString(), "stat" : d.stat, "color" : d.color, "index" : d.index, "offset" : d.offset},]
-    arc(d1,i);
-  }
-}
-
-//Used for removing duplicate stat labels in dataLabels array
-function removeDuplicates(arr){
-    let unique_array = []
-    for(let i = 0;i < arr.length; i++){
-        if(unique_array.indexOf(arr[i]) == -1){
-            unique_array.push(arr[i])
+    //DRAW CHART HELPER FUNCTIONS
+    function arcTween(d, i) {
+        let interpolator = d3.interpolate(0, d.value);
+        return t => {
+            d1 = [{
+                "value": interpolator(t).toString(),
+                "stat": d.stat,
+                "color": d.color,
+                "index": d.index,
+                "offset": d.offset
+            }, ]
+            arc(d1, i);
         }
     }
-    return unique_array
-}
+
+    //Used for removing duplicate stat labels in dataLabels array
+    function removeDuplicates(arr) {
+        let unique_array = []
+        for (let i = 0; i < arr.length; i++) {
+            if (unique_array.indexOf(arr[i]) == -1) {
+                unique_array.push(arr[i])
+            }
+        }
+        return unique_array
+    }
 
     /**
-    * Compute inner radius of arc based on stat values
-    */
+     * Compute inner radius of arc based on stat values
+     */
     function computeInnerRadius(index) {
-      if(visualizationMode == "adjacent"){
-        return r+padding+index*(arcWidth);
-      }else{
-        pad = index % 2 == 0 || oppositeTeam==null ? padding : 0;
-        return r+pad+padding+index*(arcWidth);
-      }
+        pad = index % 2 == 0 || oppositeTeam == null ? padding : 0;
+        return r + pad + padding + index * (arcWidth);
     }
 
     /**
-    * Compute outer radius of arc based on stat values
-    */
+     * Compute outer radius of arc based on stat values
+     */
     function computeOuterRadius(index) {
-      if(visualizationMode == "adjacent"){
-        return r+arcWidth+index*(arcWidth);
-      }else{
-        pad = index % 2 == 0 && oppositeTeam!=null ? padding : 0;
-        return r+arcWidth+pad+index*(arcWidth);
-      }
+        pad = index % 2 == 0 && oppositeTeam != null ? padding : 0;
+        return r + arcWidth + pad + index * (arcWidth);
     }
 
     /**
-    * Compute arc angle based on stat values
-    */
-    function computeAngle(value){
-      return (1/200)*value*(10/6)*Math.PI;
+     * Compute arc angle based on stat values
+     */
+    function computeAngle(value) {
+        return (1 / 200) * value * (10 / 6) * Math.PI;
     }
 
     /**
-    * display tooltip on mouse hover
-    */
+     * display tooltip on mouse hover
+     */
     function showTooltip(d) {
-      tooltip.style('left', (d3.event.pageX + 10) + 'px')
-        .style('top', (d3.event.pageY - 25) + 'px')
-        .style('display', 'inline-block')
-        .html(d.stat+" : "+d.value);
+        tooltip.style('left', (d3.event.pageX + 10) + 'px')
+            .style('top', (d3.event.pageY - 25) + 'px')
+            .style('display', 'inline-block')
+            .html(d.stat + " : " + d.value);
     }
 
     /**
-    * hide tooltip on mouse out
-    */
+     * hide tooltip on mouse out
+     */
     function hideTooltip() {
-      tooltip.style('display', 'none');
+        tooltip.style('display', 'none');
     }
 
     /**
-    * Reformat team data for chart drawing
-    */
-    function teamsToArray(d, dOpposite){
-      if(dOpposite!=null)
-      {
-        if(visualizationMode == "adjacent"){
-          return [
-            {"value" : d.point < dOpposite.point ? d.point : dOpposite.point, "stat" : "Pts", "color" : d.point < dOpposite.point ? d.color : dOpposite.color, "index" : "0", "offset" : "0"},
-            {"value" : d.point < dOpposite.point ? dOpposite.point - d.point : d.point - dOpposite.point, "stat" : "Pts", "color" : d.point < dOpposite.point ? dOpposite.color : d.color, "index" : "0", "offset" : d.point < dOpposite.point ? d.point : dOpposite.point},
-            {"value" : d.teamGoalScored < dOpposite.teamGoalScored ? d.teamGoalScored : dOpposite.teamGoalScored, "stat" : "GF", "color" : d.teamGoalScored < dOpposite.teamGoalScored ? d.color : dOpposite.color, "index" : "1", "offset": "0"},
-            {"value" : d.teamGoalScored < dOpposite.teamGoalScored ? dOpposite.teamGoalScored - d.teamGoalScored : d.teamGoalScored - dOpposite.teamGoalScored, "stat" : "GF", "color" : d.teamGoalScored < dOpposite.teamGoalScored ? dOpposite.color : d.color, "index" : "1", "offset" : d.teamGoalScored < dOpposite.teamGoalScored ? d.teamGoalScored : dOpposite.teamGoalScored},
-            {"value" : d.teamGoalAgainst < dOpposite.teamGoalAgainst ? d.teamGoalAgainst : dOpposite.teamGoalAgainst, "stat" : "GA", "color" :d.teamGoalAgainst < dOpposite.teamGoalAgainst ? d.color : dOpposite.color, "index" : "2", "offset" : "0"},
-            {"value" : d.teamGoalAgainst < dOpposite.teamGoalAgainst ? dOpposite.teamGoalAgainst - d.teamGoalAgainst : dOpposite.teamGoalAgainst, "stat" : "GA", "color" :d.teamGoalAgainst < dOpposite.teamGoalAgainst ? dOpposite.color : d.color, "index" : "2", "offset" : d.teamGoalAgainst < dOpposite.teamGoalAgainst ? d.teamGoalAgainst : dOpposite.teamGoalAgainst},
-            {"value" : d.teamWins < dOpposite.teamWins ? d.teamWins : dOpposite.teamWins, "stat" : "W", "color" : d.teamWins < dOpposite.teamWins ? d.color : dOpposite.color, "index" : "3", "offset":"0"},
-            {"value" : d.teamWins < dOpposite.teamWins ? dOpposite.teamWins - d.teamWins : d.teamWins - dOpposite.teamWins, "stat" : "W", "color" : d.teamWins < dOpposite.teamWins ? dOpposite.color : d.color, "index" : "3", "offset":d.teamWins < dOpposite.teamWins ? d.teamWins : dOpposite.teamWins},
-            {"value" : d.teamLosses < dOpposite.teamLosses ? d.teamLosses : dOpposite.teamLosses, "stat" : "L", "color" : d.teamLosses < dOpposite.teamLosses ? d.color : dOpposite.color, "index" : "4", "offset":"0"},
-            {"value" : d.teamLosses < dOpposite.teamLosses ? dOpposite.teamLosses - d.teamLosses : d.teamLosses - dOpposite.teamLosses, "stat" : "L", "color" : d.teamLosses < dOpposite.teamLosses ? dOpposite.color : d.color, "index" : "4", "offset":d.teamLosses < dOpposite.teamLosses ? d.teamLosses : dOpposite.teamLosses},
-          ]
-        }else{
-          return [
-            {"value" : d.point, "stat" : "Pts", "color" : d.color, "index" : "0", "offset" : "0"},
-            {"value" : dOpposite.point, "stat" : "Pts", "color" : dOpposite.color, "index" : "0", "offset" : "0"},
-            {"value" : d.teamGoalScored, "stat" : "GF", "color" : d.color, "index" : "1", "offset" : "0"},
-            {"value" : dOpposite.teamGoalScored, "stat" : "GF", "color" : dOpposite.color, "index" : "1", "offset" : "0"},
-            {"value" : d.teamGoalAgainst, "stat" : "GA", "color" : d.color, "index" : "2", "offset" : "0"},
-            {"value" : dOpposite.teamGoalAgainst, "stat" : "GA", "color" : dOpposite.color, "index" : "2", "offset" : "0"},
-            {"value" : d.teamWins, "stat" : "W", "color" : d.color, "index" : "3", "offset" : "0"},
-            {"value" : dOpposite.teamWins, "stat" : "W", "color" : dOpposite.color, "index" : "3", "offset" : "0"},
-            {"value" : d.teamLosses, "stat" : "L", "color" : d.color, "index" : "4", "offset" : "0"},
-            {"value" : dOpposite.teamLosses, "stat" : "L", "color" : dOpposite.color, "index" : "4", "offset" : "0"}
-          ]
+     * Reformat team data for chart drawing
+     */
+    function teamsToArray(d, dOpposite) {
+        if (dOpposite != null) {
+            return [
+                {"value": d.point,"stat": "Pts","color": d.color,"index": "0","offset": "0"},
+                {"value": dOpposite.point,"stat": "Pts","color": dOpposite.color,"index": "0","offset": "0"},
+                {"value": d.teamGoalScored,"stat": "GF","color": d.color,"index": "1","offset": "0"},
+                {"value": dOpposite.teamGoalScored,"stat": "GF","color": dOpposite.color,"index": "1","offset": "0"},
+                {"value": d.teamGoalAgainst,"stat": "GA","color": d.color,"index": "2","offset": "0"},
+                {"value": dOpposite.teamGoalAgainst,"stat": "GA","color": dOpposite.color,"index": "2","offset": "0"},
+                {"value": d.teamWins,"stat": "W","color": d.color,"index": "3","offset": "0"},
+                {"value": dOpposite.teamWins,"stat": "W","color": dOpposite.color,"index": "3","offset": "0"},
+                {"value": d.teamLosses,"stat": "L","color": d.color,"index": "4","offset": "0"},
+                {"value": dOpposite.teamLosses,"stat": "L","color": dOpposite.color,"index": "4","offset": "0"}
+            ];
+        } else {
+            return [
+                {value: d.point, "stat": "Pts", "color": d.color, "index": "0", "offset": "0"},
+                {value: d.teamGoalScored, "stat": "GF", "color": d.color, "index": "1", "offset": "0"},
+                {value: d.teamGoalAgainst,"stat": "GA","color": d.color,"index": "2","offset": "0"},
+                {value: d.teamWins,"stat": "W","color": d.color,"index": "3","offset": "0"},
+                {value: d.teamLosses,"stat": "L","color": d.color,"index": "4","offset": "0"}
+            ]
         }
-      }else{
-        return [
-          {"value" : d.point, "stat" : "Pts", "color" : d.color, "index" : "0", "offset" : "0"},
-          {"value" : d.teamGoalScored, "stat" : "GF", "color" : d.color, "index" : "1", "offset" : "0"},
-          {"value" : d.teamGoalAgainst, "stat" : "GA", "color" : d.color, "index" : "2", "offset" : "0"},
-          {"value" : d.teamWins, "stat" : "W", "color" : d.color, "index" : "3", "offset" : "0"},
-          {"value" : d.teamLosses, "stat" : "L", "color" : d.color, "index" : "4", "offset" : "0"}
-        ]
-      }
     }
 
     /**
-    * Filter out useless team data fields for chart drawing
-    */
-    function filterTeamFields(d){
-      if(d!=null){
-        delete d.name;
-        delete d.logo;
-        delete d.conference;
-        delete d.division;
-        delete d.id;
-      }
-      return d;
+     * Filter out useless team data fields for chart drawing
+     */
+    function filterTeamFields(d) {
+        if (d != null) {
+            delete d.name;
+            delete d.logo;
+            delete d.conference;
+            delete d.division;
+            delete d.id;
+        }
+        return d;
     }
-  }
 }
 
 // When the window is resized
