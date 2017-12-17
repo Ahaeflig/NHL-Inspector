@@ -534,8 +534,8 @@ function placeTeams() {
         const deltaV = (svgBox.height-t1Box.height)/4;
         patternImage1.attr("x", (s - r) / 2 + deltaH ).attr("y", (s - r) / 2  + deltaV);
         patternImage2.attr("x", (s - r) / 2 - deltaH*3 ).attr("y", (s - r) / 2  - deltaV*3);
-        patternCircle1.attr("cx", r).attr("cy", r);
-        patternCircle2.attr("cx", r - deltaH).attr("cy", r - deltaV);
+        patternCircle1.attr("cx", r+deltaH).attr("cy", r+deltaV);
+        patternCircle2.attr("cx", r - deltaH*3).attr("cy", r - deltaV*3);
 
         drawChart(myTeam, oppositeTeam);
 
