@@ -449,8 +449,9 @@ function placeTeams() {
         // Compute the Logo dimension and
         const s = r + rCorr;
 
-        d3.select('#myTeamDoubleRainbow').selectAll("path").remove();
-        d3.select('#myTeamDoubleRainbow').selectAll("defs").remove();
+        const doubleRainbow = d3.select('#myTeamDoubleRainbow');
+        doubleRainbow.selectAll("path").remove();
+        doubleRainbow.selectAll("defs").remove();
 
         //TODO can precompute this once
         function getArcGen(inner, outer) {
@@ -477,27 +478,25 @@ function placeTeams() {
             endAngleOfMyArc: Math.PI + Math.PI / 4
         }, ];
 
-        let def1 = d3.select('#myTeamDoubleRainbow').select("#t1").append('defs')
+        const t1 = d3.select("#t1");
+        const t2 = d3.select("#t2");
+
+        let def1 = t1.append('defs')
         let pattern = def1.append("svg:pattern")
             .attr("id", "teamlogo1")
             .attr("width", 1)
             .attr("height", 1);
 
-        pattern.append("circle")
-            .attr("cx", r)
-            .attr("cy", r)
+        let patternCircle1 = pattern.append("circle")
             .attr("r", r)
             .style("fill", myTeam.color);
 
-        pattern.append("svg:image")
+        let patternImage1 = pattern.append("svg:image")
             .attr("xlink:href", myTeam.logo)
             .attr("width", s)
             .attr("height", s)
-            .attr("x", (s - r) / 2)
-            .attr("y", (s - r) / 2);
 
-        d3.select('#t1')
-            .selectAll('path')
+        t1.selectAll('path')
             .data(arcData1)
             .enter()
             .append('path')
@@ -505,33 +504,38 @@ function placeTeams() {
             .attr("fill", "url(#teamlogo1)")
             .attr("transform", "translate(" + cx + "," + cy + ")");
 
-        let def2 = d3.select('#myTeamDoubleRainbow').select("#t2").append('defs')
+        let def2 = t2.append('defs')
         let pattern2 = def2.append("svg:pattern")
             .attr("id", "teamlogo2")
             .attr("width", 1)
             .attr("height", 1)
 
-        pattern2.append("circle")
-            .attr("cx", r)
-            .attr("cy", r)
-            .attr("r", r * 2)
+        let patternCircle2 = pattern2.append("circle")
+            .attr("r", r)
             .style("fill", oppositeTeam.color);
 
-        pattern2.append("svg:image")
+        let patternImage2 = pattern2.append("svg:image")
             .attr("xlink:href", oppositeTeam.logo)
             .attr("width", s)
             .attr("height", s)
-            .attr("x", -9)
-            .attr("y", -9);
 
-        d3.select('#t2')
-            .selectAll('path')
+        t2.selectAll('path')
             .data(arcData2)
             .enter()
             .append('path')
             .attr('d', arcGen)
             .attr("fill", "url(#teamlogo2)")
             .attr("transform", "translate(" + cx + "," + cy + ")");
+
+        // Center G in arc
+        const svgBox = doubleRainbow.node().getBBox();
+        const t1Box = t1.node().getBBox(); // Assume t2 box is same size
+        const deltaH = (svgBox.width-t1Box.width)/4;
+        const deltaV = (svgBox.height-t1Box.height)/4;
+        patternImage1.attr("x", (s - r) / 2 + deltaH ).attr("y", (s - r) / 2  + deltaV);
+        patternImage2.attr("x", (s - r) / 2 - deltaH*3 ).attr("y", (s - r) / 2  - deltaV*3);
+        patternCircle1.attr("cx", r).attr("cy", r);
+        patternCircle2.attr("cx", r - deltaH).attr("cy", r - deltaV);
 
         drawChart(myTeam, oppositeTeam);
 
@@ -544,6 +548,7 @@ function placeTeams() {
 
     } else {
         if (WARNING) console.log("Favorite team is null !");
+        // In case of null favorite team, display the modal
         $("#teamSelection").modal("show");
     }
 }
