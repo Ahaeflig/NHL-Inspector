@@ -380,7 +380,7 @@ function createMainTransition() {
                     rightPl.addClass('activePanel');
                     leftPl.removeClass('activePanel');
                     leftPl.height("40%").width("20%").css({
-                        top: '54px'
+                        top: '57px'
                     });
                     rightTitle.addClass('activeTool')
                     leftTitle.removeClass('activeTool')
@@ -406,7 +406,7 @@ function createMainTransition() {
                     leftPl.addClass('activePanel');
                     rightPl.removeClass('activePanel');
                     rightPl.height("40%").width("20%").css({
-                        top: '54px'
+                        top: '57px'
                     });
                     leftTitle.addClass('activeTool')
                     rightTitle.removeClass('activeTool')

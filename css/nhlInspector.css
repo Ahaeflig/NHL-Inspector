@@ -61,7 +61,7 @@ nav{
     height: 40%;
     width: 20%;
     position: absolute;
-    top: 54px;
+    top: 57px;
     right: 0px;
     z-index: 99;
 }
@@ -85,6 +85,10 @@ path.spiral {
     fill: none;
     stroke: #000000;
     stroke-width: 3px;
+}
+
+.white{
+    color:white
 }
 
 #myTeamDoubleRainbow #t1 path {
