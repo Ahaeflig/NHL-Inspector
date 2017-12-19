@@ -877,7 +877,7 @@ function init() {
         // Draw initial spiral
         initSpiralSVG(cleanedTeams)
 
-        draw(cleanedTeams, false)
+        draw(cleanedTeams, true)
 
       });
 }
