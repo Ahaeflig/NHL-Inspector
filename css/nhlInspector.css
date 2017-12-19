@@ -66,7 +66,7 @@ nav{
 }
 
 .hidden {
-    display: none !important;    
+    display: none !important;
 }
 
 
@@ -79,8 +79,6 @@ nav{
     background: #111111;
     background-image: url("images/nhl-background.jpg");
     background-position: center;
-    /*height: 300px;
-    width: 400px;*/
     height: 40%;
     width: 20%;
     position: absolute;

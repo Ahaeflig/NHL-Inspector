@@ -516,12 +516,25 @@ function placeTeams() {
         // Center G in arc
         const svgBox = doubleRainbow.node().getBBox();
         const t1Box = t1.node().getBBox(); // Assume t2 box is same size
-        const deltaH = (svgBox.width-t1Box.width)/4;
-        const deltaV = (svgBox.height-t1Box.height)/4;
-        patternImage1.attr("x", (s - r) / 2 + deltaH ).attr("y", (s - r) / 2  + deltaV);
-        patternImage2.attr("x", (s - r) / 2 - deltaH*3 ).attr("y", (s - r) / 2  - deltaV*3);
-        patternCircle1.attr("cx", r+deltaH).attr("cy", r+deltaV);
-        patternCircle2.attr("cx", r - deltaH*3).attr("cy", r - deltaV*3);
+        const t2Box = t2.node().getBBox(); // Assume t2 box is same size
+
+        // Center of the svg
+        const centerX = (svgBox.x+svgBox.width/2);
+        const centerY = (svgBox.y+svgBox.height/2);
+
+        // Compute the relative position of this center following the two
+        // BBox of the t1 and t2 arc
+        const deltaX1 = centerX - t1Box.x;
+        const deltaY1 = centerY - t1Box.y;
+        const deltaX2 = centerX - t2Box.x;
+        const deltaY2 = centerY - t2Box.y;
+
+        // Move the pattern circle on the center (-0 because the encore is the center)
+        // Move the pattern image on the center (-s/2 because the anchor is top left corner)
+        patternImage1.attr("x",  deltaX1-s/2).attr("y", deltaY1-s/2);
+        patternImage2.attr("x",  deltaX2-s/2).attr("y", deltaY2-s/2);
+        patternCircle1.attr("cx", deltaX1).attr("cy", deltaY1);
+        patternCircle2.attr("cx", deltaX2).attr("cy", deltaY2);
 
         drawChart(myTeam, oppositeTeam);
 
