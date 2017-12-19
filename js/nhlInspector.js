@@ -303,10 +303,6 @@ function initSpiralSVG(teams) {
 
     patternSelector.append("ellipse")
         .attr("id", function(d) {return "ellipse" + d.team.id;})
-        .attr("cx", function(d) {return d.r;})
-        .attr("cy", function(d) {return d.r;})
-        .attr("rx", function(d) {return d.r;})
-        .attr("ry", function(d) {return d.r;})
         .style("fill", function(d) {return d.team.color;})
         .style("stroke", function(d) {return myFavoriteTeamId() == d.team.id ? blueSelectorColor : redSelectorColor;})
         .style("stroke-width", function(d) {return myFavoriteTeamId() == d.team.id || myOppositeTeamId() == d.team.id ? 12 : 0;});
@@ -314,10 +310,6 @@ function initSpiralSVG(teams) {
     patternSelector.append("svg:image")
         .attr("id", function(d) {return "circle_image" + d.team.id;})
         .attr("xlink:href", function(d) {return d.team.logo})
-        .attr("width", function(d) {return d.s;})
-        .attr("height", function(d) {return d.s;})
-        .attr("x", function(d) {return (d.s - d.r) / 2;})
-        .attr("y", function(d) {return (d.s - d.r) / 2;});
 
     let circles = spiralG.selectAll("circle")
         .data(spiral_data)
@@ -325,24 +317,18 @@ function initSpiralSVG(teams) {
 
     circles.append("circle")
         .attr("id", function(d) {return "circle" + d.team.id;})
-        .attr("cx", function(d) {return d.x;})
-        .attr("cy", function(d) {return d.y;})
-        .attr("r", function(d) {return d.r;})
         .style("fill", function(d) {return "url(#pattern" + d.team.id + ")";})
 
     circles.append("circle")
         .attr("id", function(d) {return "circleTip" + d.team.id;})
-        .attr("cx", function(d) {return d.x+(d.r+8)*d.nx;})
-        .attr("cy", function(d) {return d.y+(d.r+8)*d.ny;})
-        .attr("r", function(d) {return 10;})
         .style("fill", "black")
     circles.append("text")
         .attr("id", function(d) {return "circleTipText" + d.team.id;})
-        .attr("dx", function(d){return d.x+(d.r+8)*d.nx-5})
-        .attr("dy", function(d){return d.y+(d.r+8)*d.ny+5})
-	    .text(function(d){return "A"})
+        .attr("text-anchor", "middle")
+        .attr("alignment-baseline", "middle")
         .style("fill", "white")
-
+        .style("font-size", "9pt")
+        .style("text-align", "center")
 }
 
 
@@ -629,208 +615,115 @@ function drawSpiral(teams_, shouldTransit) {
     const cy = height / 2;
 
     //transition time TODO fine tune value
-    let t_time = 2250
+    let t_time = shouldTransit ? 1500 : 0;
 
     //Compute new points
     let newSpiralPoint = computeSpiralData(teams_, width, height);
 
     //Sets everything to invisible, selected team will have a new transition set
-    spiralG.selectAll("circle").transition()
-                    .duration(t_time/3).style('opacity', 0);
-    spiralG.selectAll("ellipse").transition()
-                    .duration(t_time/3).style('opacity', 0);
-    spiralG.selectAll("circle_image").transition()
-                    .duration(t_time/3).style('opacity', 0);
+    spiralG.selectAll("circle").transition().duration(t_time / 3).style('opacity', 0);
+    spiralG.selectAll("text").transition().duration(t_time / 3).style('opacity', 0);
+    spiralG.selectAll("ellipse").transition().duration(t_time / 3).style('opacity', 0);
+    spiralG.selectAll("circle_image").transition().duration(t_time / 3).style('opacity', 0);
 
-    if (shouldTransit) {
-      //Trick to remove the mouseenter that trigger transitions while we play the main transition of the circles
-      d3.selectAll("circle")
-        .on("mouseenter", function() {
-        })
-        .on("mouseleave", function() {
-        })
-        .on("click", function() {
-        })
+    d3.selectAll("circle")
+        .on("mouseenter", function() {})
+        .on("mouseleave", function() {})
+        .on("click", function() {})
 
-      //Might be a way to do this with an .data().enter()?
-      for (let i = 0; i < teams_.length; i++) {
-          //Check if we should draw this team or if it is not in the conf/division
-              let d = newSpiralPoint[i]
+    //Might be a way to do this with an .data().enter()?
+    for (let i = 0; i < teams_.length; i++) {
+        //Check if we should draw this team or if it is not in the conf/division
+        let d = newSpiralPoint[i]
 
-              d3.select("#circleTip"+d.team.id)
+        if(d.r > 25){
+
+            d3.select("#circleTip" + d.team.id)
                 .transition()
                 .duration(t_time)
-                .attr("cx", d.x+(d.r+8)*d.nx)
-                .attr("cy", d.y+(d.r+8)*d.ny)
+                .attr("cx", d.x + (d.r + 8) * d.nx)
+                .attr("cy", d.y + (d.r + 8) * d.ny)
                 .attr("r", 10)
                 .style('opacity', 1)
-                console.log("data1")
 
-              d3.select("#circle"+d.team.id)
+            d3.select("#circleTipText" + d.team.id)
                 .transition()
                 .duration(t_time)
-                .attr("cx", d.x)
-                .attr("cy", d.y)
-                .attr("r", d.r)
+                .attr("x",  d.x + (d.r + 8) * d.nx)
+                .attr("y",  d.y + (d.r + 8) * d.ny)
+                .text(teams_.length-i)
                 .style('opacity', 1)
-                .on("end", function() {
+        }
 
-                  d3.select(this)
-                  .on("mouseenter", function() {
-                      d3.select(this).transition()
-                          .duration(200)
-                          .attr("cx", d.x + d.nx * 20)
-                          .attr("cy", d.y + d.ny * 20);
-
-                      d3.select("#circleTip"+d.team.id).transition()
-                              .duration(200)
-                              d.x+(d.r+8)*d.nx
-                              .attr("cx", d.x+(d.r+8)*d.nx + d.nx*20)
-                              .attr("cy", d.y+(d.r+8)*d.ny + d.ny * 20);
-
-                    d3.select("#circleTip"+d.team.id).transition()
-                            .duration(200)
-                            d.x+(d.r+8)*d.nx
-                            .attr("cx", d.x+(d.r+8)*d.nx + d.nx*20)
-                            .attr("cy", d.y+(d.r+8)*d.ny + d.ny * 20)
-                    d3.select("#circleTipText"+d.team.id).transition()
-                            .duration(200)
-                             .attr("dx", function(d){return d.x+(d.r+8)*d.nx-5+ d.nx*20})
-                             .attr("dy", function(d){return d.y+(d.r+8)*d.ny+5+ d.ny*20})
-
-                      $('#teamName').html(d.team.name)
-                  })
-                  .on("mouseleave", function() {
-                      d3.select(this).transition()
-                          .duration(800)
-                          .attr("cx", d.x)
-                          .attr("cy", d.y)
-                      d3.select("#circleTip"+d.team.id).transition()
-                          .duration(800)
-                          .attr("cx", d.x+(d.r+8)*d.nx)
-                          .attr("cy", d.y+(d.r+8)*d.ny)
-                      d3.select("#circleTipText"+d.team.id).transition()
-                              .duration(800)
-                               .attr("dx", function(d){return d.x+(d.r+8)*d.nx-5})
-                               .attr("dy", function(d){return d.y+(d.r+8)*d.ny+5})
-
-                      $('#teamName').html("");
-                  }).on("click", function() {
-                             if (d.team.id != myFavoriteTeamId()) {
-                               locallyStoreOppositeTeamId(d.team.id)
-                               draw(teams_, false)
-                             }
-                   })
-                   // Be sure to call it only once
-                   if(i == teams_.length-1){
-                       sliderAnim.moveSliderRight();
-                   }
-                })
-
-              d3.select("#ellipse"+d.team.id)
-                .transition()
-                .duration(t_time)
-                .attr("cx",  d.r)
-                .attr("cy", d.r)
-                .attr("rx", d.r)
-                .attr("ry", d.r)
-                .style('opacity', 1)
-                .style("fill",  d.team.color)
-                .style("stroke", myFavoriteTeamId() == d.team.id ? blueSelectorColor : redSelectorColor)
-                .style("stroke-width",  myFavoriteTeamId() == d.team.id || myOppositeTeamId() == d.team.id ? 15:0);
-
-              d3.select("#circle_image"+d.team.id)
-                .transition()
-                .duration(t_time)
-                .attr("width", d.s)
-                .attr("height", d.s)
-                .style('opacity', 1)
-                .attr("x", (d.s - d.r) / 2)
-                .attr("y", (d.s - d.r) / 2)
-          }
-      } else {
-
-        //d3.selectAll("circle").interrupt();
-        //d3.selectAll("ellipse").interrupt();
-        //d3.selectAll("image").interrupt();
-
-        for (let i = 0; i < teams_.length; i++) {
-          let d = newSpiralPoint[i]
-
-          //First cancel all pending transition
-          d3.select("#circle"+d.team.id).interrupt();
-          d3.select("#ellipse"+d.team.id).interrupt();
-          d3.select("#circle_image"+d.team.id).interrupt();
-          d3.select("#circleTip"+d.team.id).interrupt();
-          d3.select("#circleTip"+d.team.id)
-            .attr("cx", d.x+(d.r+8)*d.nx)
-            .attr("cy", d.y+(d.r+8)*d.ny)
-            .attr("r", 10)
-            .style('opacity', 1)
-
-          d3.select("#circle"+d.team.id)
+        d3.select("#circle" + d.team.id)
+            .transition()
+            .duration(t_time)
             .attr("cx", d.x)
             .attr("cy", d.y)
             .attr("r", d.r)
             .style('opacity', 1)
-            .on("mouseenter", function() {
-                d3.select(this).transition()
-                    .duration(200)
-                    .attr("cx", d.x + d.nx * 20)
-                    .attr("cy", d.y + d.ny * 20)
-                d3.select("#circleTip"+d.team.id).transition()
-                        .duration(200)
-                        .attr("cx", d.x+(d.r+8)*d.nx + d.nx*20)
-                        .attr("cy", d.y+(d.r+8)*d.ny + d.ny * 20)
-                d3.select("#circleTipText"+d.team.id).transition()
-                        .duration(200)
-                         .attr("dx", function(d){return d.x+(d.r+8)*d.nx-5+ d.nx*20})
-                         .attr("dy", function(d){return d.y+(d.r+8)*d.ny+5+ d.ny*20})
+            .on("end", function() {
 
-                $('#teamName').html(d.team.name)
-            })
-            .on("mouseleave", function() {
-              d3.select(this).transition()
-                    .duration(800)
-                    .attr("cx", d.x)
-                    .attr("cy", d.y)
-            d3.select("#circleTip"+d.team.id).transition()
-                    .duration(800)
-                    .attr("cx", d.x+(d.r+8)*d.nx)
-                    .attr("cy", d.y+(d.r+8)*d.ny)
+                d3.select(this)
+                    .on("mouseenter", function() {
+                        d3.select(this).transition().duration(200)
+                            .attr("cx", d.x + d.nx * 20)
+                            .attr("cy", d.y + d.ny * 20);
+                        d3.select("#circleTip" + d.team.id).transition().duration(200)
+                            .attr("cx", d.x + (d.r + 8) * d.nx + d.nx * 20)
+                            .attr("cy", d.y + (d.r + 8) * d.ny + d.ny * 20)
+                        d3.select("#circleTipText" + d.team.id).transition().duration(200)
+                            .attr("x", d.x + (d.r + 8) * d.nx + d.nx * 20)
+                            .attr("y", d.y + (d.r + 8) * d.ny + d.ny * 20)
 
-            d3.select("#circleTipText"+d.team.id).transition()
-                    .duration(800)
-                     .attr("dx", function(d){return d.x+(d.r+8)*d.nx-5})
-                     .attr("dy", function(d){return d.y+(d.r+8)*d.ny+5})
+                        $('#teamName').html(d.team.name)
+                    })
+                    .on("mouseleave", function() {
+                        d3.select(this).transition().duration(800)
+                            .attr("cx", d.x)
+                            .attr("cy", d.y)
+                        d3.select("#circleTip" + d.team.id).transition().duration(800)
+                            .attr("cx", d.x + (d.r + 8) * d.nx)
+                            .attr("cy", d.y + (d.r + 8) * d.ny)
+                        d3.select("#circleTipText" + d.team.id).transition().duration(800)
+                            .attr("x", d.x + (d.r + 8) * d.nx)
+                            .attr("y", d.y + (d.r + 8) * d.ny)
 
-                $('#teamName').html("")
-            }).on("click", function() {
-                     if (d.team.id != myFavoriteTeamId()) {
-                       locallyStoreOppositeTeamId(d.team.id)
-                       draw(teams_, false)
-                     }
-                 })
+                        $('#teamName').html("");
+                    })
+                    .on("click", function() {
+                        if (d.team.id != myFavoriteTeamId()) {
+                            locallyStoreOppositeTeamId(d.team.id)
+                            draw(teams_, false)
+                        }
+                    });
+                // Be sure to call it only once
+                if (i == teams_.length - 1) {
+                    sliderAnim.moveSliderRight();
+                }
+            });
 
-          d3.select("#ellipse"+d.team.id)
-            .attr("cx",  d.r)
+        d3.select("#ellipse" + d.team.id)
+            .transition()
+            .duration(t_time)
+            .attr("cx", d.r)
             .attr("cy", d.r)
             .attr("rx", d.r)
             .attr("ry", d.r)
             .style('opacity', 1)
-            .style("fill",  d.team.color)
+            .style("fill", d.team.color)
             .style("stroke", myFavoriteTeamId() == d.team.id ? blueSelectorColor : redSelectorColor)
-            .style("stroke-width",  myFavoriteTeamId() == d.team.id || myOppositeTeamId() == d.team.id ? 15:0);
+            .style("stroke-width", myFavoriteTeamId() == d.team.id || myOppositeTeamId() == d.team.id ? 15 : 0);
 
-          d3.select("#circle_image"+d.team.id)
+        d3.select("#circle_image" + d.team.id)
+            .transition()
+            .duration(t_time)
             .attr("width", d.s)
             .attr("height", d.s)
-            .attr("x", (d.s - d.r) / 2)
-            .attr("y", (d.s - d.r) / 2)
             .style('opacity', 1)
-
-          }
-      }
+            .attr("x", (d.s - d.r) / 2)
+            .attr("y", (d.s - d.r) / 2);
+    }
 }
 
 const sliderAnim = {
