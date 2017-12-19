@@ -613,8 +613,8 @@ function drawSpiral(teams_, shouldTransit) {
     const cy = height / 2;
 
     //transition time TODO fine tune value
-    let t_time = 1500;
-
+    const t_time = 1500;
+    const minRadiusForTip = 25 // Smaller than the smallest on main, and bigger than the biggest in the right
     //Compute new points
     let newSpiralPoint = computeSpiralData(teams_, width, height);
 
@@ -637,7 +637,7 @@ function drawSpiral(teams_, shouldTransit) {
         //Check if we should draw this team or if it is not in the conf/division
         let d = newSpiralPoint[i]
 
-        if(d.r > 25){
+        if(d.r > minRadiusForTip){
 
             let circlesTip = d3.select("#circleTip" + d.team.id)
             let circlesTipText = d3.select("#circleTipText" + d.team.id)
@@ -665,26 +665,28 @@ function drawSpiral(teams_, shouldTransit) {
                     d3.select(this).transition().duration(200)
                         .attr("cx", d.x + d.nx * 20)
                         .attr("cy", d.y + d.ny * 20);
-                    d3.select("#circleTip" + d.team.id).transition().duration(200)
-                        .attr("cx", d.x + (d.r + 8) * d.nx + d.nx * 20)
-                        .attr("cy", d.y + (d.r + 8) * d.ny + d.ny * 20)
-                    d3.select("#circleTipText" + d.team.id).transition().duration(200)
-                        .attr("x", d.x + (d.r + 8) * d.nx + d.nx * 20)
-                        .attr("y", d.y + (d.r + 8) * d.ny + d.ny * 20)
-
+                    if(d.r > minRadiusForTip){
+                        d3.select("#circleTip" + d.team.id).transition().duration(200)
+                            .attr("cx", d.x + (d.r + 8) * d.nx + d.nx * 20)
+                            .attr("cy", d.y + (d.r + 8) * d.ny + d.ny * 20)
+                        d3.select("#circleTipText" + d.team.id).transition().duration(200)
+                            .attr("x", d.x + (d.r + 8) * d.nx + d.nx * 20)
+                            .attr("y", d.y + (d.r + 8) * d.ny + d.ny * 20)
+                    }
                     $('#teamName').html(d.team.name)
                 })
                 .on("mouseleave", function() {
                     d3.select(this).transition().duration(800)
                         .attr("cx", d.x)
                         .attr("cy", d.y)
-                    d3.select("#circleTip" + d.team.id).transition().duration(800)
-                        .attr("cx", d.x + (d.r + 8) * d.nx)
-                        .attr("cy", d.y + (d.r + 8) * d.ny)
-                    d3.select("#circleTipText" + d.team.id).transition().duration(800)
-                        .attr("x", d.x + (d.r + 8) * d.nx)
-                        .attr("y", d.y + (d.r + 8) * d.ny)
-
+                    if(d.r > minRadiusForTip){
+                        d3.select("#circleTip" + d.team.id).transition().duration(800)
+                            .attr("cx", d.x + (d.r + 8) * d.nx)
+                            .attr("cy", d.y + (d.r + 8) * d.ny)
+                        d3.select("#circleTipText" + d.team.id).transition().duration(800)
+                            .attr("x", d.x + (d.r + 8) * d.nx)
+                            .attr("y", d.y + (d.r + 8) * d.ny)
+                    }
                     $('#teamName').html("");
                 })
                 .on("click", function() {
