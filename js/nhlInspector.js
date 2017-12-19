@@ -625,100 +625,93 @@ function drawSpiral(teams_, shouldTransit) {
         spiralG.selectAll("text").transition().duration(t_time / 3).style('opacity', 0);
         spiralG.selectAll("ellipse").transition().duration(t_time / 3).style('opacity', 0);
         spiralG.selectAll("circle_image").transition().duration(t_time / 3).style('opacity', 0);
-
-        d3.selectAll("circle")
-            .on("mouseenter", function() {})
-            .on("mouseleave", function() {})
-            .on("click", function() {})
     }
+    d3.selectAll("circle")
+        .on("mouseenter", function() {})
+        .on("mouseleave", function() {})
+        .on("click", function() {})
 
     //Might be a way to do this with an .data().enter()?
     for (let i = 0; i < teams_.length; i++) {
         //Check if we should draw this team or if it is not in the conf/division
         let d = newSpiralPoint[i]
 
-        if(d.r > minRadiusForTip){
+        const onEvents = function(d) {
+            console.log(d.r)
+            if(d.r > minRadiusForTip){
+                d3.select("#circle" + d.team.id)
+                    .on("mouseenter", function() {
+                        d3.select(this).transition().duration(200)
+                            .attr("cx", d.x + d.nx * 20)
+                            .attr("cy", d.y + d.ny * 20);
 
-            let circlesTip = d3.select("#circleTip" + d.team.id)
-            let circlesTipText = d3.select("#circleTipText" + d.team.id)
-
-            if(shouldTransit){
-                    circlesTip = circlesTip.transition().duration(t_time)
-                    circlesTipText = circlesTipText.transition().duration(t_time)
-            }
-            circlesTip.attr("cx", d.x + (d.r + 8) * d.nx)
-                .attr("cy", d.y + (d.r + 8) * d.ny)
-                .attr("r", 10)
-                .style('opacity', 1)
-
-            circlesTipText.attr("x",  d.x + (d.r + 8) * d.nx)
-                .attr("y",  d.y + (d.r + 8) * d.ny)
-                .text(teams_.length-i)
-                .style('opacity', 1)
-        }
-
-
-        const onEvents = function() {
-
-            d3.select("#circle" + d.team.id)
-                .on("mouseenter", function() {
-                    d3.select(this).transition().duration(200)
-                        .attr("cx", d.x + d.nx * 20)
-                        .attr("cy", d.y + d.ny * 20);
-                    if(d.r > minRadiusForTip){
                         d3.select("#circleTip" + d.team.id).transition().duration(200)
                             .attr("cx", d.x + (d.r + 8) * d.nx + d.nx * 20)
                             .attr("cy", d.y + (d.r + 8) * d.ny + d.ny * 20)
                         d3.select("#circleTipText" + d.team.id).transition().duration(200)
                             .attr("x", d.x + (d.r + 8) * d.nx + d.nx * 20)
                             .attr("y", d.y + (d.r + 8) * d.ny + d.ny * 20)
-                    }
-                    $('#teamName').html(d.team.name)
-                })
-                .on("mouseleave", function() {
-                    d3.select(this).transition().duration(800)
-                        .attr("cx", d.x)
-                        .attr("cy", d.y)
-                    if(d.r > minRadiusForTip){
+                        $('#teamName').html(d.team.name)
+                    })
+                    .on("mouseleave", function() {
+                        d3.select(this).transition().duration(800)
+                            .attr("cx", d.x)
+                            .attr("cy", d.y)
                         d3.select("#circleTip" + d.team.id).transition().duration(800)
                             .attr("cx", d.x + (d.r + 8) * d.nx)
                             .attr("cy", d.y + (d.r + 8) * d.ny)
                         d3.select("#circleTipText" + d.team.id).transition().duration(800)
                             .attr("x", d.x + (d.r + 8) * d.nx)
                             .attr("y", d.y + (d.r + 8) * d.ny)
-                    }
-                    $('#teamName').html("");
-                })
-                .on("click", function() {
-                    if (d.team.id != myFavoriteTeamId()) {
-                        locallyStoreOppositeTeamId(d.team.id)
-                        draw(teams_, false)
-                    }
-                });
+                        $('#teamName').html("");
+                    })
+                    .on("click", function() {
+                        if (d.team.id != myFavoriteTeamId()) {
+                            locallyStoreOppositeTeamId(d.team.id)
+                            draw(teams_, false)
+                        }
+                    });
+            }
+
             // Be sure to call it only once
             if (i == teams_.length - 1) {
                 sliderAnim.moveSliderRight();
             }
         }
 
-
+        let circlesTip = d3.select("#circleTip" + d.team.id)
+        let circlesTipText = d3.select("#circleTipText" + d.team.id)
         let circles = d3.select("#circle" + d.team.id)
         let elipseId = d3.select("#ellipse" + d.team.id)
         let imageId = d3.select("#circle_image" + d.team.id)
 
         if(shouldTransit){
+            circlesTip = circlesTip.transition().duration(t_time)
+            circlesTipText = circlesTipText.transition().duration(t_time)
             circles = circles.transition().duration(t_time)
             elipseId = elipseId.transition().duration(t_time)
             imageId = imageId.transition().duration(t_time)
         }else{
-            onEvents();
+            onEvents(d);
         }
+
+        const opacityTip = d.r > minRadiusForTip ? 1 : 0;
+
+        circlesTip.attr("cx", d.x + (d.r + 8) * d.nx)
+            .attr("cy", d.y + (d.r + 8) * d.ny)
+            .attr("r", 10)
+            .style('opacity', opacityTip)
+
+        circlesTipText.attr("x",  d.x + (d.r + 8) * d.nx)
+            .attr("y",  d.y + (d.r + 8) * d.ny)
+            .text(teams_.length-i)
+            .style('opacity', opacityTip)
 
         circles.attr("cx", d.x)
             .attr("cy", d.y)
             .attr("r", d.r)
             .style('opacity', 1)
-            .on("end", onEvents);
+            .on("end", onEvents(d));
 
         elipseId.attr("cx", d.r)
             .attr("cy", d.r)
