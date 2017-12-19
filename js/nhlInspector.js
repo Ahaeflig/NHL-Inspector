@@ -386,9 +386,7 @@ function createMainTransition() {
                 complete: function() {
                     leftPl.addClass('activePanel');
                     rightPl.removeClass('activePanel');
-                    rightPl.height("40%").width("20%").css({
-                        top: '57px'
-                    });
+                    rightPl.height("40%").width("20%").css({top: '57px'});
                     leftTitle.addClass('activeTool')
                     rightTitle.removeClass('activeTool')
                     placeTeams();
@@ -615,21 +613,24 @@ function drawSpiral(teams_, shouldTransit) {
     const cy = height / 2;
 
     //transition time TODO fine tune value
-    let t_time = shouldTransit ? 1500 : 0;
+    let t_time = 1500;
 
     //Compute new points
     let newSpiralPoint = computeSpiralData(teams_, width, height);
 
     //Sets everything to invisible, selected team will have a new transition set
-    spiralG.selectAll("circle").transition().duration(t_time / 3).style('opacity', 0);
-    spiralG.selectAll("text").transition().duration(t_time / 3).style('opacity', 0);
-    spiralG.selectAll("ellipse").transition().duration(t_time / 3).style('opacity', 0);
-    spiralG.selectAll("circle_image").transition().duration(t_time / 3).style('opacity', 0);
 
-    d3.selectAll("circle")
-        .on("mouseenter", function() {})
-        .on("mouseleave", function() {})
-        .on("click", function() {})
+    if(shouldTransit){
+        spiralG.selectAll("circle").transition().duration(t_time / 3).style('opacity', 0);
+        spiralG.selectAll("text").transition().duration(t_time / 3).style('opacity', 0);
+        spiralG.selectAll("ellipse").transition().duration(t_time / 3).style('opacity', 0);
+        spiralG.selectAll("circle_image").transition().duration(t_time / 3).style('opacity', 0);
+
+        d3.selectAll("circle")
+            .on("mouseenter", function() {})
+            .on("mouseleave", function() {})
+            .on("click", function() {})
+    }
 
     //Might be a way to do this with an .data().enter()?
     for (let i = 0; i < teams_.length; i++) {
@@ -638,27 +639,34 @@ function drawSpiral(teams_, shouldTransit) {
 
         if(d.r > 25){
 
-            d3.select("#circleTip" + d.team.id)
-                .transition()
-                .duration(t_time)
-                .attr("cx", d.x + (d.r + 8) * d.nx)
+            let circlesTip = d3.select("#circleTip" + d.team.id)
+            let circlesTipText = d3.select("#circleTipText" + d.team.id)
+
+            if(shouldTransit){
+                    circlesTip = circlesTip.transition().duration(t_time)
+                    circlesTipText = circlesTipText.transition().duration(t_time)
+            }
+            circlesTip.attr("cx", d.x + (d.r + 8) * d.nx)
                 .attr("cy", d.y + (d.r + 8) * d.ny)
                 .attr("r", 10)
                 .style('opacity', 1)
 
-            d3.select("#circleTipText" + d.team.id)
-                .transition()
-                .duration(t_time)
-                .attr("x",  d.x + (d.r + 8) * d.nx)
+            circlesTipText.attr("x",  d.x + (d.r + 8) * d.nx)
                 .attr("y",  d.y + (d.r + 8) * d.ny)
                 .text(teams_.length-i)
                 .style('opacity', 1)
         }
 
-        d3.select("#circle" + d.team.id)
-            .transition()
-            .duration(t_time)
-            .attr("cx", d.x)
+        let circles = d3.select("#circle" + d.team.id)
+        let elipseId = d3.select("#ellipse" + d.team.id)
+        let imageId = d3.select("#circle_image" + d.team.id)
+
+        if(shouldTransit){
+                circles = circles.transition().duration(t_time)
+                elipseId = elipseId.transition().duration(t_time)
+                imageId = imageId.transition().duration(t_time)
+        }
+        circles.attr("cx", d.x)
             .attr("cy", d.y)
             .attr("r", d.r)
             .style('opacity', 1)
@@ -703,10 +711,7 @@ function drawSpiral(teams_, shouldTransit) {
                 }
             });
 
-        d3.select("#ellipse" + d.team.id)
-            .transition()
-            .duration(t_time)
-            .attr("cx", d.r)
+        elipseId.attr("cx", d.r)
             .attr("cy", d.r)
             .attr("rx", d.r)
             .attr("ry", d.r)
@@ -715,10 +720,7 @@ function drawSpiral(teams_, shouldTransit) {
             .style("stroke", myFavoriteTeamId() == d.team.id ? blueSelectorColor : redSelectorColor)
             .style("stroke-width", myFavoriteTeamId() == d.team.id || myOppositeTeamId() == d.team.id ? 15 : 0);
 
-        d3.select("#circle_image" + d.team.id)
-            .transition()
-            .duration(t_time)
-            .attr("width", d.s)
+        imageId.attr("width", d.s)
             .attr("height", d.s)
             .style('opacity', 1)
             .attr("x", (d.s - d.r) / 2)
