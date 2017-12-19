@@ -413,6 +413,10 @@ function placeTeams() {
 
     if (myId != null) {
 
+        if(oppositeId == null){
+            $("#infoModal").modal("show");
+        }
+
         const myTeam = team(myId);
         const oppositeTeam = oppositeId != null ? team(oppositeId) : myTeam;
 
