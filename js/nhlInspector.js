@@ -657,59 +657,66 @@ function drawSpiral(teams_, shouldTransit) {
                 .style('opacity', 1)
         }
 
+
+        const onEvents = function() {
+
+            d3.select("#circle" + d.team.id)
+                .on("mouseenter", function() {
+                    d3.select(this).transition().duration(200)
+                        .attr("cx", d.x + d.nx * 20)
+                        .attr("cy", d.y + d.ny * 20);
+                    d3.select("#circleTip" + d.team.id).transition().duration(200)
+                        .attr("cx", d.x + (d.r + 8) * d.nx + d.nx * 20)
+                        .attr("cy", d.y + (d.r + 8) * d.ny + d.ny * 20)
+                    d3.select("#circleTipText" + d.team.id).transition().duration(200)
+                        .attr("x", d.x + (d.r + 8) * d.nx + d.nx * 20)
+                        .attr("y", d.y + (d.r + 8) * d.ny + d.ny * 20)
+
+                    $('#teamName').html(d.team.name)
+                })
+                .on("mouseleave", function() {
+                    d3.select(this).transition().duration(800)
+                        .attr("cx", d.x)
+                        .attr("cy", d.y)
+                    d3.select("#circleTip" + d.team.id).transition().duration(800)
+                        .attr("cx", d.x + (d.r + 8) * d.nx)
+                        .attr("cy", d.y + (d.r + 8) * d.ny)
+                    d3.select("#circleTipText" + d.team.id).transition().duration(800)
+                        .attr("x", d.x + (d.r + 8) * d.nx)
+                        .attr("y", d.y + (d.r + 8) * d.ny)
+
+                    $('#teamName').html("");
+                })
+                .on("click", function() {
+                    if (d.team.id != myFavoriteTeamId()) {
+                        locallyStoreOppositeTeamId(d.team.id)
+                        draw(teams_, false)
+                    }
+                });
+            // Be sure to call it only once
+            if (i == teams_.length - 1) {
+                sliderAnim.moveSliderRight();
+            }
+        }
+
+
         let circles = d3.select("#circle" + d.team.id)
         let elipseId = d3.select("#ellipse" + d.team.id)
         let imageId = d3.select("#circle_image" + d.team.id)
 
         if(shouldTransit){
-                circles = circles.transition().duration(t_time)
-                elipseId = elipseId.transition().duration(t_time)
-                imageId = imageId.transition().duration(t_time)
+            circles = circles.transition().duration(t_time)
+            elipseId = elipseId.transition().duration(t_time)
+            imageId = imageId.transition().duration(t_time)
+        }else{
+            onEvents();
         }
+
         circles.attr("cx", d.x)
             .attr("cy", d.y)
             .attr("r", d.r)
             .style('opacity', 1)
-            .on("end", function() {
-
-                d3.select(this)
-                    .on("mouseenter", function() {
-                        d3.select(this).transition().duration(200)
-                            .attr("cx", d.x + d.nx * 20)
-                            .attr("cy", d.y + d.ny * 20);
-                        d3.select("#circleTip" + d.team.id).transition().duration(200)
-                            .attr("cx", d.x + (d.r + 8) * d.nx + d.nx * 20)
-                            .attr("cy", d.y + (d.r + 8) * d.ny + d.ny * 20)
-                        d3.select("#circleTipText" + d.team.id).transition().duration(200)
-                            .attr("x", d.x + (d.r + 8) * d.nx + d.nx * 20)
-                            .attr("y", d.y + (d.r + 8) * d.ny + d.ny * 20)
-
-                        $('#teamName').html(d.team.name)
-                    })
-                    .on("mouseleave", function() {
-                        d3.select(this).transition().duration(800)
-                            .attr("cx", d.x)
-                            .attr("cy", d.y)
-                        d3.select("#circleTip" + d.team.id).transition().duration(800)
-                            .attr("cx", d.x + (d.r + 8) * d.nx)
-                            .attr("cy", d.y + (d.r + 8) * d.ny)
-                        d3.select("#circleTipText" + d.team.id).transition().duration(800)
-                            .attr("x", d.x + (d.r + 8) * d.nx)
-                            .attr("y", d.y + (d.r + 8) * d.ny)
-
-                        $('#teamName').html("");
-                    })
-                    .on("click", function() {
-                        if (d.team.id != myFavoriteTeamId()) {
-                            locallyStoreOppositeTeamId(d.team.id)
-                            draw(teams_, false)
-                        }
-                    });
-                // Be sure to call it only once
-                if (i == teams_.length - 1) {
-                    sliderAnim.moveSliderRight();
-                }
-            });
+            .on("end", onEvents);
 
         elipseId.attr("cx", d.r)
             .attr("cy", d.r)
@@ -1131,6 +1138,6 @@ function drawChart(myTeam, oppositeTeam) {
 // When the window is resized
 $(window).resize(
     function() {
-        draw(teams(), false);
+        draw(teams(), false); // TODO Why not true !
     }
 )

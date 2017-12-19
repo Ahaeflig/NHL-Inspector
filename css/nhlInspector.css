@@ -101,7 +101,7 @@ path.spiral {
     stroke-width: 0.25%;
       }
 
-#teamName, #teamVersus{
+#teamVersus{
     position: absolute;
     color: #fff;
     left:20px;
@@ -112,6 +112,20 @@ path.spiral {
     display: none;
     text-align: center;
 }
+
+#teamName {
+    position: absolute;
+    color: #fff;
+    left:auto;
+    bottom: 100px;
+    width: 100%;
+    height: auto;
+    z-index: 100;
+    display: none;
+    text-align: center;
+}
+
+
 .activeTool{
     display: block !important;
 }
