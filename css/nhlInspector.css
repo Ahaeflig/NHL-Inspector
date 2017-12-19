@@ -47,6 +47,15 @@ nav{
     height: 100%;
 }
 
+@keyframes blink {
+   50% { border-color: #000000; }
+}
+
+.blinkborder{
+    animation: blink .5s step-end infinite alternate;
+}
+
+
 #rightPanel, #leftPanel{
 
     border-style: solid;

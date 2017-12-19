@@ -359,6 +359,7 @@ function createMainTransition() {
                 },
                 complete: function() {
                     rightPl.addClass('activePanel');
+                    rightPl.removeClass('blinkborder');
                     leftPl.removeClass('activePanel');
                     leftPl.height("40%").width("20%").css({
                         top: '57px'
@@ -626,6 +627,7 @@ function drawSpiral(teams_, shouldTransit) {
         spiralG.selectAll("ellipse").transition().duration(t_time / 3).style('opacity', 0);
         spiralG.selectAll("circle_image").transition().duration(t_time / 3).style('opacity', 0);
     }
+
     d3.selectAll("circle")
         .on("mouseenter", function() {})
         .on("mouseleave", function() {})
@@ -637,7 +639,6 @@ function drawSpiral(teams_, shouldTransit) {
         let d = newSpiralPoint[i]
 
         const onEvents = function(d) {
-            console.log(d.r)
             if(d.r > minRadiusForTip){
                 d3.select("#circle" + d.team.id)
                     .on("mouseenter", function() {
@@ -692,6 +693,12 @@ function drawSpiral(teams_, shouldTransit) {
             elipseId = elipseId.transition().duration(t_time)
             imageId = imageId.transition().duration(t_time)
         }else{
+
+            circlesTip.interrupt();
+            circlesTipText.interrupt();
+            circles.interrupt();
+            elipseId.interrupt();
+            imageId.interrupt();
             onEvents(d);
         }
 
