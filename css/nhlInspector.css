@@ -48,11 +48,25 @@ nav{
 }
 
 @keyframes blink {
-   50% { border-color: #000000; }
+   50% { border-color: #000000;  color: #000000}
 }
 
 .blinkborder{
     animation: blink .5s step-end infinite alternate;
+}
+
+#clickme{
+    display: block;
+    position: absolute;
+    bottom: 5%;
+    width: 100%;
+    text-align:center;
+    color: #28a745;
+    animation: blink .5s step-end infinite alternate;
+}
+
+.hidden {
+    display: none !important;    
 }
 
 

@@ -345,6 +345,7 @@ function createMainTransition() {
     const rightTitle = $("#teamVersus");
     const leftPl = $('#leftPanel');
     const leftTitle = $("#teamName");
+    const clickme = $("#clickme");
 
     rightPl.click(function() {
         if (leftPl.hasClass("activePanel")) {
@@ -359,6 +360,7 @@ function createMainTransition() {
                 },
                 complete: function() {
                     rightPl.addClass('activePanel');
+                    clickme.addClass('hidden');
                     rightPl.removeClass('blinkborder');
                     leftPl.removeClass('activePanel');
                     leftPl.height("40%").width("20%").css({
@@ -693,7 +695,6 @@ function drawSpiral(teams_, shouldTransit) {
             elipseId = elipseId.transition().duration(t_time)
             imageId = imageId.transition().duration(t_time)
         }else{
-
             circlesTip.interrupt();
             circlesTipText.interrupt();
             circles.interrupt();
