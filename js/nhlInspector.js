@@ -658,6 +658,7 @@ function drawSpiral(teams_, shouldTransit) {
         let d = newSpiralPoint[i]
 
         const onEvents = function(d) {
+            //TODO this breaks certain circles, no more transitions etc
             if(d.r > minRadiusForTip){
                 d3.select("#circle" + d.team.id)
                     .on("mouseenter", function() {
@@ -692,11 +693,6 @@ function drawSpiral(teams_, shouldTransit) {
                         }
                     });
             }
-
-            // Be sure to call it only once
-            if (i == teams_.length - 1) {
-                sliderAnim.moveSliderRight();
-            }
         }
 
         let circlesTip = d3.select("#circleTip" + d.team.id)
@@ -710,7 +706,18 @@ function drawSpiral(teams_, shouldTransit) {
             circlesTipText = circlesTipText.transition().duration(t_time)
             circles = circles.transition().duration(t_time)
             elipseId = elipseId.transition().duration(t_time)
-            imageId = imageId.transition().duration(t_time)
+            // Be sure to call it only once
+            if (i == teams_.length - 1) {
+              let transitions = 0;
+              imageId = imageId.transition().duration(t_time)
+                .on("end", function() {
+                  sliderAnim.moveSliderRight();
+                });
+            } else {
+                imageId = imageId.transition().duration(t_time)
+            }
+
+
         }else{
             circlesTip.interrupt();
             circlesTipText.interrupt();
@@ -761,6 +768,7 @@ const sliderAnim = {
     toggleSliderAnim: function (){
         this.isAnimPlay = !this.isAnimPlay;
         this.moveSliderRight();
+        //drawSpiral(filterConf(team))
     },
     pauseAnim: function(){
         this.isAnimPlay = false;
@@ -779,7 +787,7 @@ const sliderAnim = {
     }
 }
 
-// Is called when the document is ready
+// Function called at the end of the html to set up the Viz
 function init() {
 
     if (MESSAGE) console.log("Document is Ready");
@@ -855,7 +863,9 @@ function init() {
 
                 dateString = yyyy + "-" + mm + "-" + dd
                 sessionStoreDate(dateString);
+                console.log("called bitch")
                 reloadAndDraw(dateString, true);
+
             }
         },
         slideStart: function(ui){
