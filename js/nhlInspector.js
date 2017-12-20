@@ -740,7 +740,7 @@ function drawSpiral(teams_, shouldTransit) {
               }else if(teams_.length-i == 3){
                 return d3.rgb("#8C7853");
               }else{
-                return 'black;'
+                return 'black';
               }
             })
             .style('opacity', opacityTip)
@@ -752,7 +752,7 @@ function drawSpiral(teams_, shouldTransit) {
               if(teams_.length-i <= 3){
                 return 'black';
               }else{
-                return 'white;'
+                return 'white';
               }
             })
             .style('opacity', opacityTip)
