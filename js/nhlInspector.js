@@ -732,11 +732,29 @@ function drawSpiral(teams_, shouldTransit) {
         circlesTip.attr("cx", d.x + (d.r + 8) * d.nx)
             .attr("cy", d.y + (d.r + 8) * d.ny)
             .attr("r", 10)
+            .style('fill', ()=>{
+              if(teams_.length-i == 1){
+                return d3.rgb("#D4AF37");
+              }else if(teams_.length-i == 2){
+                return d3.rgb("#C4CACE");
+              }else if(teams_.length-i == 3){
+                return d3.rgb("#8C7853");
+              }else{
+                return 'black;'
+              }
+            })
             .style('opacity', opacityTip)
 
         circlesTipText.attr("x",  d.x + (d.r + 8) * d.nx)
             .attr("y",  d.y + (d.r + 8) * d.ny)
             .text(teams_.length-i)
+            .style('fill', ()=>{
+              if(teams_.length-i <= 3){
+                return 'black';
+              }else{
+                return 'white;'
+              }
+            })
             .style('opacity', opacityTip)
 
         circles.attr("cx", d.x)
