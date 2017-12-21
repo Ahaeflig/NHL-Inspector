@@ -351,6 +351,7 @@ function createMainTransition() {
     const rightTitle = $("#teamVersus");
     const leftPl = $('#leftPanel');
     const leftTitle = $("#teamName");
+    const colorLabels = $("#colorLabels");
     const clickme = $("#clickme");
 
     rightPl.click(function() {
@@ -374,6 +375,7 @@ function createMainTransition() {
                     });
                     rightTitle.addClass('activeTool')
                     leftTitle.removeClass('activeTool')
+                    colorLabels.removeClass('activeTool')
 
                     draw(filterConf(teams()), false)
                 }
@@ -397,6 +399,7 @@ function createMainTransition() {
                     rightPl.removeClass('activePanel');
                     rightPl.height("40%").width("20%").css({top: '57px'});
                     leftTitle.addClass('activeTool')
+                    colorLabels.addClass('activeTool')
                     rightTitle.removeClass('activeTool')
                     placeTeams();
                 }
@@ -653,6 +656,7 @@ function drawSpiral(teams_, shouldTransit) {
         spiralG.selectAll("circle_image").transition().duration(t_time / 3).style('opacity', 0);
     }
 
+
     d3.selectAll("circle")
         .on("mouseenter", function() {})
         .on("mouseleave", function() {})
@@ -803,7 +807,6 @@ const sliderAnim = {
         if(this.isAnimPlay){
             const value = this.slider.slider('getValue');
             const maxValue = this.slider.slider('getAttribute', 'max');
-            console.log(maxValue);
             const newValue = value == maxValue ? 1: value+1;
             this.slider.slider('setValue', newValue, false, true);
         }
@@ -820,7 +823,7 @@ function init() {
         locallyStoreFavoriteTeamId(index);
         draw(teams(), false);
     });
-
+    //$("#colorLabels").html("Qualified for playoffs");
     // Create the main transition
     createMainTransition();
 
@@ -886,7 +889,6 @@ function init() {
 
                 dateString = yyyy + "-" + mm + "-" + dd
                 sessionStoreDate(dateString);
-                console.log("called bitch")
                 reloadAndDraw(dateString, true);
 
             }
@@ -1073,7 +1075,7 @@ function drawChart(myTeam, oppositeTeam) {
         .style('fill', 'white')
         .style('font-size', "14px")
         .style('font-weight', '700')
-        .attr("transform", (d, i) => ("translate(" + (width / 2 - 20 + "," + (height / 2 - computeOuterRadius(2 * i) + 2.5) + ")")));
+        .attr("transform", (d, i) => ("translate(" + (width / 2 - 22 + "," + (height / 2 - computeOuterRadius(2 * i) + 2.5) + ")")));
 
     arcs.on('mouseenter', showTooltip)
         .on('mouseout', hideTooltip);

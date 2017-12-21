@@ -133,6 +133,16 @@ path.spiral {
     display: none;
     text-align: center;
 }
+#colorLabels{
+  position: absolute;
+  color: #fff;
+  right: 20px;
+  bottom: 100px;
+  height: auto;
+  z-index: 100;
+  display: none;
+  text-align: left;
+}
 
 #teamName {
     position: absolute;
