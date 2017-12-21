@@ -357,8 +357,8 @@ function createMainTransition() {
     rightPl.click(function() {
         if (leftPl.hasClass("activePanel")) {
             rightPl.animate({
-                width: '100%',
-                height: '100%',
+                width: '120%',
+                height: '105%',
                 top: '0px'
             }, {
                 duration: 300,
@@ -370,8 +370,8 @@ function createMainTransition() {
                     clickme.addClass('hidden');
                     rightPl.removeClass('blinkborder');
                     leftPl.removeClass('activePanel');
-                    leftPl.height("40%").width("20%").css({
-                        top: '57px'
+                    leftPl.height("50%").width("30%").css({
+                        top: '57px',
                     });
                     rightTitle.addClass('activeTool')
                     leftTitle.removeClass('activeTool')
@@ -386,8 +386,8 @@ function createMainTransition() {
     leftPl.click(function() {
         if (rightPl.hasClass("activePanel")) {
             leftPl.animate({
-                width: '100%',
-                height: '100%',
+                width: '120%',
+                height: '105%',
                 top: '0px'
             }, {
                 duration: 300,
@@ -397,7 +397,7 @@ function createMainTransition() {
                 complete: function() {
                     leftPl.addClass('activePanel');
                     rightPl.removeClass('activePanel');
-                    rightPl.height("40%").width("20%").css({top: '57px'});
+                    rightPl.height("50%").width("30%").css({top: '57px'});
                     leftTitle.addClass('activeTool')
                     colorLabels.addClass('activeTool')
                     rightTitle.removeClass('activeTool')
