@@ -92,6 +92,9 @@ function getCleanedTeams(data) {
             const losses = teamRecords.leagueRecord.losses;
             const team_conf = teamRecords.team.conference.name;
             const div = teamRecords.team.division.name;
+            const divRank = teamRecords.divisionRank;
+            const confRank = teamRecords.conferenceRank;
+            const wildCard = teamRecords.wildCardRank;
 
             teams.push({
                 name: teamName,
@@ -105,6 +108,9 @@ function getCleanedTeams(data) {
                 color : TEAM_DICT[teamName][1],
                 conference : team_conf,
                 division : div,
+                divisionRank : divRank,
+                conferenceRank : confRank,
+                wildCardRank : wildCard
             });
         }
     }
@@ -733,12 +739,11 @@ function drawSpiral(teams_, shouldTransit) {
             .attr("cy", d.y + (d.r + 8) * d.ny)
             .attr("r", 10)
             .style('fill', ()=>{
-              if(teams_.length-i == 1){
-                return d3.rgb("#D4AF37");
-              }else if(teams_.length-i == 2){
+
+              if(d.team.divisionRank <= 3){
                 return d3.rgb("#C4CACE");
-              }else if(teams_.length-i == 3){
-                return d3.rgb("#8C7853");
+              }else if(d.team.wildCardRank > 0 && d.team.wildCardRank<=2){
+                return 'green';
               }else{
                 return 'black';
               }
@@ -749,7 +754,7 @@ function drawSpiral(teams_, shouldTransit) {
             .attr("y",  d.y + (d.r + 8) * d.ny)
             .text(teams_.length-i)
             .style('fill', ()=>{
-              if(teams_.length-i <= 3){
+              if(d.team.wildCardRank <= 2){
                 return 'black';
               }else{
                 return 'white';
@@ -1044,7 +1049,7 @@ function drawChart(myTeam, oppositeTeam) {
         .enter().append("svg:path")
         .attr("d", arc)
         .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")")
-        .style("fill", (d, i) => d.color)
+        .style("fill", (d, i) => d3.rgb(d.color).brighter(0.35*d.index))
 
     //console.log(arcs);
     /*arcs.transition()
