@@ -370,8 +370,9 @@ function createMainTransition() {
                     clickme.addClass('hidden');
                     rightPl.removeClass('blinkborder');
                     leftPl.removeClass('activePanel');
-                    leftPl.height("40%").width("20%").css({
-                        top: '57px'
+                    leftPl.height("50%").width("30%").css({
+                        top: '57px',
+                        "margin-right":"0%"
                     });
                     rightTitle.addClass('activeTool')
                     leftTitle.removeClass('activeTool')
@@ -397,7 +398,7 @@ function createMainTransition() {
                 complete: function() {
                     leftPl.addClass('activePanel');
                     rightPl.removeClass('activePanel');
-                    rightPl.height("40%").width("20%").css({top: '57px'});
+                    rightPl.height("50%").width("30%").css({top: '57px', "margin-right":"0%"});
                     leftTitle.addClass('activeTool')
                     colorLabels.addClass('activeTool')
                     rightTitle.removeClass('activeTool')
