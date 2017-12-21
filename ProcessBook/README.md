@@ -25,23 +25,38 @@ The goal is really to show how the championship is evolving over time.
 At first we went with a carousel selector with a pop-up to let the user select his favorite team.
 
 <div align = 'center'>
-<img src="images/ui0.jpg" width="450" />
+<img src="images/ui0.png" width="450" />
 </div>
 
 But the selection of the team was too tedious and slow so we added a grid layout to select the team. Since there are 31 teams, we also added a random selector to have an nice even grid of 4 by 8.
 
 <div align = 'center'>
-<img src="images/ui1.jpg" width="450" />
+<img src="images/ui1.png" width="450" />
 </div>
 
 We also implemented a slider that let's the user easily change the date of the championship.
+
+<div align = 'center'>
+<img src="images/ui2.png" width="450" />
+</div>
+
+
+<div align = 'center'>
+<img src="images/ui3.png" width="450" />
+</div>
+
+
+<div align = 'center'>
+<img src="images/ui4.png" width="450" />
+</div>
+
 
 ## Layout choice evolution
 
 First we thought about having three separated parts of the page dedicated to display the data and the user choices.
 One part was the overall state of the competition and the two other parts were to compare the selected team's statistics. 
 <div align = 'center'>
-<img src="images/im01.jpg" width="450" />
+<img src="images/im01.png" width="450" />
 </div>
 
 But we were not satisfied with this design so we decided to change for a "two sided" page where the user, by hovering on either the right or left side of the page, slides the window and can focus on the general ranking or the selected team's statistics. This gives us the possibility to show within a single circle the stats and logo of both team at the same time.
@@ -56,6 +71,49 @@ Right now we are wondering about changing direction again as this sliding window
 <img src="images/im04.png" width="450" />
 </div>
 
+<div align = 'center'>
+<img src="images/layout1.png" width="450" />
+</div>
+
+<div align = 'center'>
+<img src="images/layout2.png" width="450" />
+</div>
+
+<div align = 'center'>
+<img src="images/layout3.png" width="450" />
+</div>
+
+<div align = 'center'>
+<img src="images/layout4.png" width="450" />
+</div>
+
+<div align = 'center'>
+<img src="images/layout5.png" width="450" />
+</div>
+
+<div align = 'center'>
+<img src="images/layout6.png" width="450" />
+</div>
+
+<div align = 'center'>
+<img src="images/layout7.png" width="450" />
+</div>
+
+<div align = 'center'>
+<img src="images/layout9.png" width="450" />
+</div>
+
+<div align = 'center'>
+<img src="images/layout10.png" width="450" />
+</div>
+
+<div align = 'center'>
+<img src="images/layout11.png" width="450" />
+</div>
+
+<div align = 'center'>
+<img src="images/layout12.png" width="450" />
+</div>
 ## Implementations details
 
 Key things to note are:
