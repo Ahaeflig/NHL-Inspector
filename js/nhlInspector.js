@@ -821,9 +821,9 @@ function init() {
     $("#teamSelection").on("hidden.bs.modal", function() {
         const index = $('#teamSelectorCarousel li.active').attr('data-index');
         locallyStoreFavoriteTeamId(index);
-        draw(teams(), false);
+        draw(teams(), true);
     });
-    //$("#colorLabels").html("Qualified for playoffs");
+
     // Create the main transition
     createMainTransition();
 
@@ -856,16 +856,21 @@ function init() {
         .attr("id", "spiralG");
 
     // NHL opens the 4th october 2017 this season !
-    const championshipStartDate = new Date(2017, 9, 4); // TODO maybe not hardcoded this value here ?
+    const championshipStartDate = new Date(2017, 9, 4);
     const today = new Date();
     const diffDays = Math.floor((today.getTime() - championshipStartDate.getTime()) / (1000 * 3600 * 24));
+    let  dateStoredVal = diffDays
+    if (chosenDate()) {
+      const dateParts = chosenDate().split('-');
+      dateStoredVal = Math.floor((new Date(dateParts[0],dateParts[1]-1,dateParts[2]) - championshipStartDate.getTime()) / (1000 * 3600 * 24));
+    }
 
     $("#timeSliderInput")
         .slider({
             id: "timeSlider",
             min: 0,
             max: diffDays,
-            value: diffDays,
+            value: dateStoredVal,
             steps: 1,
             tooltip: 'always',
             formatter: function(value) {
@@ -877,7 +882,6 @@ function init() {
 
     $('#timeSliderInput').on({
         change: function(ui) {
-            //console.log("MMM")
             if (ui.value != null) {
                 let newSliderVal = ui.value['newValue']
                 const date = new Date(championshipStartDate.valueOf());
@@ -1053,19 +1057,7 @@ function drawChart(myTeam, oppositeTeam) {
         .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")")
         .style("fill", (d, i) => d3.rgb(d.color).brighter(0.35*d.index))
 
-    //console.log(arcs);
-    /*arcs.transition()
-      .delay((d,i)=>i*200)
-      .duration(1000)
-      .attrTween('d', (d,i)=>{
-        console.log(d)
-        let interpolator = d3.interpolate(0, d.value);
-        return t =>{
-          d1 = [{value : interpolator(t).toString(), stat : d.stat, color : d.color, index : d.index, offset : d.offset},]
-          console.log(d1)
-          arc(d1,i);
-        }
-      });*/
+
     let labels = d3.select('#myTeamG')
         .selectAll('text')
         .data(dataLabels)
