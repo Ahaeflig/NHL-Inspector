@@ -746,7 +746,7 @@ function drawSpiral(teams_, shouldTransit) {
 
               if(d.team.divisionRank <= 3){
                 return d3.rgb("#C4CACE");
-              }else if(d.team.wildCardRank > 0 && d.team.wildCardRank<=2){
+              }else if(d.team.wildCardRank >= 0 && d.team.wildCardRank<=2){
                 return 'green';
               }else{
                 return 'black';
@@ -795,7 +795,6 @@ const sliderAnim = {
     toggleSliderAnim: function (){
         this.isAnimPlay = !this.isAnimPlay;
         this.moveSliderRight();
-        //drawSpiral(filterConf(team))
     },
     pauseAnim: function(){
         this.isAnimPlay = false;
@@ -863,6 +862,9 @@ function init() {
     if (chosenDate()) {
       const dateParts = chosenDate().split('-');
       dateStoredVal = Math.floor((new Date(dateParts[0],dateParts[1]-1,dateParts[2]) - championshipStartDate.getTime()) / (1000 * 3600 * 24));
+    } else {
+      const today_string = today.getFullYear() + "-" + today.getMonth() + "-" + today.getDate();
+      sessionStoreDate(today_string);
     }
 
     $("#timeSliderInput")
@@ -927,11 +929,9 @@ function init() {
         sliderAnim.toggleSliderAnim();
     });
 
-    const today_string = today.getFullYear() + "-" + today.getMonth() + "-" + today.getDate();
-    sessionStoreDate(today_string);
 
     //Setup teamSelectorGrid and other elements that need data once
-    loadedData = loadNHLData(today_string);
+    loadedData = loadNHLData(chosenDate());
     loadedData.done(function(response) {
         cleanedTeams = getCleanedTeams(response);
         // Store locally the teams values
