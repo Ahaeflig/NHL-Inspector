@@ -12,3 +12,6 @@
 
 ### Process Book
 [Link](https://github.com/Ahaeflig/NHL-Inspector/tree/master/ProcessBook)
+
+### Screencast Video
+[Link](https://youtu.be/nuPHmzmivEA)
