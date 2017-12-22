@@ -1073,20 +1073,7 @@ function drawChart(myTeam, oppositeTeam) {
         .on('mouseout', hideTooltip);
 
 
-    //DRAW CHART HELPER FUNCTIONS
-    function arcTween(d, i) {
-        let interpolator = d3.interpolate(0, d.value);
-        return t => {
-            d1 = [{
-                "value": interpolator(t).toString(),
-                "stat": d.stat,
-                "color": d.color,
-                "index": d.index,
-                "offset": d.offset
-            }, ]
-            arc(d1, i);
-        }
-    }
+    /*****DRAW CHART HELPER FUNCTIONS*****/
 
     //Used for removing duplicate stat labels in dataLabels array
     function removeDuplicates(arr) {
