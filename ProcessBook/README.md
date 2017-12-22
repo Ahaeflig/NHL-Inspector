@@ -35,7 +35,7 @@ One part was the overall state of the competition and the two other parts were u
 
 <br >
 <div align = 'center'>
-<img src="images/im01.png" width="450" />
+<img src="https://github.com/Ahaeflig/NHL-Inspector/blob/master/ProcessBook/images/im01.png?raw=true" width="450" />
 </div>
 <br >
 
@@ -45,8 +45,8 @@ But we were not satisfied with this design so we decided to change for a "two si
 <br >
 <div align = 'center'>
  <figure>
-  <img src="images/im03.png" width="450" />
-  <img src="images/im02.png" width="450" />
+  <img src="https://github.com/Ahaeflig/NHL-Inspector/blob/master/ProcessBook/images/im03.png?raw=true" width="450" />
+  <img src="https://github.com/Ahaeflig/NHL-Inspector/blob/master/ProcessBook/images/im02.png?raw=true" width="450" />
 </figure>
 </p>
 </div>
@@ -56,7 +56,7 @@ The next screenshot gives a look at what this layout looked like:
 
 <br >
 <div align = 'center'>
-  <img src="images/layout0.png" width="450" />
+  <img src="https://github.com/Ahaeflig/NHL-Inspector/blob/master/ProcessBook/images/layout0.png?raw=true" width="450" />
 </div>
 <br >
 
@@ -68,7 +68,7 @@ We also sketched a diffrent layout with a "wheel" to select and show the state o
 
 <br >
 <div align = 'center'>
-  <img src="images/im04.png" width="450" />
+  <img src="https://github.com/Ahaeflig/NHL-Inspector/blob/master/ProcessBook/images/im04.png?raw=true" width="450" />
 </div>
 <br >
 
@@ -77,7 +77,7 @@ We went for two rectangular frames (that can be interchanged) instead of a slidi
 
 <br >
 <div align = 'center'>
-  <img src="images/layout1.png" width="450" />
+  <img src="https://github.com/Ahaeflig/NHL-Inspector/blob/master/ProcessBook/images/layout1.png?raw=true" width="450" />
 </div>
 <br >
 
@@ -85,7 +85,7 @@ At this point we had a layout that fitted our needs and it was a good time for a
 
 <br >
 <div align = 'center'>
-  <img src="images/layout2.png" width="450" />
+  <img src="https://github.com/Ahaeflig/NHL-Inspector/blob/master/ProcessBook/images/layout2.png?raw=true" width="450" />
 </div>
 <br >
 
@@ -96,7 +96,7 @@ The next step was to implement the content of the right panel and see how it int
 
 <br >
 <div align = 'center'>
-  <img src="images/layout3.png" width="450" />
+  <img src="https://github.com/Ahaeflig/NHL-Inspector/blob/master/ProcessBook/images/layout3.png?raw=true" width="450" />
 </div>
 <br >
 
@@ -106,7 +106,7 @@ In the next image you can see the resulting layout from the other panel's perspe
 
 <br >
 <div align = 'center'>
-  <img src="images/layout4.png" width="450" />
+  <img src="https://github.com/Ahaeflig/NHL-Inspector/blob/master/ProcessBook/images/layout4.png?raw=true" width="450" />
 </div>
 <br >
 
@@ -116,7 +116,7 @@ After some thought and tests we decided to change the "bar plot sticking out of 
 
 <br >
 <div align = 'center'>
-  <img src="images/layout5.png" width="450" />
+  <img src="https://github.com/Ahaeflig/NHL-Inspector/blob/master/ProcessBook/images/layout5.png?raw=true" width="450" />
 </div>
 <br >
 
@@ -129,7 +129,7 @@ Then we added labels and showed for each team, a bar for each stats such that we
 
 <br />
 <div align = 'center'>
-  <img src="images/layout7.png" width="450" />
+  <img src="https://github.com/Ahaeflig/NHL-Inspector/blob/master/ProcessBook/images/layout7.png?raw=true" width="450" />
 </div>
 <br >
 
@@ -137,7 +137,7 @@ We also considered a stacked bar version, but it was harder to compare the bars 
 
 <br >
 <div align = 'center'>
-  <img src="images/layout6.png" width="450" />
+  <img src="https://github.com/Ahaeflig/NHL-Inspector/blob/master/ProcessBook/images/layout6.png?raw=true" width="450" />
 </div>
 <br >
 
@@ -145,7 +145,7 @@ When updating the data from the timeline, the spiral transits. The first version
 
 <br >
 <div align = 'center'>
-  <img src="images/layout8.png" width="450" />
+  <img src="https://github.com/Ahaeflig/NHL-Inspector/blob/master/ProcessBook/images/layout8.png?raw=true" width="450" />
 </div>
 <br >
 
@@ -153,7 +153,7 @@ But it turns out that in order to perceive the evolution of the league, it's pri
 
 <br >
 <div align = 'center'>
-  <img src="images/layout9.png" width="450" />
+  <img src="https://github.com/Ahaeflig/NHL-Inspector/blob/master/ProcessBook/images/layout9.png?raw=true" width="450" />
 </div>
 <br >
 
@@ -161,7 +161,7 @@ At this point we did some small adjustement to improve the visual quality of the
 
 <br >
 <div align = 'center'>
-  <img src="images/layout10.png" width="450" />
+  <img src="https://github.com/Ahaeflig/NHL-Inspector/blob/master/ProcessBook/images/layout10.png?raw=true" width="450" />
 </div>
 <br >
 
@@ -172,7 +172,7 @@ We can also use the new circle to show which teams are the first of the league w
 
 <br >
 <div align = 'center'>
-  <img src="images/layout12.png" width="450" />
+  <img src="https://github.com/Ahaeflig/NHL-Inspector/blob/master/ProcessBook/images/layout12.png?raw=true" width="450" />
 </div>
 <br >
 
@@ -180,7 +180,7 @@ But if you know about the NHL, you know that what matters most is to know which 
 
 <br >
 <div align = 'center'>
-  <img src="images/layout13.png" width="450" />
+  <img src="https://github.com/Ahaeflig/NHL-Inspector/blob/master/ProcessBook/images/layout13.png?raw=true" width="450" />
 </div>
 <br >
 
@@ -190,7 +190,7 @@ After this we made the top right pannel bigger and we recentered the spiral. We 
 
 <br >
 <div align = 'center'>
-  <img src="images/layout14.png" width="450" />
+  <img src="https://github.com/Ahaeflig/NHL-Inspector/blob/master/ProcessBook/images/layout14.png?raw=true" width="450" />
 </div>
 <br >
 
@@ -201,7 +201,7 @@ At first we went with a carousel selector with a pop-up to let the user select h
 
 <br >
 <div align = 'center'>
-<img src="images/ui0.png" width="450" />
+<img src="https://github.com/Ahaeflig/NHL-Inspector/blob/master/ProcessBook/images/ui0.png?raw=true" width="450" />
 </div>
 <br >
 
@@ -210,7 +210,7 @@ But the selection of the team was too tedious and slow so we added a grid layout
 
 <br >
 <div align = 'center'>
-<img src="images/ui1.png" width="450" />
+<img src="https://github.com/Ahaeflig/NHL-Inspector/blob/master/ProcessBook/images/ui1.png?raw=true" width="450" />
 </div>
 <br >
 
@@ -219,7 +219,7 @@ a dropdown to select either the conference or the division of the currently sele
 
 <br >
 <div align = 'center'>
-<img src="images/ui2.png" width="450" />
+<img src="https://github.com/Ahaeflig/NHL-Inspector/blob/master/ProcessBook/images/ui2.png?raw=true" width="450" />
 </div>
 <br >
 
@@ -228,7 +228,7 @@ The final version of the panel is blinking until the user clicks on hit once suc
 
 <br >
 <div align = 'center'>
-<img src="images/ui3.png" width="450" />
+<img src="https://github.com/Ahaeflig/NHL-Inspector/blob/master/ProcessBook/images/ui3.png?raw=true" width="450" />
 </div>
 <br >
 
@@ -236,7 +236,7 @@ The user can also click on another team to select it and it will be highlighted 
 
 <br >
 <div align = 'center'>
-<img src="images/ui4.png" width="450" />
+<img src="https://github.com/Ahaeflig/NHL-Inspector/blob/master/ProcessBook/images/ui4.png?raw=true" width="450" />
 </div>
 <br >
 
@@ -245,7 +245,7 @@ Finally we added a play button that let's the timeline change automatically lett
 
 <br >
 <div align = 'center'>
-<img src="images/ui5.png" width="450" />
+<img src="https://github.com/Ahaeflig/NHL-Inspector/blob/master/ProcessBook/images/ui5.png?raw=true" width="450" />
 </div>
 <br >
 
@@ -295,7 +295,7 @@ We then compute the correct position for the image from the bounding box of the 
 
 <br >
 <div align = 'center'>
-<img src="images/details0.png" width="450" />
+<img src="https://github.com/Ahaeflig/NHL-Inspector/blob/master/ProcessBook/images/details0.png?raw=true" width="450" />
 </div>
 <br >
 
