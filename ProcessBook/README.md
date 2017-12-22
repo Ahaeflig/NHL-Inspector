@@ -3,22 +3,22 @@
 ## Content
 
 This process book contains 5 part:
-* Original Project Proposal
+* Project Proposal
 * Evolution of the layout and sketches
 * Evolution of the user interaction
 * Interesting technical details
 * Possible Improvements
 
-## Project Propsoal
+## Initial Project Propsoal
 
-We want to build a visualization that overviews the current state of the NHL championship while giving the opportunity to the viewer to compare stats between two teams. We will include a time slider that let's the user interactively change the date to transform the data that is fed to the visualization.
+We want to build a visualization that overviews the current state of the NHL championship while giving the opportunity to the viewer to compare stats between two teams: his favorite team and another team. We will include a time slider that let's the user interactively change the date to transform the data that is fed to the visualization.
 
 For the overview, we will order and scale the logos of each team with respect to their current number of points in the league. We want to show the ordered logos following a certain shape, like a spiral or eventually a shape related to hockey.
 
 To compare two team, the user will have to click on one logo, then that logo will be highlighted and when the user clicks on another logo, the two logo are superposed (one half in the right with one half on the left) and re-scaled, and circular barplots around the logos appear to compare their statistics.
 
 ### Motivation
-It would be interesting to make a viz that can give a good picture of how the NHL is evolving while being interactive and giving the user more in depth comparison of his favorite team if he wants to.
+It would be interesting to make a viz that can give a good picture of how the NHL is evolving while being interactive and giving the user more in depth comparison of his favorite team if he wants to. This viz could then be adapted for other championship and sports.
 
 ### Target Audience
 We target mostly NHL fans but no specific knowledge is required to understand the overview visualization. The comparison might require the viewer to know about hockey a bit.
@@ -27,12 +27,11 @@ We target mostly NHL fans but no specific knowledge is required to understand th
 We wanted to find a nice way to get a global picture of a championship and we found the NHL to be a good fit to try.
 
 ### What am I trying to show
-The goal is really to show how the championship is evolving over time.
+The goal is really to show how the championship is evolving over time while letting the user interact with the visualization a bit.
 
 ## Layout evolution and sketches
-
 First we thought about having three separated parts of the page dedicated to display the data and the user choices.
-One part was the overall state of the competition and the two other parts were to compare the selected team's statistics.
+One part was the overall state of the competition and the two other parts were used to compare the selected team's statistics using bar plots going out of a circle with each team's logo in the center.
 
 <br >
 <div align = 'center'>
@@ -62,9 +61,9 @@ The next screenshot gives a look at what this layout looked like:
 <br >
 
 
-But as you can see the sliding window doesn't bring a lot of value to the visualization. You don't get much from the unselected panel.
+But as you can see the sliding window doesn't bring a lot of value to the visualization. You don't get much from the unselected panel, the dimension is not good to display either stats or the overall ranking.
 
-We sketched a diffrent layout with a "wheel" to select and show the state of the championship while showing the detailed stats:
+We also sketched a diffrent layout with a "wheel" to select and show the state of the championship while showing the detailed stats:
 
 
 <br >
@@ -73,7 +72,7 @@ We sketched a diffrent layout with a "wheel" to select and show the state of the
 </div>
 <br >
 
-But we never implemented this layout as we found a different idea that holds the original wish of having a specific shape representing the state of the league.
+But we never implemented this layout as we found a different idea that holds the original wish of having a specific shape that represents the state of the league.
 We went for two rectangular frames (that can be interchanged) instead of a sliding windows such that the content in the frame can be observed wheter it is minized or not:
 
 <br >
@@ -82,7 +81,7 @@ We went for two rectangular frames (that can be interchanged) instead of a slidi
 </div>
 <br >
 
-At this point we have a layout that fits our needs and it was a good time for a first beautify:
+At this point we had a layout that fitted our needs and it was a good time for a first beautify:
 
 <br >
 <div align = 'center'>
@@ -90,9 +89,10 @@ At this point we have a layout that fits our needs and it was a good time for a 
 </div>
 <br >
 
-Of course a lot of the functionality is still missing at this point but the viz is already nicer to look at.
+Of course a lot of the functionality was still missing at this point but the viz was already nicer to look at.
 
-The next step was to actually implement the content of the right panel and see how it interacted with the whole visualization. Here is how the two panels were displayed at this point:
+
+The next step was to implement the content of the right panel and see how it interacted with the whole visualization. Here is how the two panels were working at this point:
 
 <br >
 <div align = 'center'>
@@ -101,7 +101,7 @@ The next step was to actually implement the content of the right panel and see h
 <br >
 
 
-And in the next image you can see the other layout.
+In the next image you can see the resulting layout from the other panel's perspective.
 
 
 <br >
@@ -112,7 +112,7 @@ And in the next image you can see the other layout.
 
 You might notice that the size of the top right panel is too small. This will be adressed later down the line!
 
-After some thought and tests we decided to change the "bar plot sticking out of a circle" idea for a radial chart. It is visually more coherent. You can see the first prototype version of it in the next image:
+After some thought and tests we decided to change the "bar plot sticking out of a circle" idea for a radial chart. It is visually more coherent and easier to get the stats not going off our panel given its dimensions. Take a look at the the first prototype version of it:
 
 <br >
 <div align = 'center'>
@@ -133,7 +133,7 @@ Then we added labels and showed for each team, a bar for each stats such that we
 </div>
 <br >
 
-We also considered a stacked bar version, but it is even harder to compare the bars that way:
+We also considered a stacked bar version, but it was harder to compare the bars that way so we decided to stay with the design above.
 
 <br >
 <div align = 'center'>
@@ -141,7 +141,7 @@ We also considered a stacked bar version, but it is even harder to compare the b
 </div>
 <br >
 
-When updating the data from the timeline, the spiral transits. The first version only moved all the circles in the center and looked like something from the next image:
+When updating the data from the timeline, the spiral transits. The first version only moved all the circles in the center and redrew the whole spiral after removing every element, what a waste! It looked like something from the next image while in transition:
 
 <br >
 <div align = 'center'>
@@ -149,7 +149,7 @@ When updating the data from the timeline, the spiral transits. The first version
 </div>
 <br >
 
-But it turns out that in order to perceive the evolution of the league, it's primordial to see how the circles ordering changes. For that reason we implemented improved transition where each circles moves towards its new designated position:
+But it turns out that in order to perceive the evolution of the league, it's primordial to see how the circles ordering changes. For that reason we implemented improved transitions where each circle moves towards its new designated position and we never remove and redraw anything from scratch!
 
 <br >
 <div align = 'center'>
@@ -165,7 +165,10 @@ At this point we did some small adjustement to improve the visual quality of the
 </div>
 <br >
 
-Thanks to feedback from the teacher, we realized that we were missing key indication to explain how the viz works to new users. We improved the understandability by adding small circles stating the rank of the team. We can also leverage this circle to show which teams are the first of the league with golden-silver-bronze colors!
+Thanks to feedback from the teacher, we realized that we were missing key indication to explain how the viz works and what each element were supposed to be. We improved the understandability
+ by adding some text explanation the first time the user is on the page with indication on what is clickable. We also added small circles stating the rank of each team.
+
+We can also use the new circle to show which teams are the first of the league with golden-silver-bronze colors!
 
 <br >
 <div align = 'center'>
@@ -173,7 +176,7 @@ Thanks to feedback from the teacher, we realized that we were missing key indica
 </div>
 <br >
 
-But if you know about the NHL, you know that what matters most is to know which team goes to the play-off, therefore we decided to use the small circles to show which team gets to be in the next phase of the championship at the current time:
+But if you know about the NHL, you know that what matters most is to know which team goes to the play-off, therefore we decided to use these circles to show which team gets to be in the next phase of the championship at the current time:
 
 <br >
 <div align = 'center'>
@@ -183,7 +186,7 @@ But if you know about the NHL, you know that what matters most is to know which 
 
 You also know directly if the team advanced because of its division ranking or if it is one of the two best team of each conference that were not qualified (wildcard).
 
-After this we made the top right pannel bigger and we recentered the spiral. We also tried to linearly change the color of circular bars in order to better differentiate each stats but as expected, since a linear change of color is not perceived linearly by the human visual system, we feel like the result isn't too good.
+After this we made the top right pannel bigger and we recentered the spiral. We also tried to linearly change the color of circular bars in order to better differentiate each stats but as expected, since a linear change of color is not perceived linearly by the human visual system, we feel like the result can be improved.
 
 <br >
 <div align = 'center'>
@@ -212,7 +215,7 @@ But the selection of the team was too tedious and slow so we added a grid layout
 <br >
 
 We implemented a slider that let's the user easily change the date of the championship and
-a dropdown to select either the conference or the division of the currently selected team as this an important feature of the NHL. This let's the user see a ranking of the team that actually play against each other in the league since the team only play against other teams in their conference.
+a dropdown to select either the conference or the division of the currently selected team as this is an important feature of the NHL. This let's the user see a ranking of teams that actually play against each other in the league since teams only play against other in their conference.
 
 <br >
 <div align = 'center'>
@@ -257,6 +260,12 @@ General things to note are:
 * We try to use modern Javascript syntax
 * We follow a "\<defs\> and \<pattern\>" architecture as much as possible.
 
+Library used are:
+* D3.js
+* Bootstrap (css and bootstrap slider)
+* Jquery/Ajax
+
+
 We can't mention everything so we will highlight some interesting points in this part.
 
 ### Data Pipeline
@@ -281,8 +290,8 @@ The procedures to draw the spiral is the following:
 The relevant functions are computeSpiralData() and drawSpiral().
 
 ### Drawing two halves of logos
-The trick here is to use two D3 arcs with the correct angles to generate a correct path for both pattern.
-We then compute the correct position for the image from the bounding box of the englobing element and the boundingbox of the path itself. That way we can perfectly align the logos:
+The trick here is to use two D3 Arcs with the correct angles and radius to generate a correct path for each pattern.
+We then compute the correct position for the image from the bounding box of the englobing element and the boundingbox of the path itself. That way we can perfectly align the logos as you can see:
 
 <br >
 <div align = 'center'>
@@ -292,7 +301,7 @@ We then compute the correct position for the image from the bounding box of the 
 
 
 ### Drawing the circular bar chart
-The circular bar chart is drawn using D3 Arcs, which are defined by an inner radius, an outer radius, a start angle and an end angle. By feeding numerical team data to the arcs and using a few computation functions to determine the radii and the angles on the fly, we are able to dynamically draw them based on the values of the data. 
+The circular bar chart is drawn using D3 Arcs, which are defined by an inner radius, an outer radius, a start angle and an end angle. By feeding numerical team data to the arcs and using a few computation functions to determine the radii and the angles on the fly, we are able to dynamically draw them based on the values of the data.
 The arcs are colored based on the team color, and distinguished by small color gradients to ease the visualization.
 
 
