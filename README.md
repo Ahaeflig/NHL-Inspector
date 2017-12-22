@@ -8,8 +8,8 @@
 * Häfliger Adan
 
 Find our code in: 
-`index.html`
-`js/nhlInspector.j`
+`index.html`, 
+`js/nhlInspector.js` and
 `css/nhlInspector.css`
 
 ### Visualization
