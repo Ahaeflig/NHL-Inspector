@@ -292,7 +292,8 @@ We then compute the correct position for the image from the bounding box of the 
 
 
 ### Drawing the circular bar chart
-TODO isma 1-2 phrases sur les arcs.
+The circular bar chart is drawn using D3 Arcs, which are defined by an inner radius, an outer radius, a start angle and an end angle. By feeding numerical team data to the arcs and using a few computation functions to determine the radii and the angles on the fly, we are able to dynamically draw them based on the values of the data. 
+The arcs are colored based on the team color, and distinguished by small color gradients to ease the visualization.
 
 
 ## Possible Improvements
